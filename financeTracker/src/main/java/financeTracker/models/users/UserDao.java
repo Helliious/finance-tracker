@@ -1,4 +1,4 @@
-package financeTracker.models;
+package financeTracker.models.users;
 
 import org.springframework.stereotype.Component;
 

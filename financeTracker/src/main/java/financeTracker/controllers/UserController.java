@@ -1,8 +1,8 @@
 package financeTracker.controllers;
 
-import financeTracker.models.LoginUserDto;
-import financeTracker.models.User;
-import financeTracker.models.UserDao;
+import financeTracker.models.users.LoginUserDto;
+import financeTracker.models.users.User;
+import financeTracker.models.users.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

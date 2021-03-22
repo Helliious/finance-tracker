@@ -1,4 +1,4 @@
-package financeTracker.models;
+package financeTracker.models.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

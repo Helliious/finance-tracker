@@ -1,4 +1,4 @@
-package financeTracker.models;
+package financeTracker.models.users;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
