@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CategoryController {
+public class CategoryController extends AbstractController {
     @Autowired
     private CategoryDao categoryDao;
     //TODO methods for category controller

@@ -8,8 +8,7 @@ import java.util.ArrayList;
 @Component
 public class TransactionDao {
     public Transaction getById(long id){
-
-     //TODO get from database
+        //TODO get from database
         return new Transaction();
     }
     public ArrayList<Transaction> getAllByUser(long ownerId){
