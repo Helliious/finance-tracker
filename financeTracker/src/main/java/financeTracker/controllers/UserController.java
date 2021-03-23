@@ -1,24 +1,38 @@
 package financeTracker.controllers;
 
-import financeTracker.models.LoginUserDto;
-import financeTracker.models.User;
-import financeTracker.models.UserDao;
+import financeTracker.models.users.LoginUserDto;
+import financeTracker.models.users.User;
+import financeTracker.models.users.UserDao;
+import financeTracker.models.users.UserWithoutPassDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class UserController {
+public class UserController extends AbstractController {
     @Autowired
     private UserDao userDao;
 
     @GetMapping("/users/{id}")
-    public User getById(@PathVariable int id) {
+    public UserWithoutPassDto getById(@PathVariable int id) throws Exception {
         User user = userDao.getById(id);
-        return user;
+        UserWithoutPassDto userWithoutPass = new UserWithoutPassDto();
+        userWithoutPass.setId(user.getId());
+        userWithoutPass.setUsername(user.getUsername());
+        userWithoutPass.setEmail(user.getEmail());
+        userWithoutPass.setFirstName(user.getFirstName());
+        userWithoutPass.setLastName(user.getLastName());
+        userWithoutPass.setCreateTime(user.getCreateTime());
+        return userWithoutPass;
     }
 
     @PostMapping("/login")
     public String userLogin(@RequestBody LoginUserDto loginUserDto) {
         return ("Loged in with username: " + loginUserDto.getUsername() + ", password: " + loginUserDto.getPassword());
     }
+
+    @GetMapping("/logout")
+    public String userLogout() {
+        return ("User logged out");
+    }
+
 }

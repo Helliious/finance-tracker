@@ -1,11 +1,11 @@
-package financeTracker.models;
+package financeTracker.models.users;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 public class LoginUserDto {
     private String username;
