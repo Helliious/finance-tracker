@@ -1,4 +1,4 @@
-package financeTracker.models.dao;
+package financeTracker.models.dto;
 
 
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserWithoutPassDto {
+public class UserWithoutPassDTO {
     private long id;
     private String firstName;
     private String lastName;

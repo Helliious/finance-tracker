@@ -1,7 +1,7 @@
 package financeTracker.controllers;
 
 import financeTracker.models.pojo.Transaction;
-import financeTracker.models.dao.TransactionDao;
+import financeTracker.models.dao.TransactionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 @RestController
 public class TransactionController extends AbstractController {
     @Autowired
-    private TransactionDao transactionDao;
+    private TransactionDAO transactionDao;
 
     @GetMapping("/transactions/{id}")
     public Transaction getById(@PathVariable long id){

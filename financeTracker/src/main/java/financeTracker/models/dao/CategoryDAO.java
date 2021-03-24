@@ -3,6 +3,6 @@ package financeTracker.models.dao;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CategoryDao {
+public class CategoryDAO {
     //TODO Category methods for DB
 }

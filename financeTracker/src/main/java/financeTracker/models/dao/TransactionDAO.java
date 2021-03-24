@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class TransactionDao {
+public class TransactionDAO {
     public Transaction getById(long id){
         //TODO get from database
         return new Transaction();
