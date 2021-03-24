@@ -20,13 +20,13 @@ public class TransactionController extends AbstractController {
         Transaction transaction=transactionDao.getById(id);
         return transaction;
     }
-    @GetMapping("/transactions/owner/{ownerId}")
-    public ArrayList<Transaction> getByUser(@PathVariable long ownerId){
+    @GetMapping("/users/{owner_id}/{transactions}")
+    public ArrayList<Transaction> getByUser(@PathVariable("owner_id") long ownerId){
         ArrayList<Transaction> userTransactions=transactionDao.getAllByUser(ownerId);
         return userTransactions;
     }
-    @GetMapping("/transactions/account/{accountId}")
-    public ArrayList<Transaction> getByAccount(long accountId){
+    @GetMapping("/accounts/{account_id}/transactions")
+    public ArrayList<Transaction> getByAccount(@PathVariable("account_id") long accountId){
         ArrayList<Transaction> accountTransactions=transactionDao.getAllByAccount(accountId);
         return accountTransactions;
     }
