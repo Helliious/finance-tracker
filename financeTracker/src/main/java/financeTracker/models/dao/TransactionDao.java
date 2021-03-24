@@ -1,6 +1,6 @@
-package financeTracker.models.transactions;
+package financeTracker.models.dao;
 
-import com.sun.xml.bind.v2.TODO;
+import financeTracker.models.pojo.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

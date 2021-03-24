@@ -1,7 +1,7 @@
 package financeTracker.controllers;
 
-import financeTracker.models.budgets.Budget;
-import financeTracker.models.budgets.BudgetDao;
+import financeTracker.models.pojo.Budget;
+import financeTracker.models.dao.BudgetDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

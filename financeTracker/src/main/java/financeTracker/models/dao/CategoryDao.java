@@ -1,4 +1,4 @@
-package financeTracker.models.categories;
+package financeTracker.models.dao;
 
 import org.springframework.stereotype.Component;
 

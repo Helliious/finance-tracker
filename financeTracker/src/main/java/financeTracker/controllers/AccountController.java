@@ -1,7 +1,7 @@
 package financeTracker.controllers;
 
-import financeTracker.models.accounts.Account;
-import financeTracker.models.accounts.AccountDao;
+import financeTracker.models.pojo.Account;
+import financeTracker.models.dao.AccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

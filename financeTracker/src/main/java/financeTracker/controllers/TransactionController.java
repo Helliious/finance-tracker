@@ -1,12 +1,11 @@
 package financeTracker.controllers;
 
-import financeTracker.models.transactions.Transaction;
-import financeTracker.models.transactions.TransactionDao;
+import financeTracker.models.pojo.Transaction;
+import financeTracker.models.dao.TransactionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import financeTracker.models.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
