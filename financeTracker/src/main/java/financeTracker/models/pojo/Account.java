@@ -23,7 +23,9 @@ public class Account {
     private double balance;
     private double accLimit;
     private Timestamp createTime;
+    @ManyToOne
+    @JoinColumn(name="owner_id")
+    private User user;
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
-
 }

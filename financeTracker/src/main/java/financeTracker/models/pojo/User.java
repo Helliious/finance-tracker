@@ -28,6 +28,8 @@ public class User {
     private String email;
     private Timestamp createTime;
     @OneToMany(mappedBy = "user")
+    private List<Account> accounts;
+    @OneToMany(mappedBy = "user")
     private List<Transaction> transactions;
 
     public User(RegisterRequestUserDTO userDTO) {

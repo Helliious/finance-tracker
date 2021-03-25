@@ -6,7 +6,6 @@ import financeTracker.models.dto.ErrorDTO;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.error_dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,12 +28,6 @@ public abstract class AbstractController {
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorDTO handleUnauthorized(AuthenticationException e) {
-        return new ErrorDTO(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDTO handleNotFoung(NotFoundException e) {
         return new ErrorDTO(e.getMessage());
     }
 }
