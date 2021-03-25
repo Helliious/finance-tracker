@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class TransactionDAO {
     public Transaction getById(long id){
         //TODO get from database
-        return new Transaction();
+        return null;
     }
     public ArrayList<Transaction> getAllByUser(long ownerId){
         //TODO get from database

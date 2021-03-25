@@ -1,5 +1,7 @@
 package financeTracker.controllers;
 
+import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,5 +13,11 @@ public abstract class AbstractController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleException(Exception e) {
         return "Error occurred, reason: " + e.getMessage();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleNotFoung(NotFoundException e) {
+        return new ErrorDTO(e.getMessage());
     }
 }
