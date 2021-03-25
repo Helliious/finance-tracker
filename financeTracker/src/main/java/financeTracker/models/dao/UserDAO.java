@@ -26,7 +26,8 @@ public class UserDAO {
                         result.getString("username"),
                         result.getString("password"),
                         result.getString("email"),
-                        result.getTimestamp("create_time")
+                        result.getTimestamp("create_time"),
+                        null
                 );
             }
             throw new Exception("User not found");

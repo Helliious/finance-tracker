@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Setter
 @AllArgsConstructor
 public class PlannedPayment {
-    private long id;
+    private int id;
     private String name;
     private String paymentType;
     private int frequency;
