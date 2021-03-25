@@ -1,5 +1,6 @@
 package financeTracker.models.pojo;
 
+import financeTracker.models.dto.user_dto.RegisterRequestUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,7 +20,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     private String firstName;
     private String lastName;
     private String username;
@@ -27,4 +29,14 @@ public class User {
     private Timestamp createTime;
     @OneToMany(mappedBy = "user")
     private List<Transaction> transactions;
+
+    public User(RegisterRequestUserDTO userDTO) {
+        firstName = userDTO.getFirstName();
+        lastName = userDTO.getLastName();
+        username = userDTO.getUsername();
+        password = userDTO.getPassword();
+        email = userDTO.getEmail();
+        createTime = userDTO.getCreateTime();
+        transactions = new ArrayList<>();
+    }
 }

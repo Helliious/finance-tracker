@@ -1,38 +1,83 @@
 package financeTracker.controllers;
 
-import financeTracker.models.dto.LoginUserDTO;
-import financeTracker.models.pojo.User;
+import financeTracker.exceptions.AuthenticationException;
+import financeTracker.exceptions.BadRequestException;
+import financeTracker.models.dto.user_dto.*;
 import financeTracker.models.dao.UserDAO;
-import financeTracker.models.dto.UserWithoutPassDTO;
+import financeTracker.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.sql.Timestamp;
 
 @RestController
 public class UserController extends AbstractController {
     @Autowired
-    private UserDAO userDao;
+    private UserService userService;
 
     @GetMapping("/users/{id}")
-    public UserWithoutPassDTO getById(@PathVariable int id) throws Exception {
-        User user = userDao.getById(id);
-        UserWithoutPassDTO userWithoutPass = new UserWithoutPassDTO();
-        userWithoutPass.setId(user.getId());
-        userWithoutPass.setUsername(user.getUsername());
-        userWithoutPass.setEmail(user.getEmail());
-        userWithoutPass.setFirstName(user.getFirstName());
-        userWithoutPass.setLastName(user.getLastName());
-        userWithoutPass.setCreateTime(user.getCreateTime());
-        return userWithoutPass;
+    public UserWithoutPassDTO getById(@PathVariable int id) {
+        return userService.getUserById(id);
     }
 
-    @PostMapping("/login")
-    public String userLogin(@RequestBody LoginUserDTO loginUserDto) {
-        return ("Loged in with username: " + loginUserDto.getUsername() + ", password: " + loginUserDto.getPassword());
+    @PutMapping("/users/register")
+    public UserWithoutPassDTO register(@RequestBody RegisterRequestUserDTO userDTO) {
+        userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        return userService.addUser(userDTO);
     }
 
-    @GetMapping("/logout")
-    public String userLogout() {
-        return ("User logged out");
+    @PostMapping("/users/login")
+    public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
+        UserWithoutPassDTO responseDto = userService.login(loginUserDto);
+        session.setAttribute("LoggedUser", responseDto.getId());
+        return responseDto;
     }
 
+    @PutMapping("/users/{user_id}/edit")
+    public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int id,
+                                   @RequestBody UpdateRequestUserDTO userDTO,
+                                   HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != id) {
+                throw new BadRequestException("Cannot modify other users!");
+            }
+        }
+        return userService.editUser(userDTO, id);
+    }
+
+    @DeleteMapping("/users/{user_id}/delete")
+    public UserWithoutPassDTO delete(@PathVariable(name = "user_id") int id, HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != id) {
+                throw new BadRequestException("Cannot delete other users!");
+            }
+        }
+        return userService.deleteUser(id);
+    }
+
+    @PostMapping("/users/{id}")
+    public String logout(@PathVariable int id, HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != id) {
+                throw new BadRequestException("Cannot logout other users!");
+            }
+        }
+        session.setAttribute("LoggedUser", null);
+        return "Logged out!";
+    }
+
+    @PostMapping("/users/forgot_password")
+    public UserWithoutPassDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
+        return userService.forgotPass(forgotPassUserDto.getEmail());
+    }
 }

@@ -21,7 +21,7 @@ public class Account {
     private int id;
     private String name;
     private double balance;
-    private double limit;
+    private double accLimit;
     private Timestamp createTime;
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
