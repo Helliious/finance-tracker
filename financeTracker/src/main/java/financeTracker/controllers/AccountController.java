@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
+import java.util.List;
 
 @RestController
 public class AccountController extends AbstractController {
-    @Autowired
-    private AccountDAO accountDao;
     @Autowired
     private AccountService accountService;
 
@@ -32,10 +31,23 @@ public class AccountController extends AbstractController {
         } else {
             int loggedId = (int) session.getAttribute("LoggedUser");
             if (loggedId != userId) {
-                throw new BadRequestException("Cannot show accounts for other users!");
+                throw new BadRequestException("Cannot show accounts of other users!");
             }
         }
         return accountService.getById(accountId);
+    }
+
+    @GetMapping("/users/{user_id}/accounts")
+    public List<AccountWithoutOwnerDTO> getAll(@PathVariable(name = "user_id") int userId, HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != userId) {
+                throw new BadRequestException("Cannot show accounts of other users!");
+            }
+        }
+        return accountService.getAll(userId);
     }
 
     @PutMapping("/users/{user_id}/create_account")
@@ -80,7 +92,7 @@ public class AccountController extends AbstractController {
         } else {
             int loggedId = (int) session.getAttribute("LoggedUser");
             if (loggedId != userId) {
-                throw new BadRequestException("Cannot modify other users!");
+                throw new BadRequestException("Cannot modify accounts for other users!");
             }
         }
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);

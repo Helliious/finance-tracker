@@ -1,7 +1,7 @@
 package financeTracker.services;
 
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.Transaction;
 import financeTracker.models.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;

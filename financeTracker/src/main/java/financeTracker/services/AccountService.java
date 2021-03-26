@@ -13,6 +13,8 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,15 +42,27 @@ public class AccountService {
     public AccountWithoutOwnerDTO getById(int accountId) {
         Optional<Account> account = accountRepository.findById(accountId);
         if (account.isEmpty()) {
-            throw new BadRequestException("Account doesn't exist!");
+            throw new NotFoundException("Account not found!");
         }
         return new AccountWithoutOwnerDTO(account.get());
+    }
+
+    public List<AccountWithoutOwnerDTO> getAll(int userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new NotFoundException("User not found!");
+        }
+        List<AccountWithoutOwnerDTO> accounts = new ArrayList<>();
+        for (Account a : user.get().getAccounts()) {
+            accounts.add(new AccountWithoutOwnerDTO(a));
+        }
+        return accounts;
     }
 
     public AccountWithoutOwnerDTO deleteAccount(int accountId) {
         Optional<Account> account = accountRepository.findById(accountId);
         if (account.isEmpty()) {
-            throw new BadRequestException("Account doesn't exist!");
+            throw new NotFoundException("Account not found!");
         }
         AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account.get());
         accountRepository.deleteById(accountId);
@@ -59,7 +73,7 @@ public class AccountService {
         Optional<Account> account = accountRepository.findById(accountId);
         Optional<User> user = userRepository.findById(userId);
         if (account.isEmpty() || user.isEmpty()) {
-            throw new BadRequestException("Wrong credentials!");
+            throw new NotFoundException("User/Account not found!");
         }
         if (accountDTO.getName() != null) {
             if (accountRepository.findAccountByNameAndUser(accountDTO.getName(), user.get()) != null) {
@@ -85,7 +99,7 @@ public class AccountService {
         accountRepository.save(account.get());
         user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new BadRequestException("User not found!");
+            throw new NotFoundException("User not found!");
         }
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user.get());
         return responseUser;

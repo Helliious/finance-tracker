@@ -1,9 +1,8 @@
 package financeTracker.controllers;
 
-import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.pojo.Transaction;
-import financeTracker.models.repository.UserRepository;
 import financeTracker.services.TransactionService;
 import financeTracker.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

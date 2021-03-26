@@ -1,4 +1,4 @@
-package financeTracker.models.dto.transactionsDTO;
+package financeTracker.models.dto.transaction_dto;
 
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Transaction;

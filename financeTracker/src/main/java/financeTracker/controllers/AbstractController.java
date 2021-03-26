@@ -2,7 +2,7 @@ package financeTracker.controllers;
 
 
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.ErrorDTO;
+import financeTracker.models.error_dto.ErrorDTO;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
