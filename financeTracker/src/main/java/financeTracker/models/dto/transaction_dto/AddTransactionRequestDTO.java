@@ -1,6 +1,5 @@
-package financeTracker.models.dto.transactionsDTO;
+package financeTracker.models.dto.transaction_dto;
 
-import financeTracker.models.pojo.Transaction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

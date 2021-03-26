@@ -1,11 +1,10 @@
 package financeTracker.models.pojo;
 
-import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
+import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
