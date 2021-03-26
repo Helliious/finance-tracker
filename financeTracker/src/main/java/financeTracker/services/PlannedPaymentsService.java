@@ -1,6 +1,7 @@
 package financeTracker.services;
 
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Category;
@@ -13,6 +14,8 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,5 +47,39 @@ public class PlannedPaymentsService {
         plannedPayment.setCategory(category);
         plannedPaymentsRepository.save(plannedPayment);
         return new UserWithoutPassDTO(user);
+    }
+
+    public ResponsePlannedPaymentDTO getById(int accountId, int plannedPaymentId) {
+        boolean isPresent = false;
+        Optional<Account> account = accountRepository.findById(accountId);
+        if (account.isEmpty()) {
+            throw new NotFoundException("Account not found!");
+        }
+        Optional<PlannedPayment> plannedPayment = plannedPaymentsRepository.findById(plannedPaymentId);
+        if (plannedPayment.isEmpty()) {
+            throw new NotFoundException("Planned payment not found!");
+        }
+        for (PlannedPayment p : account.get().getPlannedPayments()) {
+            if (p.getId() == plannedPayment.get().getId()) {
+                isPresent = true;
+                break;
+            }
+        }
+        if (!isPresent) {
+            throw new NotFoundException("Planned payment not found in this account!");
+        }
+        return new ResponsePlannedPaymentDTO(plannedPayment.get());
+    }
+
+    public List<ResponsePlannedPaymentDTO> getAll(int accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+        if (account.isEmpty()) {
+            throw new NotFoundException("Account not found!");
+        }
+        List<ResponsePlannedPaymentDTO> plannedPayments = new ArrayList<>();
+        for (PlannedPayment p : account.get().getPlannedPayments()) {
+            plannedPayments.add(new ResponsePlannedPaymentDTO(p));
+        }
+        return plannedPayments;
     }
 }
