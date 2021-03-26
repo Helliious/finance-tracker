@@ -25,7 +25,9 @@ public class Account {
     private Timestamp createTime;
     @ManyToOne
     @JoinColumn(name="owner_id")
-    private User user;
+    private User owner;
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
+    @OneToMany(mappedBy = "account")
+    private List<PlannedPayment> plannedPayments;
 }

@@ -25,7 +25,7 @@ public class TransactionService {
         }
     }
     public ArrayList<ResponseTransactionDTO> getByOwnerId(int id){
-         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByUserId(id);
+         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByOwner_Id(id);
          if (transactions.isEmpty()){
              throw new NotFoundException("User don't have transactions");
          }

@@ -34,7 +34,7 @@ public class AccountService {
         }
         User user = optUser.get();
         user.getAccounts().add(account);
-        account.setUser(user);
+        account.setOwner(user);
         accountRepository.save(account);
         return new UserWithoutPassDTO(user);
     }
@@ -76,7 +76,7 @@ public class AccountService {
             throw new NotFoundException("User/Account not found!");
         }
         if (accountDTO.getName() != null) {
-            if (accountRepository.findAccountByNameAndUser(accountDTO.getName(), user.get()) != null) {
+            if (accountRepository.findAccountByNameAndOwner(accountDTO.getName(), user.get()) != null) {
                 throw new BadRequestException("Account name already exists!");
             } else {
                 account.get().setName(accountDTO.getName());
