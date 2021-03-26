@@ -4,6 +4,7 @@ import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
 import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
 import financeTracker.models.pojo.Account;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.Transaction;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.AccountRepository;
@@ -34,7 +35,7 @@ public class TransactionService {
         }
     }
     public ArrayList<ResponseTransactionDTO> getByOwnerId(int id){
-         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByUserId(id);
+         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByOwner_Id(id);
          if (transactions.isEmpty()){
              throw new NotFoundException("User don't have transactions");
          }

@@ -28,5 +28,6 @@ public class Account {
     private User owner;
     @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
-
+    @OneToMany(mappedBy = "account")
+    private List<PlannedPayment> plannedPayments;
 }

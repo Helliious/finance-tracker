@@ -27,6 +27,8 @@ public class UserDAO {
                         result.getString("password"),
                         result.getString("email"),
                         result.getTimestamp("create_time"),
+                        null,
+                        null,
                         null
                 );
             }

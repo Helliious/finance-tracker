@@ -5,6 +5,7 @@ import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
 import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Transaction;

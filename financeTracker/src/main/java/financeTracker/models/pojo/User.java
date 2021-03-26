@@ -27,10 +27,12 @@ public class User {
     private String password;
     private String email;
     private Timestamp createTime;
-    @OneToMany(mappedBy = "user")
-    private List<Transaction> transactions;
     @OneToMany(mappedBy = "owner")
     private List<Account> accounts;
+    @OneToMany(mappedBy = "owner")
+    private List<Transaction> transactions;
+    @OneToMany(mappedBy = "owner")
+    private List<PlannedPayment> plannedPayments;
 
     public User(RegisterRequestUserDTO userDTO) {
         firstName = userDTO.getFirstName();
