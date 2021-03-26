@@ -1,11 +1,10 @@
 package financeTracker.controllers;
 
-import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.PlannedPayment;
 import financeTracker.services.PlannedPaymentsService;
+import financeTracker.utils.SessionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +22,8 @@ public class PlannedPaymentController extends AbstractController{
                                   @PathVariable(name = "account_id") int accountId,
                                   @RequestBody PlannedPayment plannedPayment,
                                   HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot add planned payments to other users!");
-            }
-        }
+        String message = "Cannot add planned payments to other users!";
+        SessionValidator.validateSession(session, message, userId);
         plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         return plannedPaymentsService.add(plannedPayment, userId, accountId);
     }
@@ -40,14 +33,8 @@ public class PlannedPaymentController extends AbstractController{
                                              @PathVariable(name = "account_id") int accountId,
                                              @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                              HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot see planned payments of other users!");
-            }
-        }
+        String message = "Cannot see planned payments of other users!";
+        SessionValidator.validateSession(session, message, userId);
         return plannedPaymentsService.getById(accountId, plannedPaymentId);
     }
 
@@ -55,14 +42,8 @@ public class PlannedPaymentController extends AbstractController{
     public List<ResponsePlannedPaymentDTO> getAll(@PathVariable(name = "user_id") int userId,
                                                   @PathVariable(name = "account_id") int accountId,
                                                   HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot see planned payments of other users!");
-            }
-        }
+        String message = "Cannot see planned payments of other users!";
+        SessionValidator.validateSession(session, message, userId);
         return plannedPaymentsService.getAll(accountId);
     }
 
@@ -71,14 +52,8 @@ public class PlannedPaymentController extends AbstractController{
                                             @PathVariable(name = "account_id") int accountId,
                                             @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                             HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot delete planned payments of other users!");
-            }
-        }
+        String message = "Cannot delete planned payments of other users!";
+        SessionValidator.validateSession(session, message, userId);
         return plannedPaymentsService.delete(accountId, plannedPaymentId);
     }
 
@@ -88,14 +63,8 @@ public class PlannedPaymentController extends AbstractController{
                                    @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                    @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
                                    HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot edit planned payments of other users!");
-            }
-        }
+        String message = "Cannot edit planned payments of other users!";
+        SessionValidator.validateSession(session, message, userId);
         return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, plannedPaymentId);
     }
 }
