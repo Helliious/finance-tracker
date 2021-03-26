@@ -1,5 +1,6 @@
 package financeTracker.services;
 
+import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
@@ -81,5 +82,79 @@ public class PlannedPaymentsService {
             plannedPayments.add(new ResponsePlannedPaymentDTO(p));
         }
         return plannedPayments;
+    }
+
+    public ResponsePlannedPaymentDTO delete(int accountId, int plannedPaymentId) {
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccount_Id(plannedPaymentId, accountId);
+        if (plannedPayment == null) {
+            throw new NotFoundException("Planned payment not found!");
+        }
+        ResponsePlannedPaymentDTO responsePlannedPaymentDTO = new ResponsePlannedPaymentDTO(plannedPayment);
+        plannedPaymentsRepository.deleteById(plannedPaymentId);
+        return responsePlannedPaymentDTO;
+    }
+
+    public UserWithoutPassDTO edit(ResponsePlannedPaymentDTO responsePlannedPaymentDTO, int accountId, int plannedPaymentId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+        Optional<PlannedPayment> plannedPayment = plannedPaymentsRepository.findById(plannedPaymentId);
+        if (account.isEmpty() || plannedPayment.isEmpty()) {
+            throw new NotFoundException("Account/Planned payment not found!");
+        }
+        if (responsePlannedPaymentDTO.getName() != null) {
+            if (plannedPaymentsRepository.findPlannedPaymentByNameAndAccount(responsePlannedPaymentDTO.getName(), account.get()) != null) {
+                throw new BadRequestException("Planned payment name already exists!");
+            } else {
+                plannedPayment.get().setName(responsePlannedPaymentDTO.getName());
+            }
+        }
+        if (responsePlannedPaymentDTO.getPaymentType() != null) {
+            if (plannedPayment.get().getPaymentType().equals(responsePlannedPaymentDTO.getPaymentType())) {
+                throw new BadRequestException("Entered the same type!");
+            } else {
+                plannedPayment.get().setPaymentType(responsePlannedPaymentDTO.getPaymentType());
+            }
+        }
+        if (responsePlannedPaymentDTO.getFrequency() != 0) {
+            if (plannedPayment.get().getFrequency() == responsePlannedPaymentDTO.getFrequency()) {
+                throw new BadRequestException("Entered the same frequency!");
+            } else {
+                plannedPayment.get().setFrequency(responsePlannedPaymentDTO.getFrequency());
+            }
+        }
+        if (responsePlannedPaymentDTO.getDurationUnit() != null) {
+            if (plannedPayment.get().getDurationUnit().equals(responsePlannedPaymentDTO.getDurationUnit())) {
+                throw new BadRequestException("Entered the same duration unit!");
+            } else {
+                plannedPayment.get().setDurationUnit(responsePlannedPaymentDTO.getDurationUnit());
+            }
+        }
+        if (responsePlannedPaymentDTO.getAmount() != 0) {
+            if (plannedPayment.get().getAmount() == responsePlannedPaymentDTO.getAmount()) {
+                throw new BadRequestException("Entered the same amount!");
+            } else {
+                plannedPayment.get().setAmount(responsePlannedPaymentDTO.getAmount());
+            }
+        }
+        if (responsePlannedPaymentDTO.getDueTime() != null) {
+            if (plannedPayment.get().getDueTime() == responsePlannedPaymentDTO.getDueTime()) {
+                throw new BadRequestException("Entered the same time!");
+            } else {
+                plannedPayment.get().setDueTime(responsePlannedPaymentDTO.getDueTime());
+            }
+        }
+        if (responsePlannedPaymentDTO.getCategory() != null) {
+            if (plannedPayment.get().getCategory().getName().equals(responsePlannedPaymentDTO.getCategory().getName())) {
+                throw new BadRequestException("Entered the same category!");
+            } else {
+                Optional<Category> category = categoryRepository.findById(responsePlannedPaymentDTO.getCategory().getId());
+                if (category.isEmpty()) {
+                    throw new NotFoundException("Category not found!");
+                }
+                plannedPayment.get().setCategory(category.get());
+            }
+        }
+        plannedPaymentsRepository.save(plannedPayment.get());
+        User user = account.get().getOwner();
+        return new UserWithoutPassDTO(user);
     }
 }

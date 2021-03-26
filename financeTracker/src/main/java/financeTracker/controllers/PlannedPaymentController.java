@@ -65,4 +65,37 @@ public class PlannedPaymentController extends AbstractController{
         }
         return plannedPaymentsService.getAll(accountId);
     }
+
+    @DeleteMapping("/users/{user_id}/accounts/{account_id}/planned_payments/{planned_payment_id}/delete")
+    public ResponsePlannedPaymentDTO delete(@PathVariable(name = "user_id") int userId,
+                                            @PathVariable(name = "account_id") int accountId,
+                                            @PathVariable(name = "planned_payment_id") int plannedPaymentId,
+                                            HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != userId) {
+                throw new BadRequestException("Cannot delete planned payments of other users!");
+            }
+        }
+        return plannedPaymentsService.delete(accountId, plannedPaymentId);
+    }
+
+    @PutMapping("/users/{user_id}/accounts/{account_id}/planned_payments/{planned_payment_id}/edit")
+    public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int userId,
+                                   @PathVariable(name = "account_id") int accountId,
+                                   @PathVariable(name = "planned_payment_id") int plannedPaymentId,
+                                   @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
+                                   HttpSession session) {
+        if (session.getAttribute("LoggedUser") == null) {
+            throw new AuthenticationException("Not logged in!");
+        } else {
+            int loggedId = (int) session.getAttribute("LoggedUser");
+            if (loggedId != userId) {
+                throw new BadRequestException("Cannot edit planned payments of other users!");
+            }
+        }
+        return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, plannedPaymentId);
+    }
 }

@@ -11,10 +11,12 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class CategoryWithoutPlannedPaymentsDTO {
+    private int id;
     private String name;
     private String type;
 
     public CategoryWithoutPlannedPaymentsDTO(Category category) {
+        id = category.getId();
         name = category.getName();
         type = category.getType();
     }
