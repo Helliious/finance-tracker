@@ -4,7 +4,7 @@ import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.PlannedPayment;
 import financeTracker.services.PlannedPaymentsService;
-import financeTracker.utils.SessionValidator;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +23,7 @@ public class PlannedPaymentController extends AbstractController{
                                   @RequestBody PlannedPayment plannedPayment,
                                   HttpSession session) {
         String message = "Cannot add planned payments to other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         return plannedPaymentsService.add(plannedPayment, userId, accountId);
     }
@@ -34,7 +34,7 @@ public class PlannedPaymentController extends AbstractController{
                                              @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                              HttpSession session) {
         String message = "Cannot see planned payments of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return plannedPaymentsService.getById(accountId, plannedPaymentId);
     }
 
@@ -43,7 +43,7 @@ public class PlannedPaymentController extends AbstractController{
                                                   @PathVariable(name = "account_id") int accountId,
                                                   HttpSession session) {
         String message = "Cannot see planned payments of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return plannedPaymentsService.getAll(accountId);
     }
 
@@ -53,7 +53,7 @@ public class PlannedPaymentController extends AbstractController{
                                             @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                             HttpSession session) {
         String message = "Cannot delete planned payments of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return plannedPaymentsService.delete(accountId, plannedPaymentId);
     }
 
@@ -64,7 +64,7 @@ public class PlannedPaymentController extends AbstractController{
                                    @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
                                    HttpSession session) {
         String message = "Cannot edit planned payments of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, plannedPaymentId);
     }
 }

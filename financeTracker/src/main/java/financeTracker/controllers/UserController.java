@@ -2,7 +2,7 @@ package financeTracker.controllers;
 
 import financeTracker.models.dto.user_dto.*;
 import financeTracker.services.UserService;
-import financeTracker.utils.SessionValidator;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class UserController extends AbstractController {
     @PostMapping("/users/login")
     public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
         UserWithoutPassDTO responseDto = userService.login(loginUserDto);
-        session.setAttribute("LoggedUser", responseDto.getId());
+        session.setAttribute(SessionManager.LOGGED_USER_ID, responseDto.getId());
         return responseDto;
     }
 
@@ -37,21 +37,21 @@ public class UserController extends AbstractController {
                                    @RequestBody UpdateRequestUserDTO userDTO,
                                    HttpSession session) {
         String message = "Cannot modify other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         return userService.editUser(userDTO, id);
     }
 
     @DeleteMapping("/users/{user_id}/delete")
     public UserWithoutPassDTO delete(@PathVariable(name = "user_id") int id, HttpSession session) {
         String message = "Cannot delete other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         return userService.deleteUser(id);
     }
 
     @PostMapping("/users/{id}")
     public String logout(@PathVariable int id, HttpSession session) {
         String message = "Cannot logout other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         session.setAttribute("LoggedUser", null);
         return "Logged out!";
     }

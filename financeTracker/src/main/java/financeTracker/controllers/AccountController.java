@@ -5,7 +5,7 @@ import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.services.AccountService;
-import financeTracker.utils.SessionValidator;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +23,14 @@ public class AccountController extends AbstractController {
                                           @PathVariable(name = "account_id") int accountId,
                                           HttpSession session) {
         String message = "Cannot show accounts of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return accountService.getById(accountId);
     }
 
     @GetMapping("/users/{user_id}/accounts")
     public List<AccountWithoutOwnerDTO> getAll(@PathVariable(name = "user_id") int userId, HttpSession session) {
         String message = "Cannot show accounts of other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return accountService.getAll(userId);
     }
 
@@ -39,7 +39,7 @@ public class AccountController extends AbstractController {
                                      @RequestBody Account account,
                                      HttpSession session) {
         String message = "Cannot create accounts for other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         account.setCreateTime(new Timestamp(System.currentTimeMillis()));
         UserWithoutPassDTO userWithoutPassDTO = accountService.createAcc(account, id);
         return userWithoutPassDTO;
@@ -50,7 +50,7 @@ public class AccountController extends AbstractController {
                                          @PathVariable(name = "account_id") int accountId,
                                          HttpSession session) {
         String message = "Cannot delete accounts for other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return accountService.deleteAccount(accountId);
     }
 
@@ -60,7 +60,7 @@ public class AccountController extends AbstractController {
                                    @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
                                    HttpSession session) {
         String message = "Cannot modify accounts for other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);
     }
 }

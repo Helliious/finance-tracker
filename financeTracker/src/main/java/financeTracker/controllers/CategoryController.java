@@ -2,7 +2,7 @@ package financeTracker.controllers;
 
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
-import financeTracker.utils.SessionValidator;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ public class CategoryController extends AbstractController {
     @GetMapping("/users/{id}/category")
     public List<Category> getAll(@PathVariable int id, HttpSession session) {
         String message = "Cannot show categories of other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         return categoryService.getAll();
     }
 
@@ -26,7 +26,7 @@ public class CategoryController extends AbstractController {
                         @RequestBody Category category,
                         HttpSession session) {
         String message = "Cannot add categories for other users!";
-        SessionValidator.validateSession(session, message, id);
+        SessionManager.validateSession(session, message, id);
         return categoryService.add(category);
     }
 
@@ -35,7 +35,7 @@ public class CategoryController extends AbstractController {
                            @PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
         String message = "Cannot delete categories for other users!";
-        SessionValidator.validateSession(session, message, userId);
+        SessionManager.validateSession(session, message, userId);
         return categoryService.delete(categoryId);
     }
 }

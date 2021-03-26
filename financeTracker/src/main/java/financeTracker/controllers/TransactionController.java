@@ -7,7 +7,7 @@ import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.services.TransactionService;
-import financeTracker.utils.SessionValidator;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,20 +28,20 @@ public class TransactionController extends AbstractController {
     public ResponseTransactionDTO addTransaction(@RequestBody AddTransactionRequestDTO dto
             ,@PathVariable("account_id") int accountId
             ,HttpSession session){
-        SessionValidator.validateSession(session,"Cannot add to other user transaction!!",dto.getUserId());
+        SessionManager.validateSession(session,"Cannot add to other user transaction!!",dto.getUserId());
         return transactionService.addTransactionToAcc(accountId,dto);
     }
     @GetMapping("/transactions/{id}")
     public ResponseTransactionDTO getById(@PathVariable int id,HttpSession session){
         ResponseTransactionDTO transaction=transactionService.getById(id);
         int ownerId=transaction.getAccount().getOwner().getId();
-        SessionValidator.validateSession(session,"Cannot get other user transaction!!",ownerId);
+        SessionManager.validateSession(session,"Cannot get other user transaction!!",ownerId);
         return transactionService.getById(id);
     }
     @GetMapping("/users/{owner_id}/transactions")
     public ArrayList<ResponseTransactionDTO> getAllByUser(@PathVariable("owner_id") int ownerId
             ,HttpSession session){
-        SessionValidator.validateSession(session,"Cannot see other users transactions!!",ownerId);
+        SessionManager.validateSession(session,"Cannot see other users transactions!!",ownerId);
         return transactionService.getByOwnerId(ownerId);
     }
     @GetMapping("/accounts/{account_id}/transactions")
@@ -53,14 +53,14 @@ public class TransactionController extends AbstractController {
         }
         Account account=optionalAccount.get();
         int ownerId=account.getOwner().getId();
-        SessionValidator.validateSession(session,"Cannot see other users account transactions!!",ownerId);
+        SessionManager.validateSession(session,"Cannot see other users account transactions!!",ownerId);
         return transactionService.getByAccountId(accountId);
     }
     @DeleteMapping("/transactions/delete/{id}")
     public void delete(@PathVariable int id,HttpSession session){
         ResponseTransactionDTO transaction=transactionService.getById(id);
         int ownerId=transaction.getAccount().getOwner().getId();
-        SessionValidator.validateSession(session,"Cannot delete other users transaction!!",ownerId);
+        SessionManager.validateSession(session,"Cannot delete other users transaction!!",ownerId);
         transactionDao.deleteById(id);
     }
 }
