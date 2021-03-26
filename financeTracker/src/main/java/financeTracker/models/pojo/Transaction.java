@@ -1,5 +1,6 @@
 package financeTracker.models.pojo;
 
+import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,6 +28,11 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User user;
-
+    public Transaction(AddTransactionRequestDTO dto){
+         type=dto.getType();
+         amount=dto.getAmount();
+         createTime=dto.getCreateTime();
+         description=dto.getDescription();
+    }
 }
 

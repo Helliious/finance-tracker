@@ -29,6 +29,8 @@ public class User {
     private Timestamp createTime;
     @OneToMany(mappedBy = "user")
     private List<Transaction> transactions;
+    @OneToMany(mappedBy = "owner")
+    private List<Account> accounts;
 
     public User(RegisterRequestUserDTO userDTO) {
         firstName = userDTO.getFirstName();

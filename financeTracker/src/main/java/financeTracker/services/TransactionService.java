@@ -1,9 +1,14 @@
 package financeTracker.services;
 
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
 import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
+import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Transaction;
+import financeTracker.models.pojo.User;
+import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.TransactionRepository;
+import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +19,18 @@ import java.util.Optional;
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseTransactionDTO getById(int id){
-        Optional<Transaction> transaction=transactionRepository.findById(id);
-        if (transaction.isPresent()){
-            return new ResponseTransactionDTO(transaction.get());
+        Optional<Transaction> optionalTransaction=transactionRepository.findById(id);
+        if (optionalTransaction.isEmpty()){
+            throw new NotFoundException("Transaction not found");
         }
         else{
-            throw new NotFoundException("Transaction not found");
+            return new ResponseTransactionDTO(optionalTransaction.get());
         }
     }
     public ArrayList<ResponseTransactionDTO> getByOwnerId(int id){
@@ -50,11 +59,28 @@ public class TransactionService {
     }
     public ResponseTransactionDTO delete(int id){
         Optional<Transaction> fakeTransaction=transactionRepository.findById(id);
-        if (fakeTransaction.isPresent()){
+        if (fakeTransaction.isEmpty()){
             throw new  NotFoundException("Transaction doesn't exist");
         }
         ResponseTransactionDTO responseTransaction=new ResponseTransactionDTO(fakeTransaction.get());
         transactionRepository.deleteById(id);
         return responseTransaction;
+    }
+    public ResponseTransactionDTO addTransactionToAcc(int accountId, AddTransactionRequestDTO dto){
+        Optional<Account> optionalAccount= accountRepository.findById(accountId);
+        Optional<User> optionalUser=userRepository.findById(dto.getUserId());
+        if (optionalAccount.isEmpty()){
+            throw new  NotFoundException("Account doesn't exist");
+        }
+        if (optionalUser.isEmpty()){
+            throw new NotFoundException("User doesn't exist");
+        }
+        Transaction transaction=new Transaction(dto);
+        Account account=optionalAccount.get();
+        User user=optionalUser.get();
+        transaction.setUser(user);
+        transaction.setAccount(account);
+        transactionRepository.save(transaction);
+        return new ResponseTransactionDTO(transaction);
     }
 }

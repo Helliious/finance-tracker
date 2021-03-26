@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction,Integer>,UserRepository {
+public interface TransactionRepository extends JpaRepository<Transaction,Integer>{
 ArrayList<Transaction> findTransactionsByUserId(int id);
 ArrayList<Transaction> findTransactionsByAccount_Id(int id);
 }
