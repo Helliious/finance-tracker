@@ -3,7 +3,6 @@ package financeTracker.controllers;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.models.dto.user_dto.*;
-import financeTracker.models.dao.UserDAO;
 import financeTracker.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

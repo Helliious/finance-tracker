@@ -2,7 +2,6 @@ package financeTracker.services;
 
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
-import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.Transaction;
@@ -78,8 +77,8 @@ public class TransactionService {
         }
         Transaction transaction=new Transaction(dto);
         Account account=optionalAccount.get();
-        User user=optionalUser.get();
-        transaction.setUser(user);
+        User owner=optionalUser.get();
+        transaction.setOwner(owner);
         transaction.setAccount(account);
         transactionRepository.save(transaction);
         return new ResponseTransactionDTO(transaction);

@@ -2,7 +2,6 @@ package financeTracker.controllers;
 
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
-import financeTracker.models.dao.CategoryDAO;
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;

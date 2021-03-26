@@ -1,19 +1,12 @@
 package financeTracker.controllers;
 
-import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transactionsDTO.AddTransactionRequestDTO;
-import financeTracker.models.dto.transactionsDTO.ResponseTransactionDTO;
 import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.Transaction;
 import financeTracker.models.repository.AccountRepository;
-import financeTracker.models.repository.TransactionRepository;
-import financeTracker.models.repository.UserRepository;
 import financeTracker.services.TransactionService;
-import financeTracker.services.UserService;
 import financeTracker.utils.SessionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
