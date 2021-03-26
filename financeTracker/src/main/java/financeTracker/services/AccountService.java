@@ -3,6 +3,8 @@ package financeTracker.services;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
+import financeTracker.models.dto.user_dto.UpdateRequestUserDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.User;
@@ -41,5 +43,51 @@ public class AccountService {
             throw new BadRequestException("Account doesn't exist!");
         }
         return new AccountWithoutOwnerDTO(account.get());
+    }
+
+    public AccountWithoutOwnerDTO deleteAccount(int accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+        if (account.isEmpty()) {
+            throw new BadRequestException("Account doesn't exist!");
+        }
+        AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account.get());
+        accountRepository.deleteById(accountId);
+        return responseAcc;
+    }
+
+    public UserWithoutPassDTO editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+        Optional<User> user = userRepository.findById(userId);
+        if (account.isEmpty() || user.isEmpty()) {
+            throw new BadRequestException("Wrong credentials!");
+        }
+        if (accountDTO.getName() != null) {
+            if (accountRepository.findAccountByNameAndUser(accountDTO.getName(), user.get()) != null) {
+                throw new BadRequestException("Account name already exists!");
+            } else {
+                account.get().setName(accountDTO.getName());
+            }
+        }
+        if (accountDTO.getAccLimit() != 0) {
+            if (account.get().getAccLimit() == accountDTO.getAccLimit()) {
+                throw new BadRequestException("Entered the same limit!");
+            } else {
+                account.get().setAccLimit(accountDTO.getAccLimit());
+            }
+        }
+        if (accountDTO.getBalance() != 0) {
+            if (account.get().getBalance() == accountDTO.getBalance()) {
+                throw new BadRequestException("Entered the same balance!");
+            } else {
+                account.get().setBalance(accountDTO.getBalance());
+            }
+        }
+        accountRepository.save(account.get());
+        user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new BadRequestException("User not found!");
+        }
+        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user.get());
+        return responseUser;
     }
 }
