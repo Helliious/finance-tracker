@@ -1,12 +1,11 @@
 package financeTracker.controllers;
 
-import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.services.AccountService;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,27 +22,15 @@ public class AccountController extends AbstractController {
     public AccountWithoutOwnerDTO getById(@PathVariable(name = "user_id") int userId,
                                           @PathVariable(name = "account_id") int accountId,
                                           HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot show accounts of other users!");
-            }
-        }
+        String message = "Cannot show accounts of other users!";
+        SessionManager.validateSession(session, message, userId);
         return accountService.getById(accountId);
     }
 
     @GetMapping("/users/{user_id}/accounts")
     public List<AccountWithoutOwnerDTO> getAll(@PathVariable(name = "user_id") int userId, HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot show accounts of other users!");
-            }
-        }
+        String message = "Cannot show accounts of other users!";
+        SessionManager.validateSession(session, message, userId);
         return accountService.getAll(userId);
     }
 
@@ -51,14 +38,8 @@ public class AccountController extends AbstractController {
     public UserWithoutPassDTO create(@PathVariable(name = "user_id") int id,
                                      @RequestBody Account account,
                                      HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot create accounts for other users!");
-            }
-        }
+        String message = "Cannot create accounts for other users!";
+        SessionManager.validateSession(session, message, id);
         account.setCreateTime(new Timestamp(System.currentTimeMillis()));
         UserWithoutPassDTO userWithoutPassDTO = accountService.createAcc(account, id);
         return userWithoutPassDTO;
@@ -68,14 +49,8 @@ public class AccountController extends AbstractController {
     public AccountWithoutOwnerDTO delete(@PathVariable(name = "user_id") int userId,
                                          @PathVariable(name = "account_id") int accountId,
                                          HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot delete accounts for other users!");
-            }
-        }
+        String message = "Cannot delete accounts for other users!";
+        SessionManager.validateSession(session, message, userId);
         return accountService.deleteAccount(accountId);
     }
 
@@ -84,14 +59,8 @@ public class AccountController extends AbstractController {
                                    @PathVariable(name = "account_id") int accountId,
                                    @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
                                    HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot modify accounts for other users!");
-            }
-        }
+        String message = "Cannot modify accounts for other users!";
+        SessionManager.validateSession(session, message, userId);
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);
     }
 }

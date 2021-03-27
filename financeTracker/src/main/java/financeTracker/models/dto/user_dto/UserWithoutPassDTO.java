@@ -40,16 +40,22 @@ public class UserWithoutPassDTO {
         email = user.getEmail();
         createTime = user.getCreateTime();
         accounts = new ArrayList<>();
-        for (Account a : user.getAccounts()) {
-            accounts.add(new AccountWithoutOwnerDTO(a));
+        if (user.getAccounts() != null) {
+            for (Account a : user.getAccounts()) {
+                accounts.add(new AccountWithoutOwnerDTO(a));
+            }
         }
         transactions = new ArrayList<>();
-        for (Transaction t : user.getTransactions()) {
-            transactions.add(new TransactionWithoutOwnerDTO(t));
+        if (user.getTransactions() != null) {
+            for (Transaction t : user.getTransactions()) {
+                transactions.add(new TransactionWithoutOwnerDTO(t));
+            }
         }
         plannedPayments = new ArrayList<>();
-        for (PlannedPayment p : user.getPlannedPayments()) {
-            plannedPayments.add(new ResponsePlannedPaymentDTO(p));
+        if (user.getPlannedPayments() != null) {
+            for (PlannedPayment p : user.getPlannedPayments()) {
+                plannedPayments.add(new ResponsePlannedPaymentDTO(p));
+            }
         }
     }
 }

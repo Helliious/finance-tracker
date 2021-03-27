@@ -1,9 +1,8 @@
 package financeTracker.controllers;
 
-import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +16,8 @@ public class CategoryController extends AbstractController {
 
     @GetMapping("/users/{id}/category")
     public List<Category> getAll(@PathVariable int id, HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot show categories of other users!");
-            }
-        }
+        String message = "Cannot show categories of other users!";
+        SessionManager.validateSession(session, message, id);
         return categoryService.getAll();
     }
 
@@ -32,14 +25,8 @@ public class CategoryController extends AbstractController {
     public Category add(@PathVariable int id,
                         @RequestBody Category category,
                         HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot add categories for other users!");
-            }
-        }
+        String message = "Cannot add categories for other users!";
+        SessionManager.validateSession(session, message, id);
         return categoryService.add(category);
     }
 
@@ -47,14 +34,8 @@ public class CategoryController extends AbstractController {
     public Category delete(@PathVariable(name = "user_id") int userId,
                            @PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != userId) {
-                throw new BadRequestException("Cannot delete categories for other users!");
-            }
-        }
+        String message = "Cannot delete categories for other users!";
+        SessionManager.validateSession(session, message, userId);
         return categoryService.delete(categoryId);
     }
 }

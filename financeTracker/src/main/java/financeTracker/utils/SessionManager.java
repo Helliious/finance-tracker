@@ -5,12 +5,14 @@ import financeTracker.exceptions.BadRequestException;
 
 import javax.servlet.http.HttpSession;
 
-public class SessionValidator {
+public class SessionManager {
+    public static final String LOGGED_USER_ID = "LOGGED_USER_ID";
+
     public static void validateSession(HttpSession session, String message, int ownerId){
-        if (session.getAttribute("LoggedUser") == null) {
+        if (session.getAttribute(LOGGED_USER_ID) == null) {
             throw new AuthenticationException("Not logged in!");
         } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
+            int loggedId = (int) session.getAttribute(LOGGED_USER_ID);
             if (loggedId != ownerId) {
                 throw new BadRequestException(message);
             }

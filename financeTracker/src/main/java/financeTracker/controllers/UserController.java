@@ -1,9 +1,8 @@
 package financeTracker.controllers;
 
-import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.models.dto.user_dto.*;
 import financeTracker.services.UserService;
+import financeTracker.utils.SessionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +28,7 @@ public class UserController extends AbstractController {
     @PostMapping("/users/login")
     public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
         UserWithoutPassDTO responseDto = userService.login(loginUserDto);
-        session.setAttribute("LoggedUser", responseDto.getId());
+        session.setAttribute(SessionManager.LOGGED_USER_ID, responseDto.getId());
         return responseDto;
     }
 
@@ -37,40 +36,22 @@ public class UserController extends AbstractController {
     public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int id,
                                    @RequestBody UpdateRequestUserDTO userDTO,
                                    HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot modify other users!");
-            }
-        }
+        String message = "Cannot modify other users!";
+        SessionManager.validateSession(session, message, id);
         return userService.editUser(userDTO, id);
     }
 
     @DeleteMapping("/users/{user_id}/delete")
     public UserWithoutPassDTO delete(@PathVariable(name = "user_id") int id, HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot delete other users!");
-            }
-        }
+        String message = "Cannot delete other users!";
+        SessionManager.validateSession(session, message, id);
         return userService.deleteUser(id);
     }
 
     @PostMapping("/users/{id}")
     public String logout(@PathVariable int id, HttpSession session) {
-        if (session.getAttribute("LoggedUser") == null) {
-            throw new AuthenticationException("Not logged in!");
-        } else {
-            int loggedId = (int) session.getAttribute("LoggedUser");
-            if (loggedId != id) {
-                throw new BadRequestException("Cannot logout other users!");
-            }
-        }
+        String message = "Cannot logout other users!";
+        SessionManager.validateSession(session, message, id);
         session.setAttribute("LoggedUser", null);
         return "Logged out!";
     }
