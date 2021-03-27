@@ -22,4 +22,6 @@ public class Category {
     private String type;
     @OneToMany(mappedBy = "category")
     private List<PlannedPayment> plannedPayments;
+    @OneToMany(mappedBy = "category")
+    private List<Transaction> transactions;
 }

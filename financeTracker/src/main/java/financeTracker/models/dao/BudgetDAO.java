@@ -13,8 +13,9 @@ import java.sql.ResultSet;
 public class BudgetDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
+/*
     public Budget getById(int id) throws Exception {
+
         String sql = "SELECT id, name, label, amount, due_time FROM budgets WHERE id = ?";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -31,5 +32,9 @@ public class BudgetDAO {
             }
             throw new Exception("Budget not found");
         }
+
+
     }
+    */
+
 }

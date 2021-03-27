@@ -17,13 +17,16 @@ public class TransactionWithoutOwnerDTO {
     private String type;
     private double amount;
     private Timestamp createTime;
-    private long categoryId;
+    private String categoryName;
+    private String description;
 
     public TransactionWithoutOwnerDTO(Transaction transaction) {
         id = transaction.getId();
         type = transaction.getType();
         amount = transaction.getAmount();
         createTime = transaction.getCreateTime();
-        categoryId = transaction.getCategoryId();
+        categoryName = transaction.getCategory().getName();
+        description=transaction.getDescription();
     }
+
 }
