@@ -24,4 +24,6 @@ public class Category {
     private List<PlannedPayment> plannedPayments;
     @OneToMany(mappedBy = "category")
     private List<Transaction> transactions;
+    @OneToOne(mappedBy = "category")
+    private CategoryImage image;
 }

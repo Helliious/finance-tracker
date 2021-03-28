@@ -1,5 +1,6 @@
 package financeTracker.controllers;
 
+import financeTracker.models.dto.category_dto.CategoryWithoutPlannedPaymentsDTO;
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
 import financeTracker.utils.SessionManager;
@@ -13,6 +14,15 @@ import java.util.List;
 public class CategoryController extends AbstractController {
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping("/users/{user_id}/category/{category_id}")
+    public CategoryWithoutPlannedPaymentsDTO getById(@PathVariable(name = "user_id") int userId,
+                                                     @PathVariable(name = "category_id") int categoryId,
+                                                     HttpSession session) {
+        String message = "Cannot show categories of other users!";
+        SessionManager.validateSession(session, message, userId);
+        return categoryService.getById(categoryId);
+    }
 
     @GetMapping("/users/{id}/category")
     public List<Category> getAll(@PathVariable int id, HttpSession session) {
