@@ -29,7 +29,7 @@ public class BudgetService {
     @Autowired
     private BudgetDAO budgetDao;
 
-    public BudgetWithoutAccountAndOwnerDTO getById(int id){
+    public BudgetWithoutAccountAndOwnerDTO getById(int id) {
         Optional<Budget> optionalBudget=budgetRepository.findById(id);
         if (optionalBudget.isEmpty()){
             throw new NotFoundException("Budget not found");
@@ -162,7 +162,8 @@ public class BudgetService {
         }
         return totalSpends;
     }
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto){
+
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto) {
          return budgetDao.filterBudget(userId,dto);
     }
 }

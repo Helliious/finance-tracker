@@ -3,10 +3,7 @@ package financeTracker.services;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.user_dto.LoginUserDTO;
-import financeTracker.models.dto.user_dto.RegisterRequestUserDTO;
-import financeTracker.models.dto.user_dto.UpdateRequestUserDTO;
-import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
+import financeTracker.models.dto.user_dto.*;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
@@ -119,5 +116,27 @@ public class UserService {
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user);
         userRepository.save(user);
         return responseUser;
+    }
+
+    public UserWithoutPassDTO changePassword(int userId, ChangePassUserDTO changePasswordDTO) {
+        Optional<User> optUser = userRepository.findById(userId);
+        UserWithoutPassDTO user;
+        if (optUser.isEmpty()) {
+            throw new NotFoundException("User not found!");
+        }
+        if (!changePasswordDTO.getPassword().equals(changePasswordDTO.getConfirmPassword())) {
+            throw new AuthenticationException("Confirm password doesn't match!");
+        }
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(changePasswordDTO.getPassword(), optUser.get().getPassword())) {
+            throw new AuthenticationException("New password matches old password!");
+        } else if (userRepository.findByPassword(changePasswordDTO.getPassword()) != null) {
+            throw new AuthenticationException("Password already exists!");
+        } else {
+            optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
+            user = new UserWithoutPassDTO(optUser.get());
+            userRepository.save(optUser.get());
+        }
+        return user;
     }
 }

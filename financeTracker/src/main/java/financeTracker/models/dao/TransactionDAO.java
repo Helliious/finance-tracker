@@ -2,8 +2,6 @@ package financeTracker.models.dao;
 
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
-import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerDTO;
 import financeTracker.models.pojo.*;
@@ -11,7 +9,6 @@ import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -92,11 +89,10 @@ public class TransactionDAO {
                     System.out.println(i + " setted " + dto.getCategoryId());
                     ps.setInt(i, dto.getCategoryId());
                     categoryIncludedInFilter = false;
-                }else if (typeIncluded){
+                } else if (typeIncluded){
                     ps.setString(i,dto.getType());
                     typeIncluded=false;
-                }
-                else if (bothAmountsIncluded) {
+                } else if (bothAmountsIncluded) {
                     ps.setDouble(i, dto.getAmountFrom());
                     ps.setDouble(++i, dto.getAmountTo());
                     bothAmountsIncluded = false;
@@ -107,7 +103,6 @@ public class TransactionDAO {
                     ps.setDouble(i, dto.getAmountTo());
                     amountToIncluded = false;
                 }
-
             }
             ResultSet result = ps.executeQuery();
 

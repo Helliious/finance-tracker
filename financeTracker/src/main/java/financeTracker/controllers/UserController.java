@@ -56,6 +56,15 @@ public class UserController extends AbstractController {
         return "Logged out!";
     }
 
+    @PostMapping("/users/{user_id}/change_password")
+    public UserWithoutPassDTO changePassword(@PathVariable(name = "user_id") int userId,
+                                             @RequestBody ChangePassUserDTO changePasswordDTO,
+                                             HttpSession session) {
+        String message = "Cannot change other users password!";
+        SessionManager.validateSession(session, message, userId);
+        return userService.changePassword(userId, changePasswordDTO);
+    }
+
     @PostMapping("/users/forgot_password")
     public UserWithoutPassDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
         return userService.forgotPass(forgotPassUserDto.getEmail());

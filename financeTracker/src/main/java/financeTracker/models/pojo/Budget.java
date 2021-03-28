@@ -1,8 +1,6 @@
 package financeTracker.models.pojo;
 
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
-import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
-import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +15,6 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Table(name="budgets")
-
 public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

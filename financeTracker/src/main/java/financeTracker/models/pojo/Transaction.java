@@ -30,7 +30,6 @@ public class Transaction {
     @JoinColumn(name="owner_id")
     private User owner;
 
-
     public Transaction(AddTransactionRequestDTO dto){
          type=dto.getType();
          amount=dto.getAmount();

@@ -44,11 +44,12 @@ public class TransactionService {
             return new TransactionWithoutOwnerDTO(optionalTransaction.get());
         }
     }
-    public ArrayList<TransactionWithoutOwnerDTO> getByOwnerId(int id){
-         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByOwner_Id(id);
-         if (transactions.isEmpty()){
-             throw new NotFoundException("User don't have transactions");
-         }
+
+    public ArrayList<TransactionWithoutOwnerDTO> getByOwnerId(int id) {
+        ArrayList<Transaction> transactions=transactionRepository.findTransactionsByOwner_Id(id);
+        if (transactions.isEmpty()){
+            throw new NotFoundException("User don't have transactions");
+        }
         ArrayList<TransactionWithoutOwnerDTO> responseTransactions =new ArrayList<>();
         for (Transaction transaction:transactions){
             TransactionWithoutOwnerDTO responseTransaction=new TransactionWithoutOwnerDTO(transaction);
@@ -56,7 +57,8 @@ public class TransactionService {
         }
         return responseTransactions;
     }
-    public ArrayList<TransactionWithoutOwnerDTO> getByAccountId(int id){
+
+    public ArrayList<TransactionWithoutOwnerDTO> getByAccountId(int id) {
         ArrayList<Transaction> transactions=transactionRepository.findTransactionsByAccount_Id(id);
         if (transactions.isEmpty()){
             throw new NotFoundException("This account dont'have transactions");
@@ -68,7 +70,8 @@ public class TransactionService {
         }
         return responseTransactions;
     }
-    public TransactionWithoutOwnerDTO delete(int id, int userId){
+
+    public TransactionWithoutOwnerDTO delete(int id, int userId) {
         Optional<Transaction> optionalTransaction=transactionRepository.findById(id);
         if (optionalTransaction.isEmpty()){
             throw new  NotFoundException("Transaction doesn't exist");
@@ -81,7 +84,8 @@ public class TransactionService {
         transactionRepository.deleteById(id);
         return responseTransaction;
     }
-    public TransactionWithoutOwnerDTO addTransactionToAcc(int accountId,AddTransactionRequestDTO dto){
+
+    public TransactionWithoutOwnerDTO addTransactionToAcc(int accountId,AddTransactionRequestDTO dto) {
         Optional<Account> optionalAccount= accountRepository.findById(accountId);
         Optional<User> optionalUser=userRepository.findById(dto.getUserId());
         Optional<Category> optionalCategory=categoryRepository.findById(dto.getCategoryId());
@@ -111,7 +115,8 @@ public class TransactionService {
         transactionRepository.save(transaction);
         return new TransactionWithoutOwnerDTO(transaction);
     }
-    public TransactionWithoutOwnerDTO editTransaction(int transactionID, EditTransactionRequestDTO dto,int ownerId){
+
+    public TransactionWithoutOwnerDTO editTransaction(int transactionID, EditTransactionRequestDTO dto,int ownerId) {
         Optional<Transaction> optionalTransaction=transactionRepository.findById(transactionID);
         Optional<Account> optionalAccount=accountRepository.findById(dto.getAccountId());
         Optional<Category> optionalCategory=categoryRepository.findById(dto.getCategoryId());
@@ -145,7 +150,8 @@ public class TransactionService {
         transactionRepository.save(transaction);
         return new TransactionWithoutOwnerDTO(transaction);
     }
-    public ArrayList<TransactionWithoutOwnerDTO> filter(int userId, FilterTransactionRequestDTO dto){
+
+    public ArrayList<TransactionWithoutOwnerDTO> filter(int userId, FilterTransactionRequestDTO dto) {
         return transactionDAO.filterTransaction(userId,dto);
     }
 
