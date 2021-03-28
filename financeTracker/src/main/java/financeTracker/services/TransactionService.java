@@ -2,8 +2,10 @@ package financeTracker.services;
 
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.EditTransactionRequestDTO;
+import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Category;
@@ -30,6 +32,8 @@ public class TransactionService {
     private UserRepository userRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private TransactionDAO transactionDAO;
 
     public TransactionWithoutOwnerDTO getById(int id){
         Optional<Transaction> optionalTransaction=transactionRepository.findById(id);
@@ -140,6 +144,9 @@ public class TransactionService {
         transaction.setAccount(account);
         transactionRepository.save(transaction);
         return new TransactionWithoutOwnerDTO(transaction);
+    }
+    public ArrayList<TransactionWithoutOwnerDTO> filter(int userId, FilterTransactionRequestDTO dto){
+        return transactionDAO.filterTransaction(userId,dto);
     }
 
 }

@@ -1,8 +1,18 @@
 package financeTracker.models.dto.transaction_dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Component
 public class FilterTransactionRequestDTO{
-    public int categoryId;
-    public int amountFrom;
-    public int amountTo;
-    public String type;
+    private String name;
+    private int categoryId;
+    private int amountFrom;
+    private int amountTo;
+    private String type;
 }

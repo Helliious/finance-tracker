@@ -74,9 +74,9 @@ public class TransactionController extends AbstractController {
     }
     @PostMapping("users/{user_id}/transactions/filter")
     public ArrayList<TransactionWithoutOwnerDTO> filter(@PathVariable(name="user_id") int userId
-            , @RequestBody FilterTransactionRequestDTO dto){
-        //todo make filter..
-        return new ArrayList<>();
-   
+            , @RequestBody FilterTransactionRequestDTO dto
+            ,HttpSession session){
+        SessionManager.validateSession(session,"You can't filter other users transactions",userId);
+        return transactionService.filter(userId,dto);
     }
 }
