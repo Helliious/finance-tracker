@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Component
-public class BudgetWithoutAccountAndOwner {
+public class BudgetWithoutAccountAndOwnerDTO {
     private int id;
     private String name;
     private String label;
@@ -19,7 +19,7 @@ public class BudgetWithoutAccountAndOwner {
     private Timestamp dueTime;
     private String categoryName;
 
-    public BudgetWithoutAccountAndOwner(Budget budget) {
+    public BudgetWithoutAccountAndOwnerDTO(Budget budget) {
         this.id = budget.getId();
         this.name = budget.getName();
         this.label = budget.getLabel();

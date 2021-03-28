@@ -1,6 +1,8 @@
 package financeTracker.models.pojo;
 
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
+import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
+import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,5 +41,6 @@ public class Budget {
         amount=dto.getAmount();
         dueTime=dto.getDueTime();
     }
+
 
 }

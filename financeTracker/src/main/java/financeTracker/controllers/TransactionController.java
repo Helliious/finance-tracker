@@ -57,7 +57,6 @@ public class TransactionController extends AbstractController {
         SessionManager.validateSession(session,"Cannot see other users account transactions!!",ownerId);
         return transactionService.getByAccountId(accountId);
     }
-
     @DeleteMapping("/users/{user_id}/transactions/delete/{transaction_id}")
     public TransactionWithoutOwnerDTO delete(@PathVariable(name="user_id") int userId
             ,@PathVariable(name="transaction_id") int transactionId

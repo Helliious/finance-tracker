@@ -2,7 +2,7 @@ package financeTracker.controllers;
 
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
-import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwner;
+import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerDTO;
 import financeTracker.models.pojo.Account;
@@ -26,7 +26,7 @@ public class BudgetController extends AbstractController {
     private AccountRepository accountRepository;
 
     @PostMapping("/users/{user_id}/add/budget")
-    public BudgetWithoutAccountAndOwner addBudget(@RequestBody CreateBudgetRequestDTO dto
+    public BudgetWithoutAccountAndOwnerDTO addBudget(@RequestBody CreateBudgetRequestDTO dto
             , @PathVariable("user_id") int userId
             , HttpSession session){
         //dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
@@ -34,20 +34,20 @@ public class BudgetController extends AbstractController {
         return budgetService.addBudgetToAcc(userId,dto);
     }
     @GetMapping("users/{user_id}/budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwner getById(@PathVariable(name = "user_id") int ownerId
+    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "user_id") int ownerId
             , @PathVariable(name="budget_id") int budgetId, HttpSession session) {
         SessionManager.validateSession(session,"Cannot get other user budget!!",ownerId);
         return budgetService.getById(budgetId);
     }
     @GetMapping("/users/{owner_id}/budgets")
-    public ArrayList<BudgetWithoutAccountAndOwner> getAllByUser(@PathVariable("owner_id") int ownerId
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(@PathVariable("owner_id") int ownerId
             , HttpSession session){
         SessionManager.validateSession(session,"Cannot see other users budgets!!",ownerId);
         return budgetService.getByOwnerId(ownerId);
     }
     @GetMapping("/accounts/{account_id}/budgets")
-    public ArrayList<BudgetWithoutAccountAndOwner> getAllByAccount(@PathVariable("account_id") int accountId
-            ,HttpSession session){
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable("account_id") int accountId
+            , HttpSession session){
         Optional<Account> optionalAccount=accountRepository.findById(accountId);
         if (optionalAccount.isEmpty()){
             throw new NotFoundException("Account does not exist..");
@@ -58,17 +58,17 @@ public class BudgetController extends AbstractController {
         return budgetService.getByAccountId(accountId);
     }
     @DeleteMapping("/users/{user_id}/budgets/delete/{budget_id}")
-    public BudgetWithoutAccountAndOwner delete(@PathVariable(name="user_id") int userId
-            ,@PathVariable(name="budget_id") int budgetId
-            ,HttpSession session){
+    public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="user_id") int userId
+            , @PathVariable(name="budget_id") int budgetId
+            , HttpSession session){
         SessionManager.validateSession(session,"Cannot delete other users budget!!",userId);
         return budgetService.delete(budgetId,userId);
     }
     @PutMapping("users/{user_id}/budgets/{budget_id}/edit")
-    public BudgetWithoutAccountAndOwner edit(@PathVariable(name = "user_id") int userId
-            ,@PathVariable(name="budget_id") int budgetId
+    public BudgetWithoutAccountAndOwnerDTO edit(@PathVariable(name = "user_id") int userId
+            , @PathVariable(name="budget_id") int budgetId
             , @RequestBody CreateBudgetRequestDTO dto,
-                                           HttpSession session ) {
+                                                HttpSession session ) {
         SessionManager.validateSession(session,"You can't modify other users budgets",userId);
         return budgetService.editBudget(budgetId,dto,userId);
     }
@@ -80,9 +80,8 @@ public class BudgetController extends AbstractController {
         return budgetService.getSpendings(categoryId);
     }
     @PostMapping("users/{user_id}/budgets/filter")
-    public ArrayList<TransactionWithoutOwnerDTO> filter(@PathVariable(name="user_id") int userId
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@PathVariable(name="user_id") int userId
             , @RequestBody FilterBudgetRequestDTO dto){
-        //todo make filter..
-        return new ArrayList<>();
+        return budgetService.filter(userId,dto);
     }
 }
