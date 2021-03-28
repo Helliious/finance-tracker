@@ -81,7 +81,9 @@ public class BudgetController extends AbstractController {
     }
     @PostMapping("users/{user_id}/budgets/filter")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@PathVariable(name="user_id") int userId
-            , @RequestBody FilterBudgetRequestDTO dto){
+            , @RequestBody FilterBudgetRequestDTO dto
+            ,HttpSession session){
+        SessionManager.validateSession(session,"You can't filter other users budgets",userId);
         return budgetService.filter(userId,dto);
     }
 }
