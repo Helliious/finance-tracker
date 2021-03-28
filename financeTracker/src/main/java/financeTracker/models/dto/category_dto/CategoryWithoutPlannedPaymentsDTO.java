@@ -14,10 +14,14 @@ public class CategoryWithoutPlannedPaymentsDTO {
     private int id;
     private String name;
     private String type;
+    private CategoryImageDTO imageDTO;
 
     public CategoryWithoutPlannedPaymentsDTO(Category category) {
         id = category.getId();
         name = category.getName();
         type = category.getType();
+        if (category.getImage() != null) {
+            imageDTO = new CategoryImageDTO(category.getImage());
+        }
     }
 }
