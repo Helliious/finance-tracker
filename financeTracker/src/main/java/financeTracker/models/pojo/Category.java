@@ -26,4 +26,7 @@ public class Category {
     private List<Transaction> transactions;
     @OneToOne(mappedBy = "category")
     private CategoryImage image;
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 }

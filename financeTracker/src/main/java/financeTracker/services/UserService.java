@@ -34,10 +34,13 @@ public class UserService {
         return userWithoutPassDTO;
     }
 
-    public UserWithoutPassDTO editUser(UpdateRequestUserDTO userDTO, int id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserWithoutPassDTO editUser(UpdateRequestUserDTO userDTO, int userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new BadRequestException("User not found!");
+        }
+        if (user.get().getId() != userId) {
+            throw new AuthenticationException("Cannot modify other users!");
         }
         if (userDTO.getUsername() != null) {
             if (userRepository.findByUsername(userDTO.getUsername()) != null) {
@@ -95,13 +98,13 @@ public class UserService {
         }
     }
 
-    public UserWithoutPassDTO deleteUser(int id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserWithoutPassDTO deleteUser(int userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new BadRequestException("User not found!");
         }
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user.get());
-        userRepository.deleteById(id);
+        userRepository.deleteById(userId);
         return responseUser;
     }
 

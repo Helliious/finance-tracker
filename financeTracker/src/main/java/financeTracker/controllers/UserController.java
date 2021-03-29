@@ -13,55 +13,51 @@ import java.sql.Timestamp;
 public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private SessionManager sessionManager;
 
     @GetMapping("/users/{id}")
     public UserWithoutPassDTO getById(@PathVariable int id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping("/users/register")
+    @PutMapping("/users")
     public UserWithoutPassDTO register(@RequestBody RegisterRequestUserDTO userDTO) {
         userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return userService.addUser(userDTO);
     }
 
-    @PostMapping("/users/login")
+    @PostMapping("/users")
     public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
         UserWithoutPassDTO responseDto = userService.login(loginUserDto);
-        session.setAttribute(SessionManager.LOGGED_USER_ID, responseDto.getId());
+        sessionManager.loginUser(session, responseDto.getId());
         return responseDto;
     }
 
-    @PutMapping("/users/{user_id}/edit")
-    public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int id,
-                                   @RequestBody UpdateRequestUserDTO userDTO,
+    @PutMapping("/users/edit")
+    public UserWithoutPassDTO edit(@RequestBody UpdateRequestUserDTO userDTO,
                                    HttpSession session) {
-        String message = "Cannot modify other users!";
-        SessionManager.validateSession(session, message, id);
-        return userService.editUser(userDTO, id);
+        int userId = sessionManager.validateSession(session);
+        return userService.editUser(userDTO, userId);
     }
 
-    @DeleteMapping("/users/{user_id}/delete")
-    public UserWithoutPassDTO delete(@PathVariable(name = "user_id") int id, HttpSession session) {
-        String message = "Cannot delete other users!";
-        SessionManager.validateSession(session, message, id);
-        return userService.deleteUser(id);
+    @DeleteMapping("/users")
+    public UserWithoutPassDTO delete(HttpSession session) {
+        int userId = sessionManager.validateSession(session);
+        return userService.deleteUser(userId);
     }
 
-    @PostMapping("/users/{id}")
-    public String logout(@PathVariable int id, HttpSession session) {
-        String message = "Cannot logout other users!";
-        SessionManager.validateSession(session, message, id);
-        session.setAttribute("LoggedUser", null);
+    @GetMapping("/users/logout")
+    public String logout(HttpSession session) {
+        sessionManager.validateSession(session);
+        sessionManager.logoutUser(session);
         return "Logged out!";
     }
 
-    @PostMapping("/users/{user_id}/change_password")
-    public UserWithoutPassDTO changePassword(@PathVariable(name = "user_id") int userId,
-                                             @RequestBody ChangePassUserDTO changePasswordDTO,
+    @PostMapping("/users/change_password")
+    public UserWithoutPassDTO changePassword(@RequestBody ChangePassUserDTO changePasswordDTO,
                                              HttpSession session) {
-        String message = "Cannot change other users password!";
-        SessionManager.validateSession(session, message, userId);
+        int userId = sessionManager.validateSession(session);
         return userService.changePassword(userId, changePasswordDTO);
     }
 

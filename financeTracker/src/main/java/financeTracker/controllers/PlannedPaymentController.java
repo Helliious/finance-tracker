@@ -16,55 +16,49 @@ import java.util.List;
 public class PlannedPaymentController extends AbstractController{
     @Autowired
     private PlannedPaymentsService plannedPaymentsService;
+    @Autowired
+    private SessionManager sessionManager;
 
-    @PutMapping("/users/{user_id}/accounts/{account_id}/planned_payments")
-    public UserWithoutPassDTO add(@PathVariable(name = "user_id") int userId,
-                                  @PathVariable(name = "account_id") int accountId,
+    @PutMapping("/accounts/{account_id}/planned_payments")
+    public UserWithoutPassDTO add(@PathVariable(name = "account_id") int accountId,
                                   @RequestBody PlannedPayment plannedPayment,
                                   HttpSession session) {
-        String message = "Cannot add planned payments to other users!";
-        SessionManager.validateSession(session, message, userId);
+        int userId = sessionManager.validateSession(session);
         plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         return plannedPaymentsService.add(plannedPayment, userId, accountId);
     }
 
-    @GetMapping("/users/{user_id}/accounts/{account_id}/planned_payments/{planned_payment_id}")
-    public ResponsePlannedPaymentDTO getById(@PathVariable(name = "user_id") int userId,
-                                             @PathVariable(name = "account_id") int accountId,
+    @GetMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")
+    public ResponsePlannedPaymentDTO getById(@PathVariable(name = "account_id") int accountId,
                                              @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                              HttpSession session) {
         String message = "Cannot see planned payments of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return plannedPaymentsService.getById(accountId, plannedPaymentId);
+        int userId = sessionManager.validateSession(session);
+        return plannedPaymentsService.getById(accountId, userId, plannedPaymentId);
     }
 
-    @GetMapping("/users/{user_id}/accounts/{account_id}/planned_payments")
-    public List<ResponsePlannedPaymentDTO> getAll(@PathVariable(name = "user_id") int userId,
-                                                  @PathVariable(name = "account_id") int accountId,
+    @GetMapping("/accounts/{account_id}/planned_payments")
+    public List<ResponsePlannedPaymentDTO> getAll(@PathVariable(name = "account_id") int accountId,
                                                   HttpSession session) {
-        String message = "Cannot see planned payments of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return plannedPaymentsService.getAll(accountId);
+        int userId = sessionManager.validateSession(session);
+        return plannedPaymentsService.getAll(accountId, userId);
     }
 
-    @DeleteMapping("/users/{user_id}/accounts/{account_id}/planned_payments/{planned_payment_id}/delete")
-    public ResponsePlannedPaymentDTO delete(@PathVariable(name = "user_id") int userId,
-                                            @PathVariable(name = "account_id") int accountId,
+    @DeleteMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")
+    public ResponsePlannedPaymentDTO delete(@PathVariable(name = "account_id") int accountId,
                                             @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                             HttpSession session) {
-        String message = "Cannot delete planned payments of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return plannedPaymentsService.delete(accountId, plannedPaymentId);
+        int userId = sessionManager.validateSession(session);
+        return plannedPaymentsService.delete(accountId, userId, plannedPaymentId);
     }
 
-    @PutMapping("/users/{user_id}/accounts/{account_id}/planned_payments/{planned_payment_id}/edit")
-    public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int userId,
-                                   @PathVariable(name = "account_id") int accountId,
+    @PostMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")
+    public ResponsePlannedPaymentDTO edit(@PathVariable(name = "account_id") int accountId,
                                    @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                    @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
                                    HttpSession session) {
         String message = "Cannot edit planned payments of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, plannedPaymentId);
+        int userId = sessionManager.validateSession(session);
+        return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, userId, plannedPaymentId);
     }
 }

@@ -8,4 +8,5 @@ import financeTracker.models.pojo.User;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
     Account findAccountByNameAndOwner(String name, User user);
+    Account findByIdAndOwnerId(int accountId, int ownerId);
 }

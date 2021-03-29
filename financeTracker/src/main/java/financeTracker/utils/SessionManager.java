@@ -1,23 +1,28 @@
 package financeTracker.utils;
 
 import financeTracker.exceptions.AuthenticationException;
-import financeTracker.exceptions.BadRequestException;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
 
+@Component
 public class SessionManager {
     public static final String LOGGED_USER_ID = "LOGGED_USER_ID";
 
-    public static int validateSession(HttpSession session, String message, int ownerId){
-        int loggedId;
+    public int validateSession(HttpSession session){
         if (session.getAttribute(LOGGED_USER_ID) == null) {
             throw new AuthenticationException("Not logged in!");
         } else {
-            loggedId = (int) session.getAttribute(LOGGED_USER_ID);
-            if (loggedId != ownerId) {
-                throw new BadRequestException(message);
-            }
+            int loggedId = (int) session.getAttribute(LOGGED_USER_ID);
+            return loggedId;
         }
-        return loggedId;
+    }
+
+    public void loginUser(HttpSession session, int userId) {
+        session.setAttribute(LOGGED_USER_ID, userId);
+    }
+
+    public void logoutUser(HttpSession session) {
+        session.invalidate();
     }
 }

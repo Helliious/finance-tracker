@@ -14,38 +14,33 @@ import java.util.List;
 public class CategoryController extends AbstractController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SessionManager sessionManager;
 
-    @GetMapping("/users/{user_id}/category/{category_id}")
-    public CategoryWithoutPlannedPaymentsDTO getById(@PathVariable(name = "user_id") int userId,
-                                                     @PathVariable(name = "category_id") int categoryId,
+    @GetMapping("/category/{category_id}")
+    public CategoryWithoutPlannedPaymentsDTO getById(@PathVariable(name = "category_id") int categoryId,
                                                      HttpSession session) {
-        String message = "Cannot show categories of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return categoryService.getById(categoryId);
+        int userId = sessionManager.validateSession(session);
+        return categoryService.getById(categoryId, userId);
     }
 
-    @GetMapping("/users/{id}/category")
-    public List<Category> getAll(@PathVariable int id, HttpSession session) {
-        String message = "Cannot show categories of other users!";
-        SessionManager.validateSession(session, message, id);
-        return categoryService.getAll();
+    @GetMapping("/category")
+    public List<Category> getAll(HttpSession session) {
+        int userId = sessionManager.validateSession(session);
+        return categoryService.getAll(userId);
     }
 
-    @PutMapping("/users/{id}/category/add_category")
-    public Category add(@PathVariable int id,
-                        @RequestBody Category category,
+    @PutMapping("/category")
+    public Category add(@RequestBody Category category,
                         HttpSession session) {
-        String message = "Cannot add categories for other users!";
-        SessionManager.validateSession(session, message, id);
-        return categoryService.add(category);
+        int userId = sessionManager.validateSession(session);
+        return categoryService.add(category, userId);
     }
 
-    @DeleteMapping("/users/{user_id}/category/{category_id}/delete_category")
-    public Category delete(@PathVariable(name = "user_id") int userId,
-                           @PathVariable(name = "category_id") int categoryId,
+    @DeleteMapping("/category/{category_id}/delete")
+    public Category delete(@PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
-        String message = "Cannot delete categories for other users!";
-        SessionManager.validateSession(session, message, userId);
-        return categoryService.delete(categoryId);
+        int userId = sessionManager.validateSession(session);
+        return categoryService.delete(categoryId, userId);
     }
 }

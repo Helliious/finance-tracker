@@ -1,5 +1,6 @@
 package financeTracker.services;
 
+import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
@@ -38,10 +39,13 @@ public class AccountService {
         return new UserWithoutPassDTO(user);
     }
 
-    public AccountWithoutOwnerDTO getById(int accountId) {
+    public AccountWithoutOwnerDTO getById(int accountId, int userId) {
         Optional<Account> account = accountRepository.findById(accountId);
         if (account.isEmpty()) {
             throw new NotFoundException("Account not found!");
+        }
+        if (account.get().getOwner().getId() != userId) {
+            throw new AuthenticationException("Cannot show accounts of other users!");
         }
         return new AccountWithoutOwnerDTO(account.get());
     }
@@ -58,10 +62,13 @@ public class AccountService {
         return accounts;
     }
 
-    public AccountWithoutOwnerDTO deleteAccount(int accountId) {
+    public AccountWithoutOwnerDTO deleteAccount(int accountId, int userId) {
         Optional<Account> account = accountRepository.findById(accountId);
         if (account.isEmpty()) {
             throw new NotFoundException("Account not found!");
+        }
+        if (account.get().getOwner().getId() != userId) {
+            throw new AuthenticationException("Cannot delete accounts of other users!");
         }
         AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account.get());
         accountRepository.deleteById(accountId);
@@ -73,6 +80,9 @@ public class AccountService {
         Optional<User> user = userRepository.findById(userId);
         if (account.isEmpty() || user.isEmpty()) {
             throw new NotFoundException("User/Account not found!");
+        }
+        if (account.get().getOwner().getId() != userId) {
+            throw new AuthenticationException("Cannot modify accounts of other users!");
         }
         if (accountDTO.getName() != null) {
             if (accountRepository.findAccountByNameAndOwner(accountDTO.getName(), user.get()) != null) {

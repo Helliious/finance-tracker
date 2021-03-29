@@ -17,50 +17,43 @@ import java.util.List;
 public class AccountController extends AbstractController {
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private SessionManager sessionManager;
 
-    @GetMapping("/users/{user_id}/accounts/{account_id}")
-    public AccountWithoutOwnerDTO getById(@PathVariable(name = "user_id") int userId,
-                                          @PathVariable(name = "account_id") int accountId,
+    @GetMapping("/accounts/{account_id}")
+    public AccountWithoutOwnerDTO getById(@PathVariable(name = "account_id") int accountId,
                                           HttpSession session) {
-        String message = "Cannot show accounts of other users!";
-        SessionManager.validateSession(session, message, userId);
-        return accountService.getById(accountId);
+        int userId = sessionManager.validateSession(session);
+        return accountService.getById(accountId, userId);
     }
 
-    @GetMapping("/users/{user_id}/accounts")
-    public List<AccountWithoutOwnerDTO> getAll(@PathVariable(name = "user_id") int userId, HttpSession session) {
-        String message = "Cannot show accounts of other users!";
-        SessionManager.validateSession(session, message, userId);
+    @GetMapping("/accounts")
+    public List<AccountWithoutOwnerDTO> getAll(HttpSession session) {
+        int userId = sessionManager.validateSession(session);
         return accountService.getAll(userId);
     }
 
-    @PutMapping("/users/{user_id}/create_account")
-    public UserWithoutPassDTO create(@PathVariable(name = "user_id") int id,
-                                     @RequestBody Account account,
+    @PutMapping("/accounts")
+    public UserWithoutPassDTO create(@RequestBody Account account,
                                      HttpSession session) {
-        String message = "Cannot create accounts for other users!";
-        SessionManager.validateSession(session, message, id);
+        int userId = sessionManager.validateSession(session);
         account.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        UserWithoutPassDTO userWithoutPassDTO = accountService.createAcc(account, id);
+        UserWithoutPassDTO userWithoutPassDTO = accountService.createAcc(account, userId);
         return userWithoutPassDTO;
     }
 
-    @DeleteMapping("/users/{user_id}/accounts/{account_id}/delete_account")
-    public AccountWithoutOwnerDTO delete(@PathVariable(name = "user_id") int userId,
-                                         @PathVariable(name = "account_id") int accountId,
+    @DeleteMapping("/accounts/{account_id}")
+    public AccountWithoutOwnerDTO delete(@PathVariable(name = "account_id") int accountId,
                                          HttpSession session) {
-        String message = "Cannot delete accounts for other users!";
-        SessionManager.validateSession(session, message, userId);
-        return accountService.deleteAccount(accountId);
+        int userId = sessionManager.validateSession(session);
+        return accountService.deleteAccount(accountId, userId);
     }
 
-    @PutMapping("/users/{user_id}/accounts/{account_id}/edit_account")
-    public UserWithoutPassDTO edit(@PathVariable(name = "user_id") int userId,
-                                   @PathVariable(name = "account_id") int accountId,
+    @PostMapping("/accounts/{account_id}")
+    public UserWithoutPassDTO edit(@PathVariable(name = "account_id") int accountId,
                                    @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
                                    HttpSession session) {
-        String message = "Cannot modify accounts for other users!";
-        SessionManager.validateSession(session, message, userId);
+        int userId = sessionManager.validateSession(session);
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);
     }
 }
