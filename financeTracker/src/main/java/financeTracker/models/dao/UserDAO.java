@@ -29,6 +29,7 @@ public class UserDAO {
                         result.getTimestamp("create_time"),
                         null,
                         null,
+                        null,
                         null
                 );
             }

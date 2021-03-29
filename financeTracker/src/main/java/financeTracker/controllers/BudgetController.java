@@ -26,7 +26,7 @@ public class BudgetController extends AbstractController {
                                                      @PathVariable("user_id") int userId,
                                                      HttpSession session){
         //dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        SessionManager.validateSession(session,"Cannot add to other user !!",userId);
+//        SessionManager.validateSession(session,"Cannot add to other user !!",userId);
         return budgetService.addBudgetToAcc(userId,dto);
     }
 
@@ -34,14 +34,14 @@ public class BudgetController extends AbstractController {
     public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "user_id") int ownerId,
                                                    @PathVariable(name="budget_id") int budgetId,
                                                    HttpSession session) {
-        SessionManager.validateSession(session,"Cannot get other user budget!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot get other user budget!!",ownerId);
         return budgetService.getById(budgetId);
     }
 
     @GetMapping("/users/{owner_id}/budgets")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(@PathVariable("owner_id") int ownerId,
                                                                    HttpSession session){
-        SessionManager.validateSession(session,"Cannot see other users budgets!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot see other users budgets!!",ownerId);
         return budgetService.getByOwnerId(ownerId);
     }
 
@@ -54,7 +54,7 @@ public class BudgetController extends AbstractController {
         }
         Account account=optionalAccount.get();
         int ownerId=account.getOwner().getId();
-        SessionManager.validateSession(session,"Cannot see other users account budgets!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot see other users account budgets!!",ownerId);
         return budgetService.getByAccountId(accountId);
     }
 
@@ -62,7 +62,7 @@ public class BudgetController extends AbstractController {
     public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="user_id") int userId,
                                                   @PathVariable(name="budget_id") int budgetId,
                                                   HttpSession session){
-        SessionManager.validateSession(session,"Cannot delete other users budget!!",userId);
+//        SessionManager.validateSession(session,"Cannot delete other users budget!!",userId);
         return budgetService.delete(budgetId,userId);
     }
 
@@ -71,7 +71,7 @@ public class BudgetController extends AbstractController {
                                                 @PathVariable(name="budget_id") int budgetId,
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
-        SessionManager.validateSession(session,"You can't modify other users budgets",userId);
+//        SessionManager.validateSession(session,"You can't modify other users budgets",userId);
         return budgetService.editBudget(budgetId,dto,userId);
     }
 
@@ -79,7 +79,7 @@ public class BudgetController extends AbstractController {
     public double getSpendingByCategory(@PathVariable(name="user_id") int userId,
                                         @PathVariable(name="category_id") int categoryId,
                                         HttpSession session){
-        SessionManager.validateSession(session,"You can't get spendings of other user",userId);
+//        SessionManager.validateSession(session,"You can't get spendings of other user",userId);
         return budgetService.getSpendings(categoryId);
     }
 
@@ -87,7 +87,7 @@ public class BudgetController extends AbstractController {
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@PathVariable(name="user_id") int userId,
                                                              @RequestBody FilterBudgetRequestDTO dto,
                                                              HttpSession session){
-        SessionManager.validateSession(session,"You can't filter other users budgets",userId);
+//        SessionManager.validateSession(session,"You can't filter other users budgets",userId);
         return budgetService.filter(userId,dto);
     }
 }

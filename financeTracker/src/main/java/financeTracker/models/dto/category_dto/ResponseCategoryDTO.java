@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @Component
-public class CategoryWithoutPlannedPaymentsDTO {
+public class ResponseCategoryDTO {
     private int id;
     private String name;
     private String type;
     private CategoryImageDTO imageDTO;
 
-    public CategoryWithoutPlannedPaymentsDTO(Category category) {
+    public ResponseCategoryDTO(Category category) {
         id = category.getId();
         name = category.getName();
         type = category.getType();

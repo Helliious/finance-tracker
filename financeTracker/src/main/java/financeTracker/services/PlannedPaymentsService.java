@@ -92,7 +92,7 @@ public class PlannedPaymentsService {
     }
 
     public ResponsePlannedPaymentDTO delete(int accountId, int userId, int plannedPaymentId) {
-        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAAndOwnerId(plannedPaymentId, accountId, userId);
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
         }
@@ -102,7 +102,7 @@ public class PlannedPaymentsService {
     }
 
     public ResponsePlannedPaymentDTO edit(ResponsePlannedPaymentDTO responsePlannedPaymentDTO, int accountId, int userId, int plannedPaymentId) {
-        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAAndOwnerId(plannedPaymentId, accountId, userId);
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
         }

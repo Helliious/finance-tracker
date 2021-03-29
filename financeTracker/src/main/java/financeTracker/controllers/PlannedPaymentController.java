@@ -32,7 +32,6 @@ public class PlannedPaymentController extends AbstractController{
     public ResponsePlannedPaymentDTO getById(@PathVariable(name = "account_id") int accountId,
                                              @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                              HttpSession session) {
-        String message = "Cannot see planned payments of other users!";
         int userId = sessionManager.validateSession(session);
         return plannedPaymentsService.getById(accountId, userId, plannedPaymentId);
     }
@@ -57,7 +56,6 @@ public class PlannedPaymentController extends AbstractController{
                                    @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                    @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
                                    HttpSession session) {
-        String message = "Cannot edit planned payments of other users!";
         int userId = sessionManager.validateSession(session);
         return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, userId, plannedPaymentId);
     }
