@@ -3,7 +3,7 @@ package financeTracker.models.dto.user_dto;
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
-import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerDTO;
+import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.PlannedPayment;
 import financeTracker.models.pojo.Transaction;
@@ -29,7 +29,7 @@ public class UserWithoutPassDTO {
     private String email;
     private Timestamp createTime;
     private List<AccountWithoutOwnerDTO> accounts;
-    private List<TransactionWithoutOwnerDTO> transactions;
+    private List<TransactionWithoutOwnerAndAccountDTO> transactions;
     private List<ResponsePlannedPaymentDTO> plannedPayments;
 
     public UserWithoutPassDTO(User user) {
@@ -48,7 +48,7 @@ public class UserWithoutPassDTO {
         transactions = new ArrayList<>();
         if (user.getTransactions() != null) {
             for (Transaction t : user.getTransactions()) {
-                transactions.add(new TransactionWithoutOwnerDTO(t));
+                transactions.add(new TransactionWithoutOwnerAndAccountDTO(t));
             }
         }
         plannedPayments = new ArrayList<>();

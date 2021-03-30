@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,4 +17,6 @@ public class FilterTransactionRequestDTO{
     private int amountFrom;
     private int amountTo;
     private String type;
+    private Timestamp dateFrom;
+    private Timestamp dateTo;
 }

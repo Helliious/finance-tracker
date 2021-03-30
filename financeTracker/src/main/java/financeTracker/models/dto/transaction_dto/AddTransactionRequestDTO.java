@@ -17,5 +17,4 @@ public class AddTransactionRequestDTO {
     private Timestamp createTime;
     private String description;
     private int categoryId;
-    private int userId;
 }
