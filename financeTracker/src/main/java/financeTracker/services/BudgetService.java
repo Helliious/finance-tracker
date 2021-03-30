@@ -147,12 +147,12 @@ public class BudgetService {
         return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
-    public double getSpendings(int categoryId) {
+    public double getSpendings(int ownerId,int categoryId) {
         Optional<Category> category=categoryRepository.findById(categoryId);
         if (category.isEmpty()){
             throw new NotFoundException("There is not category with such ID");
         }
-        ArrayList<Budget> budgets=budgetRepository.findBudgetsByCategoryId(categoryId);
+        ArrayList<Budget> budgets=budgetRepository.findBudgetsByOwnerIdAndCategoryId(ownerId,categoryId);
         if (budgets.isEmpty()){
             throw new NotFoundException("This account don't have budgets corresponding to this category");
         }

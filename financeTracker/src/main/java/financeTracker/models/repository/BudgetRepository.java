@@ -8,6 +8,5 @@ import java.util.ArrayList;
 public interface BudgetRepository extends JpaRepository<Budget,Integer>{
  ArrayList<Budget> findBudgetsByOwnerId(int ownerId);
  ArrayList<Budget> findBudgetsByAccountId(int accountId);
- ArrayList<Budget> findBudgetsByCategoryId(int categoryId);
-
+ ArrayList<Budget> findBudgetsByOwnerIdAndCategoryId(int ownerid,int categoryId);
 }
