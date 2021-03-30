@@ -31,32 +31,10 @@ public class BudgetDAO {
     private CategoryRepository categoryRepository;
     @Autowired
     private AccountRepository accountRepository;
-/*
-    public Budget getById(int id) throws Exception {
 
-        String sql = "SELECT id, name, label, amount, due_time FROM budgets WHERE id = ?";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ResultSet result = ps.executeQuery();
-            if (result.next()) {
-                return new Budget(
-                        result.getInt("id"),
-                        result.getString("name"),
-                        result.getString("label"),
-                        result.getDouble("amount"),
-                        result.getTimestamp("due_time")
-                );
-            }
-            throw new Exception("Budget not found");
-        }
-
-
-    }
-    */
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> filterBudget(int userId, FilterBudgetRequestDTO dto){
         ArrayList<BudgetWithoutAccountAndOwnerDTO> budgetsWithoutAccountAndOwnerDTOS =new ArrayList<>();
-
+        
         String sql="SELECT* FROM budgets WHERE owner_id = ? ";
         int numberOfParameters=1;
         boolean nameIncludedInFilter=false;
@@ -64,6 +42,9 @@ public class BudgetDAO {
         boolean bothAmountsIncluded=false;
         boolean amountFromIncluded=false;
         boolean amountToIncluded=false;
+        boolean bothDatesIncluded=false;
+        boolean dateFromIncluded=false;
+        boolean dateToIncluded=false;
         if (dto.getName()!=null){
             sql+="AND name LIKE ?";
             nameIncludedInFilter=true;
@@ -94,6 +75,23 @@ public class BudgetDAO {
                 numberOfParameters++;
             }
         }
+        if(dto.getDateFrom()!=null&&dto.getDateTo()!=null){
+            sql+="AND create_time BETWEEN ? AND ?";
+            numberOfParameters+=2;
+            bothDatesIncluded=true;
+        }
+        else{
+            if (dto.getDateFrom()!=null &&dto.getDateTo()==null){
+                sql+="AND create_time >= ?";
+                numberOfParameters++;
+                dateFromIncluded=true;
+            }
+            if (dto.getDateFrom()==null&&dto.getDateTo()==null){
+                sql+="AND create_time <= ?";
+                numberOfParameters++;
+                dateToIncluded=true;
+            }
+        }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -116,11 +114,21 @@ public class BudgetDAO {
                 } else if (amountToIncluded) {
                     ps.setDouble(i, dto.getAmountTo());
                     amountToIncluded = false;
+                }else if(bothDatesIncluded){
+                    ps.setTimestamp(i,dto.getDateFrom());
+                    ps.setTimestamp(++i,dto.getDateTo());
+                    bothAmountsIncluded=false;
                 }
-
+                else if(dateFromIncluded){
+                    ps.setTimestamp(i,dto.getDateFrom());
+                    dateFromIncluded=false;
+                }
+                else if(dateToIncluded){
+                    ps.setTimestamp(i,dto.getDateTo());
+                    dateToIncluded=false;
+                }
             }
             ResultSet result = ps.executeQuery();
-
             if (result.next()) {
                 do{
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
@@ -137,7 +145,6 @@ public class BudgetDAO {
                     );
                     budgetsWithoutAccountAndOwnerDTOS.add(new BudgetWithoutAccountAndOwnerDTO(budget));
                 }while (result.next());
-
             }
             else{
                 throw new NotFoundException("There is not budgets corresponding to current filter");
@@ -148,5 +155,4 @@ public class BudgetDAO {
         }
         return budgetsWithoutAccountAndOwnerDTOS;
     }
-
 }

@@ -16,6 +16,6 @@ public class FilterBudgetRequestDTO {
  private double amountFrom;
  private double amountTo;
  private int categoryId;
- private Timestamp dateBefore;
- private Timestamp dateAfter;
+ private Timestamp dateFrom;
+ private Timestamp dateTo;
 }
