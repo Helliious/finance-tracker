@@ -1,7 +1,5 @@
 package financeTracker.controllers;
 
-import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
-import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;

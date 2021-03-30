@@ -1,6 +1,5 @@
 package financeTracker.services;
 
-import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.PlannedPaymentDAO;

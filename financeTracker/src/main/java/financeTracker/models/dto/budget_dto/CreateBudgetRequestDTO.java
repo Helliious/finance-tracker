@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Component
-
 public class CreateBudgetRequestDTO {
     private String name;
     private String label;
