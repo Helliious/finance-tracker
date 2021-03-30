@@ -148,7 +148,7 @@ public class BudgetService {
     }
 
     public double getSpendings(int categoryId) {
-        Optional<Category> category=categoryRepository.findBy Id(categoryId);
+        Optional<Category> category=categoryRepository.findById(categoryId);
         if (category.isEmpty()){
             throw new NotFoundException("There is not category with such ID");
         }
