@@ -3,7 +3,7 @@ package financeTracker.models.dao;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
-import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerDTO;
+import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
@@ -31,8 +31,8 @@ public class TransactionDAO {
     private UserRepository userRepository;
 
 
-    public ArrayList<TransactionWithoutOwnerDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto){
-        ArrayList<TransactionWithoutOwnerDTO> transactionsWithoutOwnerDTOS =new ArrayList<>();
+    public ArrayList<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto){
+        ArrayList<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS =new ArrayList<>();
 
         String sql="SELECT* FROM transactions WHERE owner_id = ? ";
         int numberOfParameters=1;
@@ -120,7 +120,7 @@ public class TransactionDAO {
                             optionalAccount.get(),
                             optionalUser.get()
                     );
-                    transactionsWithoutOwnerDTOS.add(new TransactionWithoutOwnerDTO(transaction));
+                    transactionsWithoutOwnerDTOS.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
                 }while (result.next());
 
             }

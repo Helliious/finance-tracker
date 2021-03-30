@@ -16,6 +16,7 @@ public class CreateBudgetRequestDTO {
     private String name;
     private String label;
     private double amount;
+    private Timestamp createTime;
     private Timestamp dueTime;
     private int categoryId;
     private int accountId;

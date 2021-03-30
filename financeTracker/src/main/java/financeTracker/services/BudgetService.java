@@ -29,14 +29,15 @@ public class BudgetService {
     @Autowired
     private BudgetDAO budgetDao;
 
-    public BudgetWithoutAccountAndOwnerDTO getById(int id) {
+    public BudgetWithoutAccountAndOwnerDTO getById(int userId,int id) {
         Optional<Budget> optionalBudget=budgetRepository.findById(id);
         if (optionalBudget.isEmpty()){
             throw new NotFoundException("Budget not found");
         }
-        else{
-            return new BudgetWithoutAccountAndOwnerDTO(optionalBudget.get());
+        if(optionalBudget.get().getOwner().getId()!=userId){
+            throw new BadRequestException("You don't have budget with such id!!");
         }
+        return new BudgetWithoutAccountAndOwnerDTO(optionalBudget.get());
     }
 
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getByOwnerId(int ownerId) {
@@ -52,7 +53,14 @@ public class BudgetService {
         return responseBudgets;
     }
 
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getByAccountId(int accountId) {
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getByAccountId(int userId,int accountId) {
+        Optional<Account> optionalAccount=accountRepository.findById(accountId);
+        if (optionalAccount.isEmpty()){
+            throw new NotFoundException("Account does not exist..");
+        }
+        if(optionalAccount.get().getOwner().getId()!=userId){
+            throw new BadRequestException("You can't see budgets of account that you aren't owner!!");
+        }
         ArrayList<Budget> budgets=budgetRepository.findBudgetsByAccountId(accountId);
         if (budgets.isEmpty()){
             throw new NotFoundException("This account dont'have budgets");
