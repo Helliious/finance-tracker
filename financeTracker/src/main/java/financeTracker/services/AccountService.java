@@ -53,7 +53,7 @@ public class AccountService {
     public List<AccountWithoutOwnerDTO> getAll(int userId) {
         List<Account> accounts = accountRepository.findAllByOwnerId(userId);
         if (accounts.isEmpty()) {
-            throw new NotFoundException("Accounts not found!");
+            throw new NotFoundException("No accounts!");
         }
         List<AccountWithoutOwnerDTO> response = new ArrayList<>();
         for (Account a : accounts) {
