@@ -185,4 +185,6 @@ public class PlannedPaymentsService {
         plannedPaymentsRepository.save(plannedPayment);
         return new ResponsePlannedPaymentDTO(plannedPayment);
     }
+
+    //TODO: add filter functionality
 }

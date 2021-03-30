@@ -29,9 +29,8 @@ public class CategoryService {
         }
         validateCategory(category);
         category.setOwner(optUser.get());
-        ResponseCategoryDTO responseCategory = new ResponseCategoryDTO(category);
-        categoryRepository.save(category);
-        return responseCategory;
+        Category result = categoryRepository.save(category);
+        return new ResponseCategoryDTO(result);
     }
 
     public ResponseCategoryDTO delete(int categoryId, int userId) {
@@ -71,9 +70,6 @@ public class CategoryService {
         }
         if (category.getName() == null) {
             throw new BadRequestException("Need to enter valid category name!");
-        }
-        if (category.getImage() == null) {
-            throw new BadRequestException("Need to add image to category!");
         }
     }
 }

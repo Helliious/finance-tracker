@@ -31,109 +31,94 @@ public class TransactionDAO {
     private UserRepository userRepository;
 
     public ArrayList<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto){
-        ArrayList<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS =new ArrayList<>();
-
-        String sql="SELECT* FROM transactions WHERE owner_id = ? ";
-        int numberOfParameters=1;
-        boolean nameIncludedInFilter=false;
-        boolean categoryIncludedInFilter=false;
-        boolean bothAmountsIncluded=false;
-        boolean amountFromIncluded=false;
-        boolean amountToIncluded=false;
-        boolean typeIncluded=false;
-        boolean bothDatesIncluded=false;
-        boolean dateFromIncluded=false;
-        boolean dateToIncluded=false;
-        if (dto.getName()!=null){
-            sql+="AND name LIKE ?";
-            nameIncludedInFilter=true;
-            numberOfParameters++;
+        ArrayList<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS = new ArrayList<>();
+        String sql = "SELECT * FROM transactions WHERE owner_id = ? ";
+        boolean nameIncludedInFilter = false;
+        boolean categoryIncludedInFilter = false;
+        boolean bothAmountsIncluded = false;
+        boolean amountFromIncluded = false;
+        boolean amountToIncluded = false;
+        boolean typeIncluded = false;
+        boolean bothDatesIncluded = false;
+        boolean dateFromIncluded = false;
+        boolean dateToIncluded = false;
+        if (dto.getName() != null){
+            sql += "AND name LIKE ?";
+            nameIncludedInFilter = true;
         }
-        if (dto.getType()!=null){
-            sql+="AND type= ?";
-            typeIncluded=true;
-            numberOfParameters++;
+        if (dto.getType() != null){
+            sql += "AND type = ?";
+            typeIncluded = true;
         }
-        if (dto.getCategoryId()>0){
-            sql+="AND category_id= ? ";
-            categoryIncludedInFilter=true;
-            numberOfParameters++;
+        if (dto.getCategoryId() > 0){
+            sql += "AND category_id = ? ";
+            categoryIncludedInFilter = true;
         }
-        if (dto.getAmountFrom()> dto.getAmountTo()){
+        if (dto.getAmountFrom() > dto.getAmountTo()){
             throw new BadRequestException("Amount from can't be bigger than Amount to");
         }
-        if (dto.getAmountFrom()>0&&dto.getAmountTo()>0){
-            sql+="AND amount BETWEEN ? AND ? ";
-            bothAmountsIncluded=true;
-            numberOfParameters+=2;
+        if (dto.getAmountFrom() > 0 && dto.getAmountTo() > 0){
+            sql += "AND amount BETWEEN ? AND ? ";
+            bothAmountsIncluded = true;
         }
         else {
             if (dto.getAmountFrom() > 0 && dto.getAmountTo() <= 0) {
                 sql += "AND amount > ? ";
                 amountFromIncluded = true;
-                numberOfParameters++;
             }
             if (dto.getAmountFrom() < 0 && dto.getAmountTo() > 0) {
                 amountToIncluded = true;
                 sql += "AND amount< ? ";
-                numberOfParameters++;
             }
         }
-        if(dto.getDateFrom()!=null&&dto.getDateTo()!=null){
-            sql+="AND create_time BETWEEN ? AND ?";
-            numberOfParameters+=2;
-            bothDatesIncluded=true;
+        if (dto.getDateFrom() != null && dto.getDateTo() != null){
+            sql += "AND create_time BETWEEN ? AND ?";
+            bothDatesIncluded = true;
         }
-        else{
-            if (dto.getDateFrom()!=null &&dto.getDateTo()==null){
-                sql+="AND create_time >= ?";
-                numberOfParameters++;
-                dateFromIncluded=true;
+        else {
+            if (dto.getDateFrom() != null && dto.getDateTo() == null) {
+                sql += "AND create_time >= ?";
+                dateFromIncluded = true;
             }
-            if (dto.getDateFrom()==null&&dto.getDateTo()==null){
-                sql+="AND create_time <= ?";
-                numberOfParameters++;
-                dateToIncluded=true;
+            if (dto.getDateFrom() == null && dto.getDateTo() == null) {
+                sql += "AND create_time <= ?";
+                dateToIncluded = true;
             }
         }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            int paramIdx = 1;
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, userId);
-            for (int i = 2; i <= numberOfParameters; i++) {
-                if (nameIncludedInFilter) {
-                    ps.setString(i, dto.getName()+"%");
-                    nameIncludedInFilter = false;
-                } else if (categoryIncludedInFilter) {
-                    System.out.println(i + " setted " + dto.getCategoryId());
-                    ps.setInt(i, dto.getCategoryId());
-                    categoryIncludedInFilter = false;
-                } else if (typeIncluded){
-                    ps.setString(i,dto.getType());
-                    typeIncluded=false;
-                } else if (bothAmountsIncluded) {
-                    ps.setDouble(i, dto.getAmountFrom());
-                    ps.setDouble(++i, dto.getAmountTo());
-                    bothAmountsIncluded = false;
-                } else if (amountFromIncluded) {
-                    ps.setDouble(i, dto.getAmountFrom());
-                    amountFromIncluded = false;
-                } else if(amountToIncluded){
-                    ps.setDouble(i, dto.getAmountTo());
-                    amountToIncluded = false;
-                }else if(bothDatesIncluded){
-                    ps.setTimestamp(i,dto.getDateFrom());
-                    ps.setTimestamp(++i,dto.getDateTo());
-                    bothAmountsIncluded=false;
-                }
-                else if(dateFromIncluded){
-                    ps.setTimestamp(i,dto.getDateFrom());
-                    dateFromIncluded=false;
-                }
-                else if(dateToIncluded){
-                    ps.setTimestamp(i,dto.getDateTo());
-                    dateToIncluded=false;
-                }
+            ps.setInt(paramIdx++, userId);
+            if (nameIncludedInFilter) {
+                ps.setString(paramIdx++, dto.getName()+"%");
+            }
+            if (categoryIncludedInFilter) {
+//                System.out.println(i + " setted " + dto.getCategoryId());
+                ps.setInt(paramIdx++, dto.getCategoryId());
+            }
+            if (typeIncluded) {
+                ps.setString(paramIdx++, dto.getType());
+            }
+            if (bothAmountsIncluded) {
+                ps.setDouble(paramIdx++, dto.getAmountFrom());
+                ps.setDouble(paramIdx++, dto.getAmountTo());
+            }
+            if (amountFromIncluded) {
+                ps.setDouble(paramIdx++, dto.getAmountFrom());
+            }
+            if(amountToIncluded) {
+                ps.setDouble(paramIdx++, dto.getAmountTo());
+            }
+            if(bothDatesIncluded) {
+                ps.setTimestamp(paramIdx++, dto.getDateFrom());
+                ps.setTimestamp(paramIdx++, dto.getDateTo());
+            }
+            if(dateFromIncluded) {
+                ps.setTimestamp(paramIdx++, dto.getDateFrom());
+            }
+            if(dateToIncluded) {
+                ps.setTimestamp(paramIdx, dto.getDateTo());
             }
             ResultSet result = ps.executeQuery();
             if (result.next()) {

@@ -117,4 +117,6 @@ public class AccountService {
             throw new BadRequestException("Must enter valid account limit!");
         }
     }
+
+    //TODO: add filter functionality
 }
