@@ -1,5 +1,6 @@
 package financeTracker.services;
 
+import financeTracker.email.EmailServiceImpl;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
@@ -18,6 +19,8 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private EmailServiceImpl emailService;
 
     public UserWithoutPassDTO addUser(RegisterRequestUserDTO userDTO) {
         if (userRepository.findByUsername(userDTO.getUsername()) != null) {
@@ -114,10 +117,12 @@ public class UserService {
             throw new BadRequestException("User not found!");
         }
         String generatedPass = RandomString.make(20);
+        String mailMessage = "New password: " + generatedPass;
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(generatedPass));
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user);
         userRepository.save(user);
+        emailService.sendPassword(email, "Forgot password", mailMessage);
         return responseUser;
     }
 
