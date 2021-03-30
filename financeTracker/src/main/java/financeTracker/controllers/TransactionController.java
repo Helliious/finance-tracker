@@ -60,7 +60,7 @@ public class TransactionController extends AbstractController {
         return transactionService.editTransaction(transactionId,dto,userId);
     }
 
-    @PostMapping("users/{user_id}/transactions/filter")
+    @PostMapping("/transactions/filter")
     public ArrayList<TransactionWithoutOwnerAndAccountDTO> filter(@RequestBody FilterTransactionRequestDTO dto,
                                                                   HttpSession session){
         int userId=sessionManager.validateSession(session);
