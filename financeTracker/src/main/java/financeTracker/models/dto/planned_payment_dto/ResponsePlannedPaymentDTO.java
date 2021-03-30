@@ -1,7 +1,6 @@
 package financeTracker.models.dto.planned_payment_dto;
 
-import financeTracker.models.dto.category_dto.CategoryWithoutPlannedPaymentsDTO;
-import financeTracker.models.pojo.Category;
+import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import financeTracker.models.pojo.PlannedPayment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,7 @@ public class ResponsePlannedPaymentDTO {
     private String durationUnit;
     private double amount;
     private Timestamp dueTime;
-    private CategoryWithoutPlannedPaymentsDTO category;
+    private ResponseCategoryDTO category;
 
     public ResponsePlannedPaymentDTO(PlannedPayment plannedPayment) {
         name = plannedPayment.getName();
@@ -30,6 +29,6 @@ public class ResponsePlannedPaymentDTO {
         durationUnit = plannedPayment.getDurationUnit();
         amount = plannedPayment.getAmount();
         dueTime = plannedPayment.getDueTime();
-        category = new CategoryWithoutPlannedPaymentsDTO(plannedPayment.getCategory());
+        category = new ResponseCategoryDTO(plannedPayment.getCategory());
     }
 }

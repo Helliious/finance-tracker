@@ -26,7 +26,7 @@ public class TransactionController extends AbstractController {
                                                      @PathVariable("account_id") int accountId,
                                                      HttpSession session){
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        SessionManager.validateSession(session,"Cannot add to other user account!!",dto.getUserId());
+//        SessionManager.validateSession(session,"Cannot add to other user account!!",dto.getUserId());
         return transactionService.addTransactionToAcc(accountId,dto);
     }
 
@@ -34,14 +34,14 @@ public class TransactionController extends AbstractController {
     public TransactionWithoutOwnerDTO getById(@PathVariable(name="owner_id") int ownerId,
                                               @PathVariable(name="transaction_id") int transactionId,
                                               HttpSession session){
-        SessionManager.validateSession(session,"Cannot get other user transaction!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot get other user transaction!!",ownerId);
         return transactionService.getById(transactionId);
     }
 
     @GetMapping("/users/{owner_id}/transactions")
     public ArrayList<TransactionWithoutOwnerDTO> getAllByUser(@PathVariable("owner_id") int ownerId,
                                                               HttpSession session){
-        SessionManager.validateSession(session,"Cannot see other users transactions!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot see other users transactions!!",ownerId);
         return transactionService.getByOwnerId(ownerId);
     }
 
@@ -54,7 +54,7 @@ public class TransactionController extends AbstractController {
         }
         Account account=optionalAccount.get();
         int ownerId=account.getOwner().getId();
-        SessionManager.validateSession(session,"Cannot see other users account transactions!!",ownerId);
+//        SessionManager.validateSession(session,"Cannot see other users account transactions!!",ownerId);
         return transactionService.getByAccountId(accountId);
     }
 
@@ -62,7 +62,7 @@ public class TransactionController extends AbstractController {
     public TransactionWithoutOwnerDTO delete(@PathVariable(name="user_id") int userId,
                                              @PathVariable(name="transaction_id") int transactionId,
                                              HttpSession session){
-        SessionManager.validateSession(session,"Cannot delete other users transaction!!",userId);
+//        SessionManager.validateSession(session,"Cannot delete other users transaction!!",userId);
         return transactionService.delete(transactionId,userId);
     }
 
@@ -71,7 +71,7 @@ public class TransactionController extends AbstractController {
                                            @PathVariable(name="transaction_id") int transactionId,
                                            @RequestBody EditTransactionRequestDTO dto,
                                            HttpSession session) {
-        SessionManager.validateSession(session,"You can't modify other users transactions",userId);
+//        SessionManager.validateSession(session,"You can't modify other users transactions",userId);
         return transactionService.editTransaction(transactionId,dto,userId);
     }
 
@@ -79,7 +79,7 @@ public class TransactionController extends AbstractController {
     public ArrayList<TransactionWithoutOwnerDTO> filter(@PathVariable(name="user_id") int userId,
                                                         @RequestBody FilterTransactionRequestDTO dto,
                                                         HttpSession session){
-        SessionManager.validateSession(session,"You can't filter other users transactions",userId);
+//        SessionManager.validateSession(session,"You can't filter other users transactions",userId);
         return transactionService.filter(userId,dto);
     }
 }

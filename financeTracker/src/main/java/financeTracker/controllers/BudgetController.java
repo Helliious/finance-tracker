@@ -27,13 +27,16 @@ public class BudgetController extends AbstractController {
     public BudgetWithoutAccountAndOwnerDTO addBudget(@RequestBody CreateBudgetRequestDTO dto,
                                                      HttpSession session){
         //dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
+
        int userId= sessionManager.validateSession(session);
+
         return budgetService.addBudgetToAcc(userId,dto);
     }
 
     @GetMapping("budgets/{budget_id}")
     public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name="budget_id") int budgetId,
                                                    HttpSession session) {
+
        int userId= sessionManager.validateSession(session);
         return budgetService.getById(budgetId);
     }
@@ -42,6 +45,7 @@ public class BudgetController extends AbstractController {
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session){
         int userId= sessionManager.validateSession(session);
         return budgetService.getByOwnerId(userId);
+
     }
 
     @GetMapping("/budgets/accounts/{account_id}")
@@ -51,13 +55,18 @@ public class BudgetController extends AbstractController {
         if (optionalAccount.isEmpty()){
             throw new NotFoundException("Account does not exist..");
         }
+
         sessionManager.validateSession(session);
+
+        Account account=optionalAccount.get();
+        int ownerId=account.getOwner().getId();
         return budgetService.getByAccountId(accountId);
     }
 
     @DeleteMapping("/delete/{budget_id}")
     public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="budget_id") int budgetId,
                                                   HttpSession session){
+
         int userId=sessionManager.validateSession(session);
         return budgetService.delete(budgetId,userId);
     }
@@ -67,6 +76,7 @@ public class BudgetController extends AbstractController {
                                                 @PathVariable(name="budget_id") int budgetId,
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
+
         int userId=sessionManager.validateSession(session);
         return budgetService.editBudget(budgetId,dto,userId);
     }
@@ -82,6 +92,7 @@ public class BudgetController extends AbstractController {
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@PathVariable(name="user_id") int userId,
                                                              @RequestBody FilterBudgetRequestDTO dto,
                                                              HttpSession session){
+
         sessionManager.validateSession(session);
         return budgetService.filter(userId,dto);
     }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class ChangePassUserDTO {
+    private String currentPassword;
     private String password;
     private String confirmPassword;
 }
