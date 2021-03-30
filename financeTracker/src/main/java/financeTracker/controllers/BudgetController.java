@@ -20,74 +20,69 @@ public class BudgetController extends AbstractController {
     private BudgetService budgetService;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private SessionManager sessionManager;
 
-    @PostMapping("/users/{user_id}/add/budget")
+    @PutMapping("/budgets/")
     public BudgetWithoutAccountAndOwnerDTO addBudget(@RequestBody CreateBudgetRequestDTO dto,
-                                                     @PathVariable("user_id") int userId,
                                                      HttpSession session){
         //dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        SessionManager.validateSession(session,"Cannot add to other user !!",userId);
+       int userId= sessionManager.validateSession(session);
         return budgetService.addBudgetToAcc(userId,dto);
     }
 
-    @GetMapping("users/{user_id}/budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "user_id") int ownerId,
-                                                   @PathVariable(name="budget_id") int budgetId,
+    @GetMapping("budgets/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name="budget_id") int budgetId,
                                                    HttpSession session) {
-        SessionManager.validateSession(session,"Cannot get other user budget!!",ownerId);
+       int userId= sessionManager.validateSession(session);
         return budgetService.getById(budgetId);
     }
 
-    @GetMapping("/users/{owner_id}/budgets")
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(@PathVariable("owner_id") int ownerId,
-                                                                   HttpSession session){
-        SessionManager.validateSession(session,"Cannot see other users budgets!!",ownerId);
-        return budgetService.getByOwnerId(ownerId);
+    @GetMapping("/budgets/users/")
+    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session){
+        int userId= sessionManager.validateSession(session);
+        return budgetService.getByOwnerId(userId);
     }
 
-    @GetMapping("/accounts/{account_id}/budgets")
+    @GetMapping("/budgets/accounts/{account_id}")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable("account_id") int accountId,
                                                                       HttpSession session){
         Optional<Account> optionalAccount=accountRepository.findById(accountId);
         if (optionalAccount.isEmpty()){
             throw new NotFoundException("Account does not exist..");
         }
-        Account account=optionalAccount.get();
-        int ownerId=account.getOwner().getId();
-        SessionManager.validateSession(session,"Cannot see other users account budgets!!",ownerId);
+        sessionManager.validateSession(session);
         return budgetService.getByAccountId(accountId);
     }
 
-    @DeleteMapping("/users/{user_id}/budgets/delete/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="user_id") int userId,
-                                                  @PathVariable(name="budget_id") int budgetId,
+    @DeleteMapping("/delete/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="budget_id") int budgetId,
                                                   HttpSession session){
-        SessionManager.validateSession(session,"Cannot delete other users budget!!",userId);
+        int userId=sessionManager.validateSession(session);
         return budgetService.delete(budgetId,userId);
     }
 
-    @PutMapping("users/{user_id}/budgets/{budget_id}/edit")
-    public BudgetWithoutAccountAndOwnerDTO edit(@PathVariable(name = "user_id") int userId,
+    @PostMapping("budgets/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO edit(
                                                 @PathVariable(name="budget_id") int budgetId,
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
-        SessionManager.validateSession(session,"You can't modify other users budgets",userId);
+        int userId=sessionManager.validateSession(session);
         return budgetService.editBudget(budgetId,dto,userId);
     }
 
-    @GetMapping("users/{user_id}/category/{category_id}/spendings")
-    public double getSpendingByCategory(@PathVariable(name="user_id") int userId,
-                                        @PathVariable(name="category_id") int categoryId,
+    @GetMapping("budgets/category/{category_id}")
+    public double getSpendingByCategory(@PathVariable(name="category_id") int categoryId,
                                         HttpSession session){
-        SessionManager.validateSession(session,"You can't get spendings of other user",userId);
+        sessionManager.validateSession(session);
         return budgetService.getSpendings(categoryId);
     }
 
-    @PostMapping("users/{user_id}/budgets/filter")
+    @PostMapping("/budgets/filter")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@PathVariable(name="user_id") int userId,
                                                              @RequestBody FilterBudgetRequestDTO dto,
                                                              HttpSession session){
-        SessionManager.validateSession(session,"You can't filter other users budgets",userId);
+        sessionManager.validateSession(session);
         return budgetService.filter(userId,dto);
     }
 }
