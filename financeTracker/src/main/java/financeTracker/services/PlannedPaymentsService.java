@@ -3,6 +3,8 @@ package financeTracker.services;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dao.PlannedPaymentDAO;
+import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
@@ -22,6 +24,8 @@ import java.util.Optional;
 
 @Service
 public class PlannedPaymentsService {
+    @Autowired
+    private PlannedPaymentDAO plannedPaymentDAO;
     @Autowired
     private PlannedPaymentsRepository plannedPaymentsRepository;
     @Autowired
@@ -186,5 +190,7 @@ public class PlannedPaymentsService {
         return new ResponsePlannedPaymentDTO(plannedPayment);
     }
 
-    //TODO: add filter functionality
+    public List<ResponsePlannedPaymentDTO> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
+        return plannedPaymentDAO.filter(userId, plannedPaymentRequestDTO);
+    }
 }

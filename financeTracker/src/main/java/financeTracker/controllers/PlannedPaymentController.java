@@ -1,5 +1,8 @@
 package financeTracker.controllers;
 
+import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
+import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.PlannedPayment;
@@ -60,5 +63,10 @@ public class PlannedPaymentController extends AbstractController{
         return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, userId, plannedPaymentId);
     }
 
-    //TODO: add filter to planned payments
+    @PostMapping("/planned_payments/filter")
+    public List<ResponsePlannedPaymentDTO> filter(@RequestBody FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO,
+                                               HttpSession session){
+        int userId = sessionManager.validateSession(session);
+        return plannedPaymentsService.filter(userId, plannedPaymentRequestDTO);
+    }
 }

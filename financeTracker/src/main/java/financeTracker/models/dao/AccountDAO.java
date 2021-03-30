@@ -49,7 +49,7 @@ public class AccountDAO {
             nameIncludedInFilter = true;
         }
         if (accountRequestDTO.getBalanceFrom() > accountRequestDTO.getBalanceTo() && accountRequestDTO.getBalanceTo() != 0) {
-            throw new BadRequestException("Amount from can't be bigger than Amount to");
+            throw new BadRequestException("Balance from can't be bigger than Balance to!");
         }
         if (accountRequestDTO.getBalanceFrom() > 0 && accountRequestDTO.getBalanceTo() > 0) {
             //TODO: check if balance from > than balance to
@@ -152,7 +152,7 @@ public class AccountDAO {
                     accounts.add(new AccountWithoutOwnerDTO(account));
                 }while (result.next());
             } else {
-                throw new NotFoundException("Account not found");
+                throw new NotFoundException("Account not found!");
             }
         } catch (SQLException e) {
             throw new BadRequestException("Connection error, reason - " + e.getMessage());

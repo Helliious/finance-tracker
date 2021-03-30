@@ -60,7 +60,6 @@ public class AccountController extends AbstractController {
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);
     }
 
-    //TODO: add filter to accounts
     @PostMapping("/accounts/filter")
     public List<AccountWithoutOwnerDTO> filter(@RequestBody FilterAccountRequestDTO accountRequestDTO,
                                                HttpSession session){
