@@ -37,7 +37,7 @@ public class CategoryController extends AbstractController {
         return categoryService.add(category, userId);
     }
 
-    @DeleteMapping("/category/{category_id}/delete")
+    @DeleteMapping("/category/{category_id}")
     public ResponseCategoryDTO delete(@PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
         int userId = sessionManager.validateSession(session);

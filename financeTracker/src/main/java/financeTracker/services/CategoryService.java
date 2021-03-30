@@ -27,6 +27,7 @@ public class CategoryService {
         if (optUser.isEmpty()) {
             throw new AuthenticationException("User not found!");
         }
+        validateCategory(category);
         category.setOwner(optUser.get());
         ResponseCategoryDTO responseCategory = new ResponseCategoryDTO(category);
         categoryRepository.save(category);
@@ -44,14 +45,11 @@ public class CategoryService {
     }
 
     public ResponseCategoryDTO getById(int categoryId, int userId) {
-        Optional<Category> optCategory = categoryRepository.findById(categoryId);
-        if (optCategory.isEmpty()) {
+        Category optCategory = categoryRepository.findByIdAndOwnerId(categoryId, userId);
+        if (optCategory == null) {
             throw new NotFoundException("Category not found!");
         }
-        if (optCategory.get().getOwner().getId() != userId) {
-            throw new BadRequestException("Cannot show categories of other users!");
-        }
-        ResponseCategoryDTO category = new ResponseCategoryDTO(optCategory.get());
+        ResponseCategoryDTO category = new ResponseCategoryDTO(optCategory);
         return category;
     }
 
@@ -62,5 +60,20 @@ public class CategoryService {
             response.add(new ResponseCategoryDTO(c));
         }
         return response;
+    }
+
+    private void validateCategory(Category category) {
+        if (category == null) {
+            throw new BadRequestException("Wrong category credentials!");
+        }
+        if (category.getType() == null) {
+            throw new BadRequestException("Need to enter valid category type!");
+        }
+        if (category.getName() == null) {
+            throw new BadRequestException("Need to enter valid category name!");
+        }
+        if (category.getImage() == null) {
+            throw new BadRequestException("Need to add image to category!");
+        }
     }
 }

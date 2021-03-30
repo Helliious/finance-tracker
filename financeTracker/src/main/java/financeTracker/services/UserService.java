@@ -29,6 +29,7 @@ public class UserService {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new BadRequestException("Email already exists!");
         }
+        validateUser(userDTO);
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         userDTO.setPassword(encoder.encode(userDTO.getPassword()));
         User user = new User(userDTO);
@@ -157,5 +158,23 @@ public class UserService {
             throw new NotFoundException("User not found!");
         }
         return new UserWithoutPassDTO(user.get());
+    }
+
+    private void validateUser(RegisterRequestUserDTO userDTO) {
+        if (userDTO.getFirstName() == null) {
+            throw new BadRequestException("Must enter valid first name!");
+        }
+        if (userDTO.getLastName() == null) {
+            throw new BadRequestException("Must enter valid last name!");
+        }
+        if (userDTO.getUsername() == null) {
+            throw new BadRequestException("Must enter valid username!");
+        }
+        if (userDTO.getPassword() == null) {
+            throw new BadRequestException("Must enter valid password!");
+        }
+        if (userDTO.getEmail() == null) {
+            throw new BadRequestException("Must enter valid email!");
+        }
     }
 }

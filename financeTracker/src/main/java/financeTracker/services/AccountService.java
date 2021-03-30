@@ -34,6 +34,7 @@ public class AccountService {
                 throw new BadRequestException("Account already exists!");
             }
         }
+        validateAccount(account);
         User user = optUser.get();
         user.getAccounts().add(account);
         account.setOwner(user);
@@ -103,5 +104,17 @@ public class AccountService {
         accountRepository.save(account);
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(account.getOwner());
         return responseUser;
+    }
+
+    private void validateAccount(Account account) {
+        if (account.getName() == null) {
+            throw new BadRequestException("Must enter valid account name!");
+        }
+        if (account.getBalance() <= 0) {
+            throw new BadRequestException("Must enter valid account balance!");
+        }
+        if (account.getAccLimit() <= 0) {
+            throw new BadRequestException("Must enter valid account limit!");
+        }
     }
 }
