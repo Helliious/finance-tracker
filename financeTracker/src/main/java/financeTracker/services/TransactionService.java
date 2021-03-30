@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -158,7 +159,7 @@ public class TransactionService {
         return new TransactionWithoutOwnerAndAccountDTO(transaction);
     }
 
-    public ArrayList<TransactionWithoutOwnerAndAccountDTO> filter(int userId, FilterTransactionRequestDTO dto) {
+    public List<TransactionWithoutOwnerAndAccountDTO> filter(int userId, FilterTransactionRequestDTO dto) {
         return transactionDAO.filterTransaction(userId,dto);
     }
 

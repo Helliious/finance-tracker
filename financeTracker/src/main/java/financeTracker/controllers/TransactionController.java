@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -61,8 +62,8 @@ public class TransactionController extends AbstractController {
     }
 
     @PostMapping("/transactions/filter")
-    public ArrayList<TransactionWithoutOwnerAndAccountDTO> filter(@RequestBody FilterTransactionRequestDTO dto,
-                                                                  HttpSession session){
+    public List<TransactionWithoutOwnerAndAccountDTO> filter(@RequestBody FilterTransactionRequestDTO dto,
+                                                             HttpSession session){
         int userId=sessionManager.validateSession(session);
         return transactionService.filter(userId,dto);
     }

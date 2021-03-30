@@ -1,7 +1,10 @@
 package financeTracker.controllers;
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
+import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
+import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.services.AccountService;
@@ -58,4 +61,10 @@ public class AccountController extends AbstractController {
     }
 
     //TODO: add filter to accounts
+    @PostMapping("/accounts/filter")
+    public List<AccountWithoutOwnerDTO> filter(@RequestBody FilterAccountRequestDTO accountRequestDTO,
+                                               HttpSession session){
+        int userId = sessionManager.validateSession(session);
+        return accountService.filter(userId, accountRequestDTO);
+    }
 }

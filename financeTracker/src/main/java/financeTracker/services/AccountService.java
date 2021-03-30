@@ -3,7 +3,9 @@ package financeTracker.services;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dao.AccountDAO;
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class AccountService {
+    @Autowired
+    private AccountDAO accountDAO;
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
@@ -118,5 +122,7 @@ public class AccountService {
         }
     }
 
-    //TODO: add filter functionality
+    public List<AccountWithoutOwnerDTO> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
+        return accountDAO.filter(userId, accountRequestDTO);
+    }
 }

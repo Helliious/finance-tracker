@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -70,8 +71,8 @@ public class BudgetController extends AbstractController {
     }
 
     @PostMapping("/budgets/filter")
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(@RequestBody FilterBudgetRequestDTO dto,
-                                                             HttpSession session){
+    public List<BudgetWithoutAccountAndOwnerDTO> filter(@RequestBody FilterBudgetRequestDTO dto,
+                                                        HttpSession session){
         int userId = sessionManager.validateSession(session);
         return budgetService.filter(userId, dto);
     }

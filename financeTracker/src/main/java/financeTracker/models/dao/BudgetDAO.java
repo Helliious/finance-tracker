@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -32,8 +33,8 @@ public class BudgetDAO {
     @Autowired
     private AccountRepository accountRepository;
 
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filterBudget(int userId, FilterBudgetRequestDTO dto) {
-        ArrayList<BudgetWithoutAccountAndOwnerDTO> budgetsWithoutAccountAndOwnerDTOS = new ArrayList<>();
+    public List<BudgetWithoutAccountAndOwnerDTO> filterBudget(int userId, FilterBudgetRequestDTO dto) {
+        List<BudgetWithoutAccountAndOwnerDTO> budgetsWithoutAccountAndOwnerDTOS = new ArrayList<>();
         String sql = "SELECT * FROM budgets WHERE owner_id = ? ";
         boolean nameIncludedInFilter = false;
         boolean categoryIncludedInFilter = false;
@@ -116,7 +117,7 @@ public class BudgetDAO {
             }
             ResultSet result = ps.executeQuery();
             if (result.next()) {
-                do{
+                do {
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
@@ -130,7 +131,7 @@ public class BudgetDAO {
                             optionalCategory.get()
                     );
                     budgetsWithoutAccountAndOwnerDTOS.add(new BudgetWithoutAccountAndOwnerDTO(budget));
-                }while (result.next());
+                } while (result.next());
             }
             else{
                 throw new NotFoundException("There is not budgets corresponding to current filter");

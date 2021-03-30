@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -30,8 +31,8 @@ public class TransactionDAO {
     @Autowired
     private UserRepository userRepository;
 
-    public ArrayList<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto){
-        ArrayList<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS = new ArrayList<>();
+    public List<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto) {
+        List<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS = new ArrayList<>();
         String sql = "SELECT * FROM transactions WHERE owner_id = ? ";
         boolean nameIncludedInFilter = false;
         boolean categoryIncludedInFilter = false;
@@ -137,7 +138,6 @@ public class TransactionDAO {
                     );
                     transactionsWithoutOwnerDTOS.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
                 }while (result.next());
-
             }
             else{
                 throw new NotFoundException("There is not transactions corresponding to current filter");

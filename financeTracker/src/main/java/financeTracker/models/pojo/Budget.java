@@ -38,6 +38,4 @@ public class Budget {
         amount=dto.getAmount();
         dueTime=dto.getDueTime();
     }
-
-
 }

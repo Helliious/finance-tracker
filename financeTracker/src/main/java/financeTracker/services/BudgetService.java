@@ -14,6 +14,7 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -171,7 +172,7 @@ public class BudgetService {
         return totalSpends;
     }
 
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto) {
+    public List<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto) {
          return budgetDao.filterBudget(userId,dto);
     }
 }
