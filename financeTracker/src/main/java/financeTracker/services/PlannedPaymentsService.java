@@ -17,6 +17,7 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +55,7 @@ public class PlannedPaymentsService {
         user.getPlannedPayments().add(plannedPayment);
         category.getPlannedPayments().add(plannedPayment);
         account.getPlannedPayments().add(plannedPayment);
+        account.reduceBalance(plannedPayment.getAmount());
         plannedPayment.setOwner(user);
         plannedPayment.setAccount(account);
         plannedPayment.setCategory(category);
@@ -120,6 +122,12 @@ public class PlannedPaymentsService {
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
         }
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account != null) {
+            if (plannedPayment.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) < 0) {
+                account.increaseBalance(plannedPayment.getAmount());
+            }
+        }
         ResponsePlannedPaymentDTO responsePlannedPaymentDTO = new ResponsePlannedPaymentDTO(plannedPayment);
         plannedPaymentsRepository.deleteById(plannedPaymentId);
         return responsePlannedPaymentDTO;
@@ -164,7 +172,13 @@ public class PlannedPaymentsService {
             if (plannedPayment.getAmount() == responsePlannedPaymentDTO.getAmount()) {
                 throw new BadRequestException("Entered the same amount!");
             } else {
+                Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+                double oldAmount = plannedPayment.getAmount();
                 plannedPayment.setAmount(responsePlannedPaymentDTO.getAmount());
+                if (account != null) {
+                    account.increaseBalance(oldAmount);
+                    account.reduceBalance(plannedPayment.getAmount());
+                }
             }
         }
         if (responsePlannedPaymentDTO.getDueTime() != null) {
