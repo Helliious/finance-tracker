@@ -29,8 +29,10 @@ public class AccountService {
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        if (accountRepository.findById(account.getId()).isPresent()) {
-            throw new BadRequestException("Account already exists!");
+        for (Account a : optUser.get().getAccounts()) {
+            if (a.getName().equals(account.getName()) || a.getId() == account.getId()) {
+                throw new BadRequestException("Account already exists!");
+            }
         }
         User user = optUser.get();
         user.getAccounts().add(account);
@@ -40,77 +42,66 @@ public class AccountService {
     }
 
     public AccountWithoutOwnerDTO getById(int accountId, int userId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isEmpty()) {
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account == null) {
             throw new NotFoundException("Account not found!");
+        } else {
+            return new AccountWithoutOwnerDTO(account);
         }
-        if (account.get().getOwner().getId() != userId) {
-            throw new AuthenticationException("Cannot show accounts of other users!");
-        }
-        return new AccountWithoutOwnerDTO(account.get());
     }
 
     public List<AccountWithoutOwnerDTO> getAll(int userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
+        List<Account> accounts = accountRepository.findAllByOwnerId(userId);
+        if (accounts.isEmpty()) {
+            throw new NotFoundException("Accounts not found!");
         }
-        List<AccountWithoutOwnerDTO> accounts = new ArrayList<>();
-        for (Account a : user.get().getAccounts()) {
-            accounts.add(new AccountWithoutOwnerDTO(a));
+        List<AccountWithoutOwnerDTO> response = new ArrayList<>();
+        for (Account a : accounts) {
+            response.add(new AccountWithoutOwnerDTO(a));
         }
-        return accounts;
+        return response;
     }
 
     public AccountWithoutOwnerDTO deleteAccount(int accountId, int userId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isEmpty()) {
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account == null) {
             throw new NotFoundException("Account not found!");
         }
-        if (account.get().getOwner().getId() != userId) {
-            throw new AuthenticationException("Cannot delete accounts of other users!");
-        }
-        AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account.get());
+        AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account);
         accountRepository.deleteById(accountId);
         return responseAcc;
     }
 
     public UserWithoutPassDTO editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        Optional<User> user = userRepository.findById(userId);
-        if (account.isEmpty() || user.isEmpty()) {
-            throw new NotFoundException("User/Account not found!");
-        }
-        if (account.get().getOwner().getId() != userId) {
-            throw new AuthenticationException("Cannot modify accounts of other users!");
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account == null) {
+            throw new NotFoundException("Account not found!");
         }
         if (accountDTO.getName() != null) {
-            if (accountRepository.findAccountByNameAndOwner(accountDTO.getName(), user.get()) != null) {
+            if (account.getName().equals(accountDTO.getName())) {
+                throw new BadRequestException("New account has the same name!");
+            } else if (accountRepository.findAccountByNameAndOwnerId(accountDTO.getName(), userId) != null) {
                 throw new BadRequestException("Account name already exists!");
             } else {
-                account.get().setName(accountDTO.getName());
+                account.setName(accountDTO.getName());
             }
         }
-        if (accountDTO.getAccLimit() != 0) {
-            if (account.get().getAccLimit() == accountDTO.getAccLimit()) {
+        if (accountDTO.getAccLimit() > 0) {
+            if (account.getAccLimit() == accountDTO.getAccLimit()) {
                 throw new BadRequestException("Entered the same limit!");
             } else {
-                account.get().setAccLimit(accountDTO.getAccLimit());
+                account.setAccLimit(accountDTO.getAccLimit());
             }
         }
-        if (accountDTO.getBalance() != 0) {
-            if (account.get().getBalance() == accountDTO.getBalance()) {
+        if (accountDTO.getBalance() > 0) {
+            if (account.getBalance() == accountDTO.getBalance()) {
                 throw new BadRequestException("Entered the same balance!");
             } else {
-                account.get().setBalance(accountDTO.getBalance());
+                account.setBalance(accountDTO.getBalance());
             }
         }
-        accountRepository.save(account.get());
-        user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user.get());
+        accountRepository.save(account);
+        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(account.getOwner());
         return responseUser;
     }
 }

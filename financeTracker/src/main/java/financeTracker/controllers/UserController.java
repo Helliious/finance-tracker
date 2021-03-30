@@ -44,14 +44,17 @@ public class UserController extends AbstractController {
     @DeleteMapping("/users")
     public UserWithoutPassDTO delete(HttpSession session) {
         int userId = sessionManager.validateSession(session);
-        return userService.deleteUser(userId);
+        UserWithoutPassDTO responseUser = userService.deleteUser(userId);
+        sessionManager.logoutUser(session);
+        return responseUser;
     }
 
     @GetMapping("/users/logout")
-    public String logout(HttpSession session) {
-        sessionManager.validateSession(session);
+    public UserWithoutPassDTO logout(HttpSession session) {
+        int userId = sessionManager.validateSession(session);
+        UserWithoutPassDTO responseUser = userService.logoutUser(userId);
         sessionManager.logoutUser(session);
-        return "Logged out!";
+        return responseUser;
     }
 
     @PostMapping("/users/change_password")
