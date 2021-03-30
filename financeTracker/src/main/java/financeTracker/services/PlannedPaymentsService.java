@@ -35,14 +35,19 @@ public class PlannedPaymentsService {
         Optional<User> optUser = userRepository.findById(userId);
         Optional<Account> optAccount = accountRepository.findById(accountId);
         Optional<Category> optCategory = categoryRepository.findById(plannedPayment.getCategory().getId());
-        //TODO: split if statement to 3 ifs
-        if (optUser.isEmpty() || optAccount.isEmpty() || optCategory.isEmpty()) {
-            throw new NotFoundException("User/Account/Category not found!");
+        if (optUser.isEmpty()) {
+            throw new NotFoundException("User not found!");
         }
-        //TODO: validate user_id, account_id, planned_payment owner
+        if (optAccount.isEmpty()) {
+            throw new NotFoundException("Account not found!");
+        }
+        if (optCategory.isEmpty()) {
+            throw new NotFoundException("Category not found!");
+        }
         User user = optUser.get();
         Account account = optAccount.get();
         Category category = optCategory.get();
+        validatePlannedPayment(user, account, category);
         user.getPlannedPayments().add(plannedPayment);
         category.getPlannedPayments().add(plannedPayment);
         account.getPlannedPayments().add(plannedPayment);
@@ -53,39 +58,55 @@ public class PlannedPaymentsService {
         return new UserWithoutPassDTO(user);
     }
 
-    public ResponsePlannedPaymentDTO getById(int accountId, int userId, int plannedPaymentId) {
+    private void validatePlannedPayment(User user, Account account, Category category) {
         boolean isPresent = false;
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isEmpty()) {
-            throw new NotFoundException("Account not found!");
-        }
-        //TODO: validate user_id, planned_payment account_id
-        Optional<PlannedPayment> plannedPayment = plannedPaymentsRepository.findById(plannedPaymentId);
-        if (plannedPayment.isEmpty()) {
-            throw new NotFoundException("Planned payment not found!");
-        }
-        for (PlannedPayment p : account.get().getPlannedPayments()) {
-            if (p.getId() == plannedPayment.get().getId()) {
+        for (Account a : user.getAccounts()) {
+            if (a.getId() == account.getId() && a.getName().equals(account.getName())) {
                 isPresent = true;
                 break;
             }
         }
         if (!isPresent) {
-            throw new NotFoundException("Planned payment not found in this account!");
+            throw new NotFoundException("Account not found!");
         }
-        return new ResponsePlannedPaymentDTO(plannedPayment.get());
+        isPresent = false;
+        for (Category c : user.getCategories()) {
+            if (c.getName().equals(category.getName())) {
+                isPresent = true;
+            }
+        }
+        if (!isPresent) {
+            throw new NotFoundException("Category not found!");
+        }
+    }
+
+    public ResponsePlannedPaymentDTO getById(int accountId, int userId, int plannedPaymentId) {
+        boolean isPresent = false;
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        PlannedPayment result = null;
+        if (account == null) {
+            throw new NotFoundException("Account not found!");
+        }
+        for (PlannedPayment p : account.getPlannedPayments()) {
+            if (p.getId() == plannedPaymentId) {
+                isPresent = true;
+                result = p;
+                break;
+            }
+        }
+        if (!isPresent) {
+            throw new NotFoundException("Planned payment not found!");
+        }
+        return new ResponsePlannedPaymentDTO(result);
     }
 
     public List<ResponsePlannedPaymentDTO> getAll(int accountId, int userId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isEmpty()) {
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account == null) {
             throw new NotFoundException("Account not found!");
         }
-        if (account.get().getOwner().getId() != userId) {
-            throw new AuthenticationException("Cannot see planned payments of other users!");
-        }
         List<ResponsePlannedPaymentDTO> plannedPayments = new ArrayList<>();
-        for (PlannedPayment p : account.get().getPlannedPayments()) {
+        for (PlannedPayment p : account.getPlannedPayments()) {
             plannedPayments.add(new ResponsePlannedPaymentDTO(p));
         }
         return plannedPayments;
@@ -109,6 +130,8 @@ public class PlannedPaymentsService {
         if (responsePlannedPaymentDTO.getName() != null) {
             if (plannedPaymentsRepository.findPlannedPaymentByNameAndAccountId(responsePlannedPaymentDTO.getName(), accountId) != null) {
                 throw new BadRequestException("Planned payment name already exists!");
+            } else if (plannedPayment.getName().equals(responsePlannedPaymentDTO.getName())) {
+                throw new BadRequestException("Entered the same planned payment name!");
             } else {
                 plannedPayment.setName(responsePlannedPaymentDTO.getName());
             }

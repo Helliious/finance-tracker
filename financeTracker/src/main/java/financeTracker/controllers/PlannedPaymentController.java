@@ -59,4 +59,6 @@ public class PlannedPaymentController extends AbstractController{
         int userId = sessionManager.validateSession(session);
         return plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, userId, plannedPaymentId);
     }
+
+    //TODO: add filter to planned payments
 }

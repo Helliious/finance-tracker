@@ -56,4 +56,6 @@ public class AccountController extends AbstractController {
         int userId = sessionManager.validateSession(session);
         return accountService.editAccount(updateRequestAccountDTO, userId, accountId);
     }
+
+    //TODO: add filter to accounts
 }
