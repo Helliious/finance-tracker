@@ -30,7 +30,6 @@ public class TransactionDAO {
     @Autowired
     private UserRepository userRepository;
 
-
     public ArrayList<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto){
         ArrayList<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS =new ArrayList<>();
 
@@ -42,6 +41,9 @@ public class TransactionDAO {
         boolean amountFromIncluded=false;
         boolean amountToIncluded=false;
         boolean typeIncluded=false;
+        boolean bothDatesIncluded=false;
+        boolean dateFromIncluded=false;
+        boolean dateToIncluded=false;
         if (dto.getName()!=null){
             sql+="AND name LIKE ?";
             nameIncludedInFilter=true;
@@ -77,6 +79,23 @@ public class TransactionDAO {
                 numberOfParameters++;
             }
         }
+        if(dto.getDateFrom()!=null&&dto.getDateTo()!=null){
+            sql+="AND create_time BETWEEN ? AND ?";
+            numberOfParameters+=2;
+            bothDatesIncluded=true;
+        }
+        else{
+            if (dto.getDateFrom()!=null &&dto.getDateTo()==null){
+                sql+="AND create_time >= ?";
+                numberOfParameters++;
+                dateFromIncluded=true;
+            }
+            if (dto.getDateFrom()==null&&dto.getDateTo()==null){
+                sql+="AND create_time <= ?";
+                numberOfParameters++;
+                dateToIncluded=true;
+            }
+        }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -99,13 +118,24 @@ public class TransactionDAO {
                 } else if (amountFromIncluded) {
                     ps.setDouble(i, dto.getAmountFrom());
                     amountFromIncluded = false;
-                } else if (amountToIncluded) {
+                } else if(amountToIncluded){
                     ps.setDouble(i, dto.getAmountTo());
                     amountToIncluded = false;
+                }else if(bothDatesIncluded){
+                    ps.setTimestamp(i,dto.getDateFrom());
+                    ps.setTimestamp(++i,dto.getDateTo());
+                    bothAmountsIncluded=false;
+                }
+                else if(dateFromIncluded){
+                    ps.setTimestamp(i,dto.getDateFrom());
+                    dateFromIncluded=false;
+                }
+                else if(dateToIncluded){
+                    ps.setTimestamp(i,dto.getDateTo());
+                    dateToIncluded=false;
                 }
             }
             ResultSet result = ps.executeQuery();
-
             if (result.next()) {
                 do{
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));

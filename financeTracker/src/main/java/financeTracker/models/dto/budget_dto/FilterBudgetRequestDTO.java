@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,5 +16,6 @@ public class FilterBudgetRequestDTO {
  private double amountFrom;
  private double amountTo;
  private int categoryId;
-
+ private Timestamp dateBefore;
+ private Timestamp dateAfter;
 }
