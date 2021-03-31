@@ -3,6 +3,8 @@ package financeTracker.services;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dao.CategoryDAO;
+import financeTracker.models.dto.category_dto.CategoryExpensesDTO;
 import financeTracker.models.pojo.Category;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
@@ -15,6 +17,8 @@ import java.util.Optional;
 
 @Service
 public class CategoryService {
+    @Autowired
+    private CategoryDAO categoryDAO;
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
@@ -62,5 +66,9 @@ public class CategoryService {
         if (category.getName() == null) {
             throw new BadRequestException("Need to enter valid category name!");
         }
+    }
+
+    public List<CategoryExpensesDTO> referenceOverallExpensesByCategory(int userId) {
+        return categoryDAO.referenceOverallExpensesByCategory(userId);
     }
 }

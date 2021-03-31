@@ -1,5 +1,7 @@
 package financeTracker.controllers;
 
+import financeTracker.models.dao.CategoryDAO;
+import financeTracker.models.dto.category_dto.CategoryExpensesDTO;
 import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
@@ -52,6 +54,12 @@ public class CategoryController extends AbstractController {
         int userId = sessionManager.getLoggedId(session);
         Category category = categoryService.delete(categoryId, userId);
         return convertToResponseCategoryDTO(category);
+    }
+
+    @GetMapping("categories/references")
+    public List<CategoryExpensesDTO> referenceExpenses(HttpSession session) {
+        int userId = sessionManager.getLoggedId(session);
+        return categoryService.referenceOverallExpensesByCategory(userId);
     }
 
     private ResponseCategoryDTO convertToResponseCategoryDTO(Category category) {

@@ -32,7 +32,7 @@ public class AccountDAO {
 
     public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
         List<Account> accounts = new ArrayList<>();
-        StringBuilder sql =new StringBuilder("SELECT * FROM accounts WHERE owner_id = ?");
+        StringBuilder sql = new StringBuilder("SELECT * FROM accounts WHERE owner_id = ?");
         boolean nameIncludedInFilter = false;
         boolean bothBalanceIncluded = false;
         boolean balanceFromIncluded = false;

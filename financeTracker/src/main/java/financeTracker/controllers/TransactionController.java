@@ -17,7 +17,7 @@ public class TransactionController extends AbstractController {
     private TransactionService transactionService;
     @Autowired private SessionManager sessionManager;
 
-    @PutMapping("/transactions/{account_id}}")
+    @PutMapping("/transactions/accounts/{account_id}")
     public TransactionWithoutOwnerAndAccountDTO addTransaction(@RequestBody AddTransactionRequestDTO dto,
                                                                @PathVariable("account_id") int accountId,
                                                                HttpSession session){
