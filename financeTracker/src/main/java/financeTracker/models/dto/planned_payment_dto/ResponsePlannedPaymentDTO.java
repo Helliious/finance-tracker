@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Component
 public class ResponsePlannedPaymentDTO {
+    private int id;
     private String name;
     private String paymentType;
     private int frequency;
@@ -23,6 +24,7 @@ public class ResponsePlannedPaymentDTO {
     private ResponseCategoryDTO category;
 
     public ResponsePlannedPaymentDTO(PlannedPayment plannedPayment) {
+        id = plannedPayment.getId();
         name = plannedPayment.getName();
         paymentType = plannedPayment.getPaymentType();
         frequency = plannedPayment.getFrequency();

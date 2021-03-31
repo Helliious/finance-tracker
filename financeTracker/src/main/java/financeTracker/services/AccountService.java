@@ -30,7 +30,7 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserWithoutPassDTO createAcc(Account account, int ownerId) {
+    public User createAcc(Account account, int ownerId) {
         account.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
@@ -46,38 +46,32 @@ public class AccountService {
         user.getAccounts().add(account);
         account.setOwner(user);
         accountRepository.save(account);
-        return new UserWithoutPassDTO(user);
+        return user;
     }
 
-    public AccountWithoutOwnerDTO getById(int accountId, int userId) {
+    public Account getById(int accountId, int userId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");
         } else {
-            return new AccountWithoutOwnerDTO(account);
+            return account;
         }
     }
 
-    public List<AccountWithoutOwnerDTO> getAll(int userId) {
-        List<Account> accounts = accountRepository.findAllByOwnerId(userId);
-        List<AccountWithoutOwnerDTO> response = new ArrayList<>();
-        for (Account a : accounts) {
-            response.add(new AccountWithoutOwnerDTO(a));
-        }
-        return response;
+    public List<Account> getAll(int userId) {
+        return accountRepository.findAllByOwnerId(userId);
     }
 
-    public AccountWithoutOwnerDTO deleteAccount(int accountId, int userId) {
+    public Account deleteAccount(int accountId, int userId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");
         }
-        AccountWithoutOwnerDTO responseAcc = new AccountWithoutOwnerDTO(account);
         accountRepository.deleteById(accountId);
-        return responseAcc;
+        return account;
     }
 
-    public UserWithoutPassDTO editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
+    public Account editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");
@@ -106,8 +100,7 @@ public class AccountService {
             }
         }
         accountRepository.save(account);
-        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(account.getOwner());
-        return responseUser;
+        return account;
     }
 
     private void validateAccount(Account account) {
@@ -122,12 +115,7 @@ public class AccountService {
         }
     }
 
-    public List<AccountWithoutOwnerDTO> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
-        List<Account> accounts=accountDAO.filter(userId,accountRequestDTO);
-        List<AccountWithoutOwnerDTO> responseAccounts=new ArrayList<>();
-        for (Account account:accounts){
-            responseAccounts.add(new AccountWithoutOwnerDTO(account));
-        }
-        return responseAccounts;
+    public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
+        return accountDAO.filter(userId,accountRequestDTO);
     }
 }

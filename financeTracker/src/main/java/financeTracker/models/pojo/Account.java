@@ -22,7 +22,7 @@ public class Account {
     private int id;
     private String name;
     private double balance;
-    private double accLimit;
+    private Double accLimit;
     private Timestamp createTime;
     @ManyToOne
     @JoinColumn(name="owner_id")
@@ -40,7 +40,7 @@ public class Account {
     }
 
     public void increaseBalance(double amount) {
-        if (accLimit != 0 && balance + amount > accLimit) {
+        if (accLimit != null && balance + amount > accLimit) {
             throw new BadRequestException("Limit reached!");
         }
         balance += amount;

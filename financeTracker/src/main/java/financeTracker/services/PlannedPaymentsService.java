@@ -33,7 +33,7 @@ public class PlannedPaymentsService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public UserWithoutPassDTO add(PlannedPayment plannedPayment, int userId, int accountId) {
+    public User add(PlannedPayment plannedPayment, int userId, int accountId) {
         plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(userId);
         Optional<Account> optAccount = accountRepository.findById(accountId);
@@ -59,7 +59,7 @@ public class PlannedPaymentsService {
         plannedPayment.setAccount(account);
         plannedPayment.setCategory(category);
         plannedPaymentsRepository.save(plannedPayment);
-        return new UserWithoutPassDTO(user);
+        return user;
     }
 
     private void validatePlannedPayment(User user, Account account, Category category) {
@@ -84,7 +84,7 @@ public class PlannedPaymentsService {
         }
     }
 
-    public ResponsePlannedPaymentDTO getById(int accountId, int userId, int plannedPaymentId) {
+    public PlannedPayment getById(int accountId, int userId, int plannedPaymentId) {
         boolean isPresent = false;
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         PlannedPayment result = null;
@@ -101,19 +101,15 @@ public class PlannedPaymentsService {
         if (!isPresent) {
             throw new NotFoundException("Planned payment not found!");
         }
-        return new ResponsePlannedPaymentDTO(result);
+        return result;
     }
 
-    public List<ResponsePlannedPaymentDTO> getAll(int accountId, int userId) {
+    public List<PlannedPayment> getAll(int accountId, int userId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-        List<ResponsePlannedPaymentDTO> plannedPayments = new ArrayList<>();
-        for (PlannedPayment p : account.getPlannedPayments()) {
-            plannedPayments.add(new ResponsePlannedPaymentDTO(p));
-        }
-        return plannedPayments;
+        return account.getPlannedPayments();
     }
 
-    public ResponsePlannedPaymentDTO delete(int accountId, int userId, int plannedPaymentId) {
+    public PlannedPayment delete(int accountId, int userId, int plannedPaymentId) {
         PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
@@ -124,12 +120,11 @@ public class PlannedPaymentsService {
                 account.increaseBalance(plannedPayment.getAmount());
             }
         }
-        ResponsePlannedPaymentDTO responsePlannedPaymentDTO = new ResponsePlannedPaymentDTO(plannedPayment);
         plannedPaymentsRepository.deleteById(plannedPaymentId);
-        return responsePlannedPaymentDTO;
+        return plannedPayment;
     }
 
-    public ResponsePlannedPaymentDTO edit(ResponsePlannedPaymentDTO responsePlannedPaymentDTO, int accountId, int userId, int plannedPaymentId) {
+    public PlannedPayment edit(ResponsePlannedPaymentDTO responsePlannedPaymentDTO, int accountId, int userId, int plannedPaymentId) {
         PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
@@ -196,15 +191,10 @@ public class PlannedPaymentsService {
             }
         }
         plannedPaymentsRepository.save(plannedPayment);
-        return new ResponsePlannedPaymentDTO(plannedPayment);
+        return plannedPayment;
     }
 
-    public List<ResponsePlannedPaymentDTO> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
-        List<PlannedPayment> plannedPayments=plannedPaymentDAO.filter(userId,plannedPaymentRequestDTO);
-        List<ResponsePlannedPaymentDTO> responsePlannedPaymentDTOS=new ArrayList<>();
-        for (PlannedPayment plannedPayment:plannedPayments){
-            responsePlannedPaymentDTOS.add(new ResponsePlannedPaymentDTO(plannedPayment));
-        }
-        return responsePlannedPaymentDTOS;
+    public List<PlannedPayment> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
+        return plannedPaymentDAO.filter(userId,plannedPaymentRequestDTO);
     }
 }

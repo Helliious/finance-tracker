@@ -22,7 +22,7 @@ public class CategoryService {
     @Autowired
     private UserRepository userRepository;
 
-    public ResponseCategoryDTO add(Category category, int userId) {
+    public Category add(Category category, int userId) {
         Optional<User> optUser = userRepository.findById(userId);
         if (optUser.isEmpty()) {
             throw new AuthenticationException("User not found!");
@@ -30,35 +30,28 @@ public class CategoryService {
         validateCategory(category);
         category.setOwner(optUser.get());
         Category result = categoryRepository.save(category);
-        return new ResponseCategoryDTO(result);
+        return result;
     }
 
-    public ResponseCategoryDTO delete(int categoryId, int userId) {
+    public Category delete(int categoryId, int userId) {
         Category category = categoryRepository.findByIdAndOwnerId(categoryId, userId);
         if (category == null) {
             throw new NotFoundException("Category not found!");
         }
-        ResponseCategoryDTO responseCategory = new ResponseCategoryDTO(category);
         categoryRepository.deleteById(categoryId);
-        return responseCategory;
-    }
-
-    public ResponseCategoryDTO getById(int categoryId, int userId) {
-        Category optCategory = categoryRepository.findByIdAndOwnerId(categoryId, userId);
-        if (optCategory == null) {
-            throw new NotFoundException("Category not found!");
-        }
-        ResponseCategoryDTO category = new ResponseCategoryDTO(optCategory);
         return category;
     }
 
-    public List<ResponseCategoryDTO> getAll(int userId) {
-        List<Category> categories = categoryRepository.findAllByOwnerId(userId);
-        List<ResponseCategoryDTO> response = new ArrayList<>();
-        for (Category c : categories) {
-            response.add(new ResponseCategoryDTO(c));
+    public Category getById(int categoryId, int userId) {
+        Category category = categoryRepository.findByIdAndOwnerId(categoryId, userId);
+        if (category == null) {
+            throw new NotFoundException("Category not found!");
         }
-        return response;
+        return category;
+    }
+
+    public List<Category> getAll(int userId) {
+        return categoryRepository.findAllByOwnerId(userId);
     }
 
     private void validateCategory(Category category) {
