@@ -51,24 +51,24 @@ public class PlannedPaymentDAO {
             sql.append("AND payment_type = ?");
             paymentTypeIncluded = true;
         }
-        if (plannedPaymentRequestDTO.getFrequency() > 0 && plannedPaymentRequestDTO.getDurationUnit() != null) {
+        if (plannedPaymentRequestDTO.getFrequency() != null && plannedPaymentRequestDTO.getDurationUnit() != null) {
             sql.append("AND frequency = ? AND duration_unit = ?");
             frequencyIncluded = true;
         }
-        if (plannedPaymentRequestDTO.getAmountFrom() > plannedPaymentRequestDTO.getAmountTo() && plannedPaymentRequestDTO.getAmountTo() != 0) {
+        if (plannedPaymentRequestDTO.getAmountTo() != null && plannedPaymentRequestDTO.getAmountFrom() > plannedPaymentRequestDTO.getAmountTo()) {
             throw new BadRequestException("Amount from can't be bigger than Amount to!");
         }
-        if (plannedPaymentRequestDTO.getAmountFrom() > 0 && plannedPaymentRequestDTO.getAmountTo() > 0) {
+        if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() != null) {
             //TODO: check if amount from > than amount to
             sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
         else {
-            if (plannedPaymentRequestDTO.getAmountFrom() > 0 && plannedPaymentRequestDTO.getAmountTo() <= 0) {
+            if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() == null) {
                 sql.append("AND amount > ? ");
                 amountFromIncluded = true;
             }
-            if (plannedPaymentRequestDTO.getAmountFrom() <= 0 && plannedPaymentRequestDTO.getAmountTo() > 0) {
+            if (plannedPaymentRequestDTO.getAmountFrom() == null && plannedPaymentRequestDTO.getAmountTo() != null) {
                 sql.append("AND amount < ? ");
                 amountToIncluded = true;
             }
@@ -127,8 +127,17 @@ public class PlannedPaymentDAO {
             if (result.next()) {
                 do{
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
+                    if (optionalAccount.isEmpty()) {
+                        throw new NotFoundException("Account not found!");
+                    }
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
+                    if (optionalCategory.isEmpty()) {
+                        throw new NotFoundException("Category not found!");
+                    }
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
+                    if (optionalUser.isEmpty()) {
+                        throw new NotFoundException("User not found!");
+                    }
                     PlannedPayment plannedPayment = new PlannedPayment(result.getInt("id"),
                             result.getString("name"),
                             result.getString("payment_type"),

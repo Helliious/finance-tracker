@@ -16,6 +16,7 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class AccountService {
     private UserRepository userRepository;
 
     public UserWithoutPassDTO createAcc(Account account, int ownerId) {
+        account.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
@@ -58,9 +60,6 @@ public class AccountService {
 
     public List<AccountWithoutOwnerDTO> getAll(int userId) {
         List<Account> accounts = accountRepository.findAllByOwnerId(userId);
-        if (accounts.isEmpty()) {
-            throw new NotFoundException("No accounts!");
-        }
         List<AccountWithoutOwnerDTO> response = new ArrayList<>();
         for (Account a : accounts) {
             response.add(new AccountWithoutOwnerDTO(a));

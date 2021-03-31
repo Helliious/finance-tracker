@@ -38,7 +38,6 @@ public class AccountController extends AbstractController {
     public UserWithoutPassDTO create(@RequestBody Account account,
                                      HttpSession session) {
         int userId = sessionManager.validateSession(session);
-        account.setCreateTime(new Timestamp(System.currentTimeMillis()));
         UserWithoutPassDTO userWithoutPassDTO = accountService.createAcc(account, userId);
         return userWithoutPassDTO;
     }

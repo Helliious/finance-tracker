@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -23,6 +24,7 @@ public class UserService {
     private EmailServiceImpl emailService;
 
     public UserWithoutPassDTO addUser(RegisterRequestUserDTO userDTO) {
+        userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         if (userRepository.findByUsername(userDTO.getUsername()) != null) {
             throw new BadRequestException("Username already exists!");
         }

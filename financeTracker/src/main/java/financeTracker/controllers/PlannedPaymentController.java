@@ -25,7 +25,6 @@ public class PlannedPaymentController extends AbstractController{
                                   @RequestBody PlannedPayment plannedPayment,
                                   HttpSession session) {
         int userId = sessionManager.validateSession(session);
-        plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         return plannedPaymentsService.add(plannedPayment, userId, accountId);
     }
 

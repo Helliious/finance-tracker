@@ -13,10 +13,10 @@ import java.sql.Timestamp;
 @Component
 public class FilterAccountRequestDTO {
     private String name;
-    private double balanceFrom;
-    private double balanceTo;
-    private double accLimitFrom;
-    private double accLimitTo;
+    private Double balanceFrom;
+    private Double balanceTo;
+    private Double accLimitFrom;
+    private Double accLimitTo;
     private Timestamp createTimeFrom;
     private Timestamp createTimeTo;
 }

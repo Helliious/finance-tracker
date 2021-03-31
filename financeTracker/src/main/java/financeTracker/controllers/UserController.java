@@ -23,7 +23,6 @@ public class UserController extends AbstractController {
 
     @PutMapping("/users")
     public UserWithoutPassDTO register(@RequestBody RegisterRequestUserDTO userDTO) {
-        userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return userService.addUser(userDTO);
     }
 

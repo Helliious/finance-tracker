@@ -17,27 +17,27 @@ public class CategoryController extends AbstractController {
     @Autowired
     private SessionManager sessionManager;
 
-    @GetMapping("/category/{category_id}")
+    @GetMapping("/categories/{category_id}")
     public ResponseCategoryDTO getById(@PathVariable(name = "category_id") int categoryId,
                                        HttpSession session) {
         int userId = sessionManager.validateSession(session);
         return categoryService.getById(categoryId, userId);
     }
 
-    @GetMapping("/category")
+    @GetMapping("/categories")
     public List<ResponseCategoryDTO> getAll(HttpSession session) {
         int userId = sessionManager.validateSession(session);
         return categoryService.getAll(userId);
     }
 
-    @PutMapping("/category")
+    @PutMapping("/categories")
     public ResponseCategoryDTO add(@RequestBody Category category,
                         HttpSession session) {
         int userId = sessionManager.validateSession(session);
         return categoryService.add(category, userId);
     }
 
-    @DeleteMapping("/category/{category_id}")
+    @DeleteMapping("/categories/{category_id}")
     public ResponseCategoryDTO delete(@PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
         int userId = sessionManager.validateSession(session);

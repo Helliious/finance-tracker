@@ -34,6 +34,7 @@ public class PlannedPaymentsService {
     private CategoryRepository categoryRepository;
 
     public UserWithoutPassDTO add(PlannedPayment plannedPayment, int userId, int accountId) {
+        plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(userId);
         Optional<Account> optAccount = accountRepository.findById(accountId);
         Optional<Category> optCategory = categoryRepository.findById(plannedPayment.getCategory().getId());
@@ -105,9 +106,6 @@ public class PlannedPaymentsService {
 
     public List<ResponsePlannedPaymentDTO> getAll(int accountId, int userId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-        if (account == null) {
-            throw new NotFoundException("Account not found!");
-        }
         List<ResponsePlannedPaymentDTO> plannedPayments = new ArrayList<>();
         for (PlannedPayment p : account.getPlannedPayments()) {
             plannedPayments.add(new ResponsePlannedPaymentDTO(p));

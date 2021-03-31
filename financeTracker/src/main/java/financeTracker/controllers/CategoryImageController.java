@@ -17,7 +17,7 @@ public class CategoryImageController {
     @Autowired
     private CategoryImageService categoryImageService;
 
-    @PutMapping("/category/{id}/images")
+    @PutMapping("/categories/{id}/images")
     public CategoryImageDTO upload(@PathVariable int id, @RequestPart MultipartFile file) {
         File pFile = new File(filePath + File.separator + System.nanoTime() + ".png");
         try (OutputStream os = new FileOutputStream(pFile)) {
