@@ -9,6 +9,7 @@ import financeTracker.models.pojo.Category;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
+import financeTracker.utils.PDFCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PDFCreator pdfCreator;
 
     public Category add(Category category, int userId) {
         Optional<User> optUser = userRepository.findById(userId);
@@ -69,6 +72,12 @@ public class CategoryService {
     }
 
     public List<CategoryExpensesDTO> referenceOverallExpensesByCategory(int userId) {
-        return categoryDAO.referenceOverallExpensesByCategory(userId);
+        List<CategoryExpensesDTO> expenses = categoryDAO.referenceOverallExpensesByCategory(userId);
+        StringBuilder text = new StringBuilder();
+        for (CategoryExpensesDTO e : expenses) {
+            text.append(e.getName()).append(" : ").append(e.getExpenses()).append(";\n");
+        }
+        pdfCreator.insertTextInPDF(text.toString(), userId);
+        return expenses;
     }
 }
