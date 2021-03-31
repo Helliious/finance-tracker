@@ -28,14 +28,14 @@ public class AccountController extends AbstractController {
     @GetMapping("/accounts/{account_id}")
     public AccountWithoutOwnerDTO getById(@PathVariable(name = "account_id") int accountId,
                                           HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Account account = accountService.getById(accountId, userId);
         return convertToAccWithoutOwnerDTO(account);
     }
 
     @GetMapping("/accounts")
     public List<AccountWithoutOwnerDTO> getAll(HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         List<Account> accounts = accountService.getAll(userId);
         return accounts.stream()
                 .map(this::convertToAccWithoutOwnerDTO)
@@ -45,7 +45,7 @@ public class AccountController extends AbstractController {
     @PutMapping("/accounts")
     public UserWithoutPassDTO create(@RequestBody Account account,
                                      HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = accountService.createAcc(account, userId);
         return convertToUserWithoutPassDTO(user);
     }
@@ -53,7 +53,7 @@ public class AccountController extends AbstractController {
     @DeleteMapping("/accounts/{account_id}")
     public AccountWithoutOwnerDTO delete(@PathVariable(name = "account_id") int accountId,
                                          HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Account account = accountService.deleteAccount(accountId, userId);
         return convertToAccWithoutOwnerDTO(account);
     }
@@ -62,7 +62,7 @@ public class AccountController extends AbstractController {
     public AccountWithoutOwnerDTO edit(@PathVariable(name = "account_id") int accountId,
                                    @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
                                    HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Account account = accountService.editAccount(updateRequestAccountDTO, userId, accountId);
         return convertToAccWithoutOwnerDTO(account);
     }
@@ -70,7 +70,7 @@ public class AccountController extends AbstractController {
     @PostMapping("/accounts/filter")
     public List<AccountWithoutOwnerDTO> filter(@RequestBody FilterAccountRequestDTO accountRequestDTO,
                                                HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         List<Account> accounts = accountService.filter(userId, accountRequestDTO);
         return accounts.stream()
                 .map(this::convertToAccWithoutOwnerDTO)

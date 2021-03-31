@@ -28,7 +28,7 @@ public class PlannedPaymentController extends AbstractController{
     public UserWithoutPassDTO add(@PathVariable(name = "account_id") int accountId,
                                   @RequestBody PlannedPayment plannedPayment,
                                   HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = plannedPaymentsService.add(plannedPayment, userId, accountId);
         return convertToUserWithoutPassDTO(user);
     }
@@ -37,7 +37,7 @@ public class PlannedPaymentController extends AbstractController{
     public ResponsePlannedPaymentDTO getById(@PathVariable(name = "account_id") int accountId,
                                              @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                              HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.getById(accountId, userId, plannedPaymentId);
         return convertToResponsePlannedPaymentDTO(plannedPayment);
     }
@@ -45,7 +45,7 @@ public class PlannedPaymentController extends AbstractController{
     @GetMapping("/accounts/{account_id}/planned_payments")
     public List<ResponsePlannedPaymentDTO> getAll(@PathVariable(name = "account_id") int accountId,
                                                   HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         List<PlannedPayment> plannedPayments = plannedPaymentsService.getAll(accountId, userId);
         return plannedPayments.stream()
                 .map(this::convertToResponsePlannedPaymentDTO)
@@ -56,7 +56,7 @@ public class PlannedPaymentController extends AbstractController{
     public ResponsePlannedPaymentDTO delete(@PathVariable(name = "account_id") int accountId,
                                             @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                             HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.delete(accountId, userId, plannedPaymentId);
         return convertToResponsePlannedPaymentDTO(plannedPayment);
     }
@@ -66,7 +66,7 @@ public class PlannedPaymentController extends AbstractController{
                                    @PathVariable(name = "planned_payment_id") int plannedPaymentId,
                                    @RequestBody ResponsePlannedPaymentDTO responsePlannedPaymentDTO,
                                    HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.edit(responsePlannedPaymentDTO, accountId, userId, plannedPaymentId);
         return convertToResponsePlannedPaymentDTO(plannedPayment);
     }
@@ -74,7 +74,7 @@ public class PlannedPaymentController extends AbstractController{
     @PostMapping("/planned_payments/filter")
     public List<ResponsePlannedPaymentDTO> filter(@RequestBody FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO,
                                                HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         List<PlannedPayment> plannedPayments = plannedPaymentsService.filter(userId, plannedPaymentRequestDTO);
         return plannedPayments.stream()
                 .map(this::convertToResponsePlannedPaymentDTO)

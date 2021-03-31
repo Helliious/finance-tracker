@@ -24,14 +24,14 @@ public class CategoryController extends AbstractController {
     @GetMapping("/categories/{category_id}")
     public ResponseCategoryDTO getById(@PathVariable(name = "category_id") int categoryId,
                                        HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Category category = categoryService.getById(categoryId, userId);
         return convertToResponseCategoryDTO(category);
     }
 
     @GetMapping("/categories")
     public List<ResponseCategoryDTO> getAll(HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         List<Category> categories = categoryService.getAll(userId);
         return categories.stream()
                 .map(this::convertToResponseCategoryDTO)
@@ -41,7 +41,7 @@ public class CategoryController extends AbstractController {
     @PutMapping("/categories")
     public ResponseCategoryDTO add(@RequestBody Category category,
                         HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Category resultCategory = categoryService.add(category, userId);
         return convertToResponseCategoryDTO(resultCategory);
     }
@@ -49,7 +49,7 @@ public class CategoryController extends AbstractController {
     @DeleteMapping("/categories/{category_id}")
     public ResponseCategoryDTO delete(@PathVariable(name = "category_id") int categoryId,
                            HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         Category category = categoryService.delete(categoryId, userId);
         return convertToResponseCategoryDTO(category);
     }

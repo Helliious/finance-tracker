@@ -22,34 +22,34 @@ public class TransactionController extends AbstractController {
                                                                @PathVariable("account_id") int accountId,
                                                                HttpSession session){
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.addTransactionToAcc(accountId,dto,userId);
     }
 
     @GetMapping("/transactions/{transaction_id}")
     public TransactionWithoutOwnerAndAccountDTO getById(@PathVariable(name="transaction_id") int transactionId,
                                                         HttpSession session){
-       int userId=sessionManager.validateSession(session);
+       int userId=sessionManager.getLoggedId(session);
         return transactionService.getById(userId,transactionId);
     }
 
     @GetMapping("/transactions/users")
     public ArrayList<TransactionWithoutOwnerAndAccountDTO> getAllByUser(HttpSession session){
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.getByOwnerId(userId);
     }
 
     @GetMapping("/transactions/accounts/{account_id}")
     public ArrayList<TransactionWithoutOwnerAndAccountDTO> getAllByAccount(@PathVariable("account_id") int accountId,
                                                                            HttpSession session){
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.getByAccountId(userId,accountId);
     }
 
     @DeleteMapping("/users/{user_id}/transactions/delete/{transaction_id}")
     public TransactionWithoutOwnerAndAccountDTO delete(@PathVariable(name="transaction_id") int transactionId,
                                                        HttpSession session){
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.delete(transactionId,userId);
     }
 
@@ -57,14 +57,14 @@ public class TransactionController extends AbstractController {
     public TransactionWithoutOwnerAndAccountDTO edit(@PathVariable(name="transaction_id") int transactionId,
                                                      @RequestBody EditTransactionRequestDTO dto,
                                                      HttpSession session) {
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.editTransaction(transactionId,dto,userId);
     }
 
     @PostMapping("/transactions/filter")
     public List<TransactionWithoutOwnerAndAccountDTO> filter(@RequestBody FilterTransactionRequestDTO dto,
                                                              HttpSession session){
-        int userId=sessionManager.validateSession(session);
+        int userId=sessionManager.getLoggedId(session);
         return transactionService.filter(userId,dto);
     }
 }

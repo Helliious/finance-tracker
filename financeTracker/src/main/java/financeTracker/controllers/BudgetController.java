@@ -24,34 +24,34 @@ public class BudgetController extends AbstractController {
     public BudgetWithoutAccountAndOwnerDTO addBudget(@RequestBody CreateBudgetRequestDTO dto,
                                                      HttpSession session){
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.addBudgetToAcc(userId, dto);
     }
 
     @GetMapping("budgets/{budget_id}")
     public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name="budget_id") int budgetId,
                                                    HttpSession session) {
-       int userId = sessionManager.validateSession(session);
+       int userId = sessionManager.getLoggedId(session);
        return budgetService.getById(userId, budgetId);
     }
 
     @GetMapping("/budgets/users/")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.getByOwnerId(userId);
     }
 
     @GetMapping("/budgets/accounts/{account_id}")
     public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable("account_id") int accountId,
                                                                       HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.getByAccountId(userId, accountId);
     }
 
     @DeleteMapping("/budgets/{budget_id}")
     public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="budget_id") int budgetId,
                                                   HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.delete(budgetId, userId);
     }
 
@@ -59,21 +59,21 @@ public class BudgetController extends AbstractController {
     public BudgetWithoutAccountAndOwnerDTO edit(@PathVariable(name="budget_id") int budgetId,
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.editBudget(budgetId,dto, userId);
     }
 
     @GetMapping("budgets/category/{category_id}")
     public double getSpendingByCategory(@PathVariable(name="category_id") int categoryId,
                                         HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.getSpendings(userId, categoryId);
     }
 
     @PostMapping("/budgets/filter")
     public List<BudgetWithoutAccountAndOwnerDTO> filter(@RequestBody FilterBudgetRequestDTO dto,
                                                         HttpSession session){
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         return budgetService.filter(userId, dto);
     }
 }

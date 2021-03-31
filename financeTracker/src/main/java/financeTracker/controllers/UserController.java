@@ -41,14 +41,14 @@ public class UserController extends AbstractController {
     @PutMapping("/users/edit")
     public UserWithoutPassDTO edit(@RequestBody UpdateRequestUserDTO userDTO,
                                    HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = userService.editUser(userDTO, userId);
         return convertToUserWithoutPassDTO(user);
     }
 
     @DeleteMapping("/users")
     public UserWithoutPassDTO delete(HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = userService.deleteUser(userId);
         sessionManager.logoutUser(session);
         return convertToUserWithoutPassDTO(user);
@@ -56,7 +56,7 @@ public class UserController extends AbstractController {
 
     @GetMapping("/users/logout")
     public UserWithoutPassDTO logout(HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = userService.logoutUser(userId);
         sessionManager.logoutUser(session);
         return convertToUserWithoutPassDTO(user);
@@ -65,7 +65,7 @@ public class UserController extends AbstractController {
     @PostMapping("/users/change_password")
     public UserWithoutPassDTO changePassword(@RequestBody ChangePassUserDTO changePasswordDTO,
                                              HttpSession session) {
-        int userId = sessionManager.validateSession(session);
+        int userId = sessionManager.getLoggedId(session);
         User user = userService.changePassword(userId, changePasswordDTO);
         return convertToUserWithoutPassDTO(user);
     }

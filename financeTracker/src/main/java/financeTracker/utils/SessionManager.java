@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 public class SessionManager {
     public static final String LOGGED_USER_ID = "LOGGED_USER_ID";
 
-    public int validateSession(HttpSession session){
+    public int getLoggedId(HttpSession session){
         if (session.getAttribute(LOGGED_USER_ID) == null) {
             throw new AuthenticationException("Not logged in!");
         } else {
