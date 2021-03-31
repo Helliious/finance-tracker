@@ -33,7 +33,7 @@ public class PlannedPaymentDAO {
 
     public List<PlannedPayment> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
         List<PlannedPayment> plannedPayments = new ArrayList<>();
-        String sql = "SELECT * FROM planned_payments WHERE owner_id = ?";
+        StringBuilder sql =new StringBuilder("SELECT * FROM planned_payments WHERE owner_id = ?");
         boolean nameIncludedInFilter = false;
         boolean paymentTypeIncluded = false;
         boolean frequencyIncluded = false;
@@ -44,15 +44,15 @@ public class PlannedPaymentDAO {
         boolean dateFromIncluded = false;
         boolean dateToIncluded = false;
         if (plannedPaymentRequestDTO.getName() != null) {
-            sql += "AND name LIKE ?";
+            sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
         }
         if (plannedPaymentRequestDTO.getPaymentType() != null){
-            sql += "AND payment_type = ?";
+            sql.append("AND payment_type = ?");
             paymentTypeIncluded = true;
         }
         if (plannedPaymentRequestDTO.getFrequency() > 0 && plannedPaymentRequestDTO.getDurationUnit() != null) {
-            sql += "AND frequency = ? AND duration_unit = ?";
+            sql.append("AND frequency = ? AND duration_unit = ?");
             frequencyIncluded = true;
         }
         if (plannedPaymentRequestDTO.getAmountFrom() > plannedPaymentRequestDTO.getAmountTo() && plannedPaymentRequestDTO.getAmountTo() != 0) {
@@ -60,37 +60,37 @@ public class PlannedPaymentDAO {
         }
         if (plannedPaymentRequestDTO.getAmountFrom() > 0 && plannedPaymentRequestDTO.getAmountTo() > 0) {
             //TODO: check if amount from > than amount to
-            sql += "AND amount BETWEEN ? AND ? ";
+            sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
         else {
             if (plannedPaymentRequestDTO.getAmountFrom() > 0 && plannedPaymentRequestDTO.getAmountTo() <= 0) {
-                sql += "AND amount > ? ";
+                sql.append("AND amount > ? ");
                 amountFromIncluded = true;
             }
             if (plannedPaymentRequestDTO.getAmountFrom() <= 0 && plannedPaymentRequestDTO.getAmountTo() > 0) {
-                sql += "AND amount < ? ";
+                sql.append("AND amount < ? ");
                 amountToIncluded = true;
             }
         }
         if(plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
             //TODO: check if timeFrom is > than timeTo
-            sql += "AND due_time BETWEEN ? AND ?";
+            sql.append("AND due_time BETWEEN ? AND ?");
             bothDatesIncluded = true;
         }
         else{
             if (plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() == null) {
-                sql += "AND due_time >= ?";
+                sql.append("AND due_time >= ?");
                 dateFromIncluded = true;
             }
             if (plannedPaymentRequestDTO.getDueTimeFrom() == null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
-                sql += "AND due_time <= ?";
+                sql.append("AND due_time <= ?");
                 dateToIncluded = true;
             }
         }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, userId);
             if (nameIncludedInFilter) {

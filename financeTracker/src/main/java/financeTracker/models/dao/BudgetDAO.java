@@ -35,7 +35,7 @@ public class BudgetDAO {
 
     public List<Budget> filterBudget(int userId, FilterBudgetRequestDTO dto) {
         List<Budget> budgets = new ArrayList<>();
-        String sql = "SELECT * FROM budgets WHERE owner_id = ? ";
+        StringBuilder sql =new StringBuilder("SELECT * FROM budgets WHERE owner_id = ? ");
         boolean nameIncludedInFilter = false;
         boolean categoryIncludedInFilter = false;
         boolean bothAmountsIncluded = false;
@@ -45,48 +45,48 @@ public class BudgetDAO {
         boolean dateFromIncluded = false;
         boolean dateToIncluded = false;
         if (dto.getName() != null) {
-            sql += "AND name LIKE ?";
+            sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
         }
         if (dto.getCategoryId() > 0) {
-            sql += "AND category_id = ? ";
+            sql.append("AND category_id = ?");
             categoryIncludedInFilter = true;
         }
         if (dto.getAmountFrom() > dto.getAmountTo() && dto.getAmountTo() != 0) {
             throw new BadRequestException("Amount from can't be bigger than Amount to");
         }
         if (dto.getAmountFrom() > 0 && dto.getAmountTo() > 0) {
-            sql += "AND amount BETWEEN ? AND ? ";
+            sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
         else {
             if (dto.getAmountFrom() > 0 && dto.getAmountTo() <= 0) {
-                sql += "AND amount > ? ";
+                sql.append("AND amount > ? ");
                 amountFromIncluded = true;
             }
             if (dto.getAmountFrom() <= 0 && dto.getAmountTo() > 0) {
                 amountToIncluded = true;
-                sql += "AND amount < ? ";
+                sql.append("AND amount < ? ");
             }
         }
         if(dto.getDateFrom() != null && dto.getDateTo() != null) {
-            sql += "AND create_time BETWEEN ? AND ?";
+            sql.append("AND create_time BETWEEN ? AND ?");
             bothDatesIncluded = true;
         }
         else{
             if (dto.getDateFrom() != null && dto.getDateTo() == null) {
-                sql += "AND create_time >= ?";
+                sql.append("AND create_time >= ?");
                 dateFromIncluded = true;
             }
             if (dto.getDateFrom() == null && dto.getDateTo() != null) {
-                sql += "AND create_time <= ?";
+                sql.append("AND create_time <= ?");
                 dateToIncluded = true;
             }
         }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             int paramIdx = 1;
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
             ps.setInt(paramIdx++, userId);
             if (nameIncludedInFilter) {
                 ps.setString(paramIdx++, dto.getName() + "%");

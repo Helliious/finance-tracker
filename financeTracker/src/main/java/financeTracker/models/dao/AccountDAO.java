@@ -33,7 +33,7 @@ public class AccountDAO {
 
     public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
         List<Account> accounts = new ArrayList<>();
-        String sql = "SELECT * FROM accounts WHERE owner_id = ?";
+        StringBuilder sql =new StringBuilder("SELECT * FROM accounts WHERE owner_id = ?");
         boolean nameIncludedInFilter = false;
         boolean bothBalanceIncluded = false;
         boolean balanceFromIncluded = false;
@@ -45,7 +45,7 @@ public class AccountDAO {
         boolean createTimeFromIncluded = false;
         boolean createTimeToIncluded = false;
         if (accountRequestDTO.getName() != null) {
-            sql += "AND name LIKE ?";
+            sql.append("AND name LIKE ?") ;
             nameIncludedInFilter = true;
         }
         if (accountRequestDTO.getBalanceFrom() > accountRequestDTO.getBalanceTo() && accountRequestDTO.getBalanceTo() != 0) {
@@ -53,52 +53,52 @@ public class AccountDAO {
         }
         if (accountRequestDTO.getBalanceFrom() > 0 && accountRequestDTO.getBalanceTo() > 0) {
             //TODO: check if balance from > than balance to
-            sql += "AND amount BETWEEN ? AND ? ";
+            sql.append("AND amount BETWEEN ? AND ? ");
             bothBalanceIncluded = true;
         }
         else {
             if (accountRequestDTO.getBalanceFrom() > 0 && accountRequestDTO.getBalanceTo() <= 0) {
-                sql += "AND amount > ? ";
+                sql.append("AND amount > ? ");
                 balanceFromIncluded = true;
             }
             if (accountRequestDTO.getBalanceFrom() <= 0 && accountRequestDTO.getBalanceTo() > 0) {
-                sql += "AND amount < ? ";
+                sql.append("AND amount < ? ");
                 balanceToIncluded = true;
             }
         }
         if (accountRequestDTO.getAccLimitFrom() > 0 && accountRequestDTO.getAccLimitTo() > 0) {
             //TODO: check if acc limit from > than acc limit to
-            sql += "AND amount BETWEEN ? AND ? ";
+            sql.append("AND amount BETWEEN ? AND ? ");
             bothAccLimitIncluded = true;
         }
         else {
             if (accountRequestDTO.getAccLimitFrom() > 0 && accountRequestDTO.getAccLimitTo() <= 0) {
-                sql += "AND amount > ? ";
+                sql.append("AND amount > ? ");
                 accLimitFromIncluded = true;
             }
             if (accountRequestDTO.getAccLimitFrom() <= 0 && accountRequestDTO.getAccLimitTo() > 0) {
-                sql += "AND amount < ? ";
+                sql.append("AND amount < ? ");
                 accLimitToIncluded = true;
             }
         }
         if(accountRequestDTO.getCreateTimeFrom() != null && accountRequestDTO.getCreateTimeTo() != null) {
             //TODO: check if timeFrom is > than timeTo
-            sql += "AND create_time BETWEEN ? AND ?";
+            sql.append("AND create_time BETWEEN ? AND ?");
             bothCreateTimesIncluded = true;
         }
         else{
             if (accountRequestDTO.getCreateTimeFrom() != null && accountRequestDTO.getCreateTimeTo() == null) {
-                sql += "AND create_time >= ?";
+                sql.append("AND create_time >= ?");
                 createTimeFromIncluded = true;
             }
             if (accountRequestDTO.getCreateTimeFrom() == null && accountRequestDTO.getCreateTimeTo() != null) {
-                sql += "AND create_time <= ?";
+                sql.append("AND create_time <= ?");
                 createTimeToIncluded = true;
             }
         }
         System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, userId);
             if (nameIncludedInFilter) {
