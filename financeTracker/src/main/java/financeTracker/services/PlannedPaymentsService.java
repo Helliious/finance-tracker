@@ -5,11 +5,9 @@ import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.PlannedPaymentDAO;
 import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
+import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
-import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.Category;
-import financeTracker.models.pojo.PlannedPayment;
-import financeTracker.models.pojo.User;
+import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.PlannedPaymentsRepository;
@@ -204,6 +202,11 @@ public class PlannedPaymentsService {
     }
 
     public List<ResponsePlannedPaymentDTO> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
-        return plannedPaymentDAO.filter(userId, plannedPaymentRequestDTO);
+        List<PlannedPayment> plannedPayments=plannedPaymentDAO.filter(userId,plannedPaymentRequestDTO);
+        List<ResponsePlannedPaymentDTO> responsePlannedPaymentDTOS=new ArrayList<>();
+        for (PlannedPayment plannedPayment:plannedPayments){
+            responsePlannedPaymentDTOS.add(new ResponsePlannedPaymentDTO(plannedPayment));
+        }
+        return responsePlannedPaymentDTOS;
     }
 }

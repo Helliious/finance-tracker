@@ -33,8 +33,8 @@ public class BudgetDAO {
     @Autowired
     private AccountRepository accountRepository;
 
-    public List<BudgetWithoutAccountAndOwnerDTO> filterBudget(int userId, FilterBudgetRequestDTO dto) {
-        List<BudgetWithoutAccountAndOwnerDTO> budgetsWithoutAccountAndOwnerDTOS = new ArrayList<>();
+    public List<Budget> filterBudget(int userId, FilterBudgetRequestDTO dto) {
+        List<Budget> budgets = new ArrayList<>();
         String sql = "SELECT * FROM budgets WHERE owner_id = ? ";
         boolean nameIncludedInFilter = false;
         boolean categoryIncludedInFilter = false;
@@ -130,7 +130,7 @@ public class BudgetDAO {
                             optionalUser.get(),
                             optionalCategory.get()
                     );
-                    budgetsWithoutAccountAndOwnerDTOS.add(new BudgetWithoutAccountAndOwnerDTO(budget));
+                    budgets.add(budget);
                 } while (result.next());
             }
             else{
@@ -140,6 +140,6 @@ public class BudgetDAO {
         catch (SQLException e){
             e.getMessage();
         }
-        return budgetsWithoutAccountAndOwnerDTOS;
+        return budgets;
     }
 }

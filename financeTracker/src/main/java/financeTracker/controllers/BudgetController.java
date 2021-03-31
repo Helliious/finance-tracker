@@ -60,7 +60,7 @@ public class BudgetController extends AbstractController {
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
         int userId = sessionManager.validateSession(session);
-        return budgetService.editBudget(budgetId, dto, userId);
+        return budgetService.editBudget(budgetId,dto, userId);
     }
 
     @GetMapping("budgets/category/{category_id}")

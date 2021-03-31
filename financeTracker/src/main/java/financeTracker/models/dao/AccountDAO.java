@@ -31,8 +31,8 @@ public class AccountDAO {
     @Autowired
     private PlannedPaymentsRepository plannedPaymentsRepository;
 
-    public List<AccountWithoutOwnerDTO> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
-        List<AccountWithoutOwnerDTO> accounts = new ArrayList<>();
+    public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
+        List<Account> accounts = new ArrayList<>();
         String sql = "SELECT * FROM accounts WHERE owner_id = ?";
         boolean nameIncludedInFilter = false;
         boolean bothBalanceIncluded = false;
@@ -149,7 +149,7 @@ public class AccountDAO {
                                                 transactions,
                                                 plannedPayments
                                                 );
-                    accounts.add(new AccountWithoutOwnerDTO(account));
+                    accounts.add(account);
                 }while (result.next());
             } else {
                 throw new NotFoundException("Account not found!");

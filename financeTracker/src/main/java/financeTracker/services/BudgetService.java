@@ -173,6 +173,11 @@ public class BudgetService {
     }
 
     public List<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto) {
-         return budgetDao.filterBudget(userId,dto);
+        List<Budget> budgets=budgetDao.filterBudget(userId,dto);
+        List<BudgetWithoutAccountAndOwnerDTO> budgetWithoutAccountAndOwnerDTOS=new ArrayList<>();
+        for (Budget budget:budgets) {
+            budgetWithoutAccountAndOwnerDTOS.add(new BudgetWithoutAccountAndOwnerDTO(budget));
+        }
+         return budgetWithoutAccountAndOwnerDTOS;
     }
 }

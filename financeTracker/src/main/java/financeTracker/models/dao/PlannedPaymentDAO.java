@@ -31,8 +31,8 @@ public class PlannedPaymentDAO {
     @Autowired
     private UserRepository userRepository;
 
-    public List<ResponsePlannedPaymentDTO> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
-        List<ResponsePlannedPaymentDTO> plannedPayments = new ArrayList<>();
+    public List<PlannedPayment> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
+        List<PlannedPayment> plannedPayments = new ArrayList<>();
         String sql = "SELECT * FROM planned_payments WHERE owner_id = ?";
         boolean nameIncludedInFilter = false;
         boolean paymentTypeIncluded = false;
@@ -140,7 +140,7 @@ public class PlannedPaymentDAO {
                             optionalCategory.get(),
                             optionalUser.get()
                     );
-                    plannedPayments.add(new ResponsePlannedPaymentDTO(plannedPayment));
+                    plannedPayments.add(plannedPayment);
                 }while (result.next());
             } else {
                 throw new NotFoundException("Planned payment not found!");

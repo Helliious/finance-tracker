@@ -160,7 +160,12 @@ public class TransactionService {
     }
 
     public List<TransactionWithoutOwnerAndAccountDTO> filter(int userId, FilterTransactionRequestDTO dto) {
-        return transactionDAO.filterTransaction(userId,dto);
+        List<Transaction> transactions=transactionDAO.filterTransaction(userId,dto);
+        List<TransactionWithoutOwnerAndAccountDTO> transactionWithoutOwnerAndAccountDTOS=new ArrayList<>();
+        for (Transaction transaction:transactions){
+            transactionWithoutOwnerAndAccountDTOS.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
+        }
+        return transactionWithoutOwnerAndAccountDTOS;
     }
 
 }

@@ -6,8 +6,10 @@ import financeTracker.models.dao.AccountDAO;
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
+import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
+import financeTracker.models.pojo.PlannedPayment;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.UserRepository;
@@ -122,6 +124,11 @@ public class AccountService {
     }
 
     public List<AccountWithoutOwnerDTO> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
-        return accountDAO.filter(userId, accountRequestDTO);
+        List<Account> accounts=accountDAO.filter(userId,accountRequestDTO);
+        List<AccountWithoutOwnerDTO> responseAccounts=new ArrayList<>();
+        for (Account account:accounts){
+            responseAccounts.add(new AccountWithoutOwnerDTO(account));
+        }
+        return responseAccounts;
     }
 }

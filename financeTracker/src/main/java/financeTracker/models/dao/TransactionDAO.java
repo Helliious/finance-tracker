@@ -31,8 +31,8 @@ public class TransactionDAO {
     @Autowired
     private UserRepository userRepository;
 
-    public List<TransactionWithoutOwnerAndAccountDTO> filterTransaction(int userId, FilterTransactionRequestDTO dto) {
-        List<TransactionWithoutOwnerAndAccountDTO> transactionsWithoutOwnerDTOS = new ArrayList<>();
+    public List<Transaction> filterTransaction(int userId, FilterTransactionRequestDTO dto) {
+        List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT * FROM transactions WHERE owner_id = ? ";
         boolean nameIncludedInFilter = false;
         boolean categoryIncludedInFilter = false;
@@ -135,8 +135,9 @@ public class TransactionDAO {
                             optionalCategory.get(),
                             optionalAccount.get(),
                             optionalUser.get()
+
                     );
-                    transactionsWithoutOwnerDTOS.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
+                    transactions.add(transaction);
                 }while (result.next());
             }
             else{
@@ -146,6 +147,6 @@ public class TransactionDAO {
         catch (SQLException e){
             e.getMessage();
         }
-        return transactionsWithoutOwnerDTOS;
+        return transactions;
     }
 }
