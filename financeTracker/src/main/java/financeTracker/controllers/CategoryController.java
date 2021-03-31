@@ -1,7 +1,6 @@
 package financeTracker.controllers;
 
 import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
-import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Category;
 import financeTracker.services.CategoryService;
 import financeTracker.utils.SessionManager;

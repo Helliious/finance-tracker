@@ -5,8 +5,6 @@ import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.PlannedPaymentDAO;
 import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
-import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
-import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

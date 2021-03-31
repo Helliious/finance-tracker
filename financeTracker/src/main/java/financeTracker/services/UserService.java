@@ -23,7 +23,7 @@ public class UserService {
     @Autowired
     private EmailServiceImpl emailService;
 
-    public UserWithoutPassDTO addUser(RegisterRequestUserDTO userDTO) {
+    public User addUser(RegisterRequestUserDTO userDTO) {
         userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         if (userRepository.findByUsername(userDTO.getUsername()) != null) {
             throw new BadRequestException("Username already exists!");
@@ -36,11 +36,10 @@ public class UserService {
         userDTO.setPassword(encoder.encode(userDTO.getPassword()));
         User user = new User(userDTO);
         user = userRepository.save(user);
-        UserWithoutPassDTO userWithoutPassDTO = new UserWithoutPassDTO(user);
-        return userWithoutPassDTO;
+        return user;
     }
 
-    public UserWithoutPassDTO editUser(UpdateRequestUserDTO userDTO, int userId) {
+    public User editUser(UpdateRequestUserDTO userDTO, int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found!");
@@ -78,44 +77,42 @@ public class UserService {
             }
         }
         User responseUser = userRepository.save(user.get());
-        UserWithoutPassDTO userWithoutPassDTO = new UserWithoutPassDTO(responseUser);
-        return userWithoutPassDTO;
+        return responseUser;
     }
 
-    public UserWithoutPassDTO getUserById(int id) {
+    public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            return new UserWithoutPassDTO(user.get());
+            return user.get();
         } else {
             throw new NotFoundException("User not found");
         }
     }
 
-    public UserWithoutPassDTO login(LoginUserDTO loginUserDto) {
+    public User login(LoginUserDTO loginUserDto) {
         User user = userRepository.findByUsername(loginUserDto.getUsername());
         if (user == null) {
             throw new AuthenticationException("Wrong credentials");
         } else {
             PasswordEncoder encoder = new BCryptPasswordEncoder();
             if (encoder.matches(loginUserDto.getPassword(), user.getPassword())) {
-                return new UserWithoutPassDTO(user);
+                return user;
             } else {
                 throw new AuthenticationException("Wrong credentials");
             }
         }
     }
 
-    public UserWithoutPassDTO deleteUser(int userId) {
+    public User deleteUser(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user.get());
         userRepository.deleteById(userId);
-        return responseUser;
+        return user.get();
     }
 
-    public UserWithoutPassDTO forgotPass(String email) {
+    public User forgotPass(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new NotFoundException("User not found!");
@@ -124,13 +121,12 @@ public class UserService {
         String mailMessage = "New password: " + generatedPass;
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(generatedPass));
-        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user);
         userRepository.save(user);
         emailService.sendPassword(email, "Forgot password", mailMessage);
-        return responseUser;
+        return user;
     }
 
-    public UserWithoutPassDTO changePassword(int userId, ChangePassUserDTO changePasswordDTO) {
+    public User changePassword(int userId, ChangePassUserDTO changePasswordDTO) {
         Optional<User> optUser = userRepository.findById(userId);
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         if (optUser.isEmpty()) {
@@ -148,18 +144,17 @@ public class UserService {
             throw new AuthenticationException("Password already exists!");
         } else {
             optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
-            UserWithoutPassDTO user = new UserWithoutPassDTO(optUser.get());
             userRepository.save(optUser.get());
-            return user;
+            return optUser.get();
         }
     }
 
-    public UserWithoutPassDTO logoutUser(int userId) {
+    public User logoutUser(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        return new UserWithoutPassDTO(user.get());
+        return user.get();
     }
 
     private void validateUser(RegisterRequestUserDTO userDTO) {

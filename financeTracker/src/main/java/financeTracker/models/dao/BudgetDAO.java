@@ -1,7 +1,6 @@
 package financeTracker.models.dao;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Budget;

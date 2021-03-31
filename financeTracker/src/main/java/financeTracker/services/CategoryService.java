@@ -3,7 +3,6 @@ package financeTracker.services;
 import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
-import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import financeTracker.models.pojo.Category;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
@@ -11,7 +10,6 @@ import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
