@@ -5,6 +5,7 @@ import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
+import financeTracker.models.repository.BudgetRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class TransactionDAO {
     private CategoryRepository categoryRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     public List<Transaction> filterTransaction(int userId, FilterTransactionRequestDTO dto) {
         List<Transaction> transactions = new ArrayList<>();
@@ -133,7 +136,7 @@ public class TransactionDAO {
                             result.getString("description"),
                             optionalCategory.get(),
                             optionalAccount.get(),
-                            optionalUser.get()
+                            optionalUser.get(),null
 
                     );
                     transactions.add(transaction);

@@ -62,7 +62,7 @@ public class PlannedPaymentDAO {
                 sql.append("AND amount BETWEEN ? AND ? ");
                 bothAmountsIncluded = true;
             } else {
-                throw new BadRequestException("Entered invalid amount range!")
+                throw new BadRequestException("Entered invalid amount range!");
             }
         }
         else {

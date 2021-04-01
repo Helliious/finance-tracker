@@ -46,5 +46,6 @@ public class User {
         email = userDTO.getEmail();
         createTime = userDTO.getCreateTime();
         transactions = new ArrayList<>();
+        budgets=new ArrayList<>();
     }
 }

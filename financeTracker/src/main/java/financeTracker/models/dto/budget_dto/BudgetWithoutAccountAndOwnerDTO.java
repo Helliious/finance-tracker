@@ -1,12 +1,17 @@
 package financeTracker.models.dto.budget_dto;
 
+import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.pojo.Budget;
+import financeTracker.models.pojo.Transaction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +23,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
     private double amount;
     private Timestamp dueTime;
     private String categoryName;
+    private List<TransactionWithoutOwnerAndAccountDTO> transactionList;
 
     public BudgetWithoutAccountAndOwnerDTO(Budget budget) {
         this.id = budget.getId();
@@ -26,5 +32,11 @@ public class BudgetWithoutAccountAndOwnerDTO {
         this.amount = budget.getAmount();
         this.dueTime = budget.getDueTime();
         this.categoryName = budget.getCategory().getName();
+        this.transactionList=new ArrayList<>();
+        if (budget.getBudgetTransactions()!=null){
+            for (Transaction transaction:budget.getBudgetTransactions()) {
+                transactionList.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
+            }
+        }
     }
 }

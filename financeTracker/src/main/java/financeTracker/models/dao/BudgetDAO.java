@@ -127,7 +127,7 @@ public class BudgetDAO {
                             result.getTimestamp("due_time"),
                             optionalAccount.get(),
                             optionalUser.get(),
-                            optionalCategory.get()
+                            optionalCategory.get(),null
                     );
                     budgets.add(budget);
                 } while (result.next());

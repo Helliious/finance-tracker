@@ -7,14 +7,8 @@ import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.EditTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
-import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.Category;
-import financeTracker.models.pojo.Transaction;
-import financeTracker.models.pojo.User;
-import financeTracker.models.repository.AccountRepository;
-import financeTracker.models.repository.CategoryRepository;
-import financeTracker.models.repository.TransactionRepository;
-import financeTracker.models.repository.UserRepository;
+import financeTracker.models.pojo.*;
+import financeTracker.models.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +29,8 @@ public class TransactionService {
     private CategoryRepository categoryRepository;
     @Autowired
     private TransactionDAO transactionDAO;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     public TransactionWithoutOwnerAndAccountDTO getById(int userId, int id){
         Optional<Transaction> optionalTransaction=transactionRepository.findById(id);
@@ -166,6 +162,31 @@ public class TransactionService {
             transactionWithoutOwnerAndAccountDTOS.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
         }
         return transactionWithoutOwnerAndAccountDTOS;
+    }
+    public TransactionWithoutOwnerAndAccountDTO addTransactionToBudget(int ownerId,int budgetId,int transactionId){
+        Optional<Budget> optionalBudget=budgetRepository.findById(budgetId);
+        Optional<Transaction> optionalTransaction=transactionRepository.findById(transactionId);
+        if (optionalBudget.isEmpty()){
+            throw new NotFoundException("Budget doesn't exist");
+        }
+        if (optionalTransaction.isEmpty()){
+            throw new NotFoundException("Transaction doesn't exist");
+        }
+        Budget budget =optionalBudget.get();
+        Transaction transaction=optionalTransaction.get();
+        if(budget.getOwner().getId()!=ownerId){
+            throw new NotFoundException("You don't own budget with such id");
+        }
+        if (transaction.getOwner().getId()!=ownerId){
+            throw new NotFoundException("You don't own transaction with such id");
+        }
+        if (budget.getBudgetTransactions().contains(transaction)){
+            throw new BadRequestException("Transaction already exist in budget");
+        }
+            budget.getBudgetTransactions().add(transaction);
+            budgetRepository.save(budget);
+
+        return new TransactionWithoutOwnerAndAccountDTO(transactionRepository.findById(transactionId).get());
     }
 
 }

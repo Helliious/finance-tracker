@@ -14,9 +14,11 @@ import java.util.List;
 @Table(name="transactions")
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Transaction {
-    @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private int id;
     private String type;
     private double amount;
@@ -31,10 +33,9 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User owner;
-    @ManyToMany(mappedBy = "transactions")
-    //One transaction can be part of more than one budgets..
     @JsonBackReference
-    private List<Transaction> budgetsThatHaveTransaction;
+    @ManyToMany(mappedBy = "budgetTransactions")
+    List<Budget> budgetsThatHaveTransaction;
     public Transaction(AddTransactionRequestDTO dto){
          type=dto.getType();
          amount=dto.getAmount();

@@ -39,13 +39,9 @@ public class Budget {
             name="budgets_have_transactions",
             joinColumns = {@JoinColumn(name="budget_id")},
             inverseJoinColumns = {@JoinColumn(name="transaction_id")}
-
     )
     @JsonManagedReference
-    private List<Transaction> transactions;
-
-
-
+    private List<Transaction> budgetTransactions;
     public Budget(CreateBudgetRequestDTO dto){
         name=dto.getName();
         label=dto.getLabel();
