@@ -37,10 +37,10 @@ public class Transaction {
     List<Budget> budgetsThatHaveTransaction;
 
     public Transaction(AddTransactionRequestDTO dto){
-         type=dto.getType();
-         amount=dto.getAmount();
-         createTime=dto.getCreateTime();
-         description=dto.getDescription();
+         type = dto.getType();
+         amount = dto.getAmount();
+         createTime = dto.getCreateTime();
+         description = dto.getDescription();
     }
 }
 

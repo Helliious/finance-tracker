@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 @Component
 public class FilterTransactionRequestDTO{
     private String name;
-    private int categoryId;
-    private int amountFrom;
-    private int amountTo;
+    private Integer categoryId;
+    private Integer amountFrom;
+    private Integer amountTo;
     private String type;
     private Timestamp dateFrom;
     private Timestamp dateTo;

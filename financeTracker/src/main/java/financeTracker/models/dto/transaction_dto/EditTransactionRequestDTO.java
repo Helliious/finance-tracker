@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class EditTransactionRequestDTO {
     private String type;
-    private double amount;
+    private Double amount;
     private String description;
-    private int categoryId;
-    private int accountId;
+    private Integer categoryId;
+    private Integer accountId;
 }

@@ -1,6 +1,5 @@
 package financeTracker.models.pojo;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

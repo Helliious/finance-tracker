@@ -53,23 +53,23 @@ public class TransactionDAO {
             sql.append("AND type = ?");
             typeIncluded = true;
         }
-        if (dto.getCategoryId() > 0){
+        if (dto.getCategoryId() != null){
             sql.append("AND category_id = ? ");
             categoryIncludedInFilter = true;
         }
         if (dto.getAmountFrom() > dto.getAmountTo()){
             throw new BadRequestException("Amount from can't be bigger than Amount to");
         }
-        if (dto.getAmountFrom() > 0 && dto.getAmountTo() > 0){
+        if (dto.getAmountFrom() != null && dto.getAmountTo() != null){
             sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
         else {
-            if (dto.getAmountFrom() > 0 && dto.getAmountTo() <= 0) {
+            if (dto.getAmountFrom() != null && dto.getAmountTo() == null) {
                 sql.append("AND amount > ? ");
                 amountFromIncluded = true;
             }
-            if (dto.getAmountFrom() < 0 && dto.getAmountTo() > 0) {
+            if (dto.getAmountFrom() == null && dto.getAmountTo() != null) {
                 amountToIncluded = true;
                 sql.append("AND amount< ? ");
             }
@@ -83,7 +83,7 @@ public class TransactionDAO {
                 sql.append("AND create_time >= ?");
                 dateFromIncluded = true;
             }
-            if (dto.getDateFrom() == null && dto.getDateTo() == null) {
+            if (dto.getDateFrom() == null && dto.getDateTo() != null) {
                 sql.append("AND create_time <= ?");
                 dateToIncluded = true;
             }
@@ -97,7 +97,6 @@ public class TransactionDAO {
                 ps.setString(paramIdx++, dto.getName()+"%");
             }
             if (categoryIncludedInFilter) {
-//                System.out.println(i + " setted " + dto.getCategoryId());
                 ps.setInt(paramIdx++, dto.getCategoryId());
             }
             if (typeIncluded) {
@@ -110,22 +109,22 @@ public class TransactionDAO {
             if (amountFromIncluded) {
                 ps.setDouble(paramIdx++, dto.getAmountFrom());
             }
-            if(amountToIncluded) {
+            if (amountToIncluded) {
                 ps.setDouble(paramIdx++, dto.getAmountTo());
             }
-            if(bothDatesIncluded) {
+            if (bothDatesIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDateFrom());
                 ps.setTimestamp(paramIdx++, dto.getDateTo());
             }
-            if(dateFromIncluded) {
+            if (dateFromIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDateFrom());
             }
-            if(dateToIncluded) {
+            if (dateToIncluded) {
                 ps.setTimestamp(paramIdx, dto.getDateTo());
             }
             ResultSet result = ps.executeQuery();
             if (result.next()) {
-                do{
+                do {
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
@@ -141,13 +140,11 @@ public class TransactionDAO {
 
                     );
                     transactions.add(transaction);
-                }while (result.next());
-            }
-            else{
+                } while (result.next());
+            } else {
                 throw new NotFoundException("There is not transactions corresponding to current filter");
             }
-        }
-        catch (SQLException e){
+        } catch (SQLException e){
             e.getMessage();
         }
         return transactions;
