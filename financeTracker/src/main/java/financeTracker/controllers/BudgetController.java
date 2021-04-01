@@ -27,7 +27,7 @@ public class BudgetController extends AbstractController {
         int userId = sessionManager.getLoggedId(session);
         return budgetService.addBudgetToAcc(userId, dto);
     }
-
+    
     @GetMapping("budgets/{budget_id}")
     public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name="budget_id") int budgetId,
                                                    HttpSession session) {
