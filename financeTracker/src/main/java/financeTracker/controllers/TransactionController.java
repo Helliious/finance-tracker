@@ -46,7 +46,7 @@ public class TransactionController extends AbstractController {
         return transactionService.getByAccountId(userId,accountId);
     }
 
-    @DeleteMapping("/users/{user_id}/transactions/delete/{transaction_id}")
+    @DeleteMapping("/transactions/{transaction_id}")
     public TransactionWithoutOwnerAndAccountDTO delete(@PathVariable(name="transaction_id") int transactionId,
                                                        HttpSession session){
         int userId=sessionManager.getLoggedId(session);

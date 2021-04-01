@@ -3,7 +3,10 @@ package financeTracker.models.dto.user_dto;
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
+<<<<<<< HEAD
 import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
+=======
+>>>>>>> 3dd92c7017c74b834b692248f4f7d327df36bc7d
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.pojo.*;
@@ -60,6 +63,7 @@ public class UserWithoutPassDTO {
                 plannedPayments.add(new ResponsePlannedPaymentDTO(p));
             }
         }
+<<<<<<< HEAD
         categories = new ArrayList<>();
         if (user.getCategories() != null) {
             for (Category c : user.getCategories()) {
@@ -70,6 +74,12 @@ public class UserWithoutPassDTO {
         if (user.getBudgets() != null) {
             for (Budget b : user.getBudgets()) {
                 budgets.add(new BudgetWithoutAccountAndOwnerDTO(b));
+=======
+        budgets=new ArrayList<>();
+        if (user.getBudgets()!=null){
+            for (Budget budget:user.getBudgets()) {
+                budgets.add(new BudgetWithoutAccountAndOwnerDTO(budget));
+>>>>>>> 3dd92c7017c74b834b692248f4f7d327df36bc7d
             }
         }
     }

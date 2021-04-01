@@ -1,5 +1,6 @@
 package financeTracker.models.pojo;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,6 +34,18 @@ public class Budget {
     @ManyToOne
     @JoinColumn(name="category_id")
     private Category category;
+    @ManyToMany
+    @JoinTable(
+            name="budgets_have_transactions",
+            joinColumns = {@JoinColumn(name="budget_id")},
+            inverseJoinColumns = {@JoinColumn(name="transaction_id")}
+
+    )
+    @JsonManagedReference
+    private List<Transaction> transactions;
+
+
+
     public Budget(CreateBudgetRequestDTO dto){
         name=dto.getName();
         label=dto.getLabel();
