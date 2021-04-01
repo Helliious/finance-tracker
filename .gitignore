@@ -16,7 +16,7 @@ target/
 ### IntelliJ IDEA ###
 application.properties
 /references/
-/assests/
+/assets/
 .idea
 *.iws
 *.iml
