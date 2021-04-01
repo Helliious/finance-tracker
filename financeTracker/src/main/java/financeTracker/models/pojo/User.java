@@ -45,7 +45,28 @@ public class User {
         password = userDTO.getPassword();
         email = userDTO.getEmail();
         createTime = userDTO.getCreateTime();
+        accounts = new ArrayList<>();
         transactions = new ArrayList<>();
-        budgets=new ArrayList<>();
+        plannedPayments = new ArrayList<>();
+        categories = new ArrayList<>();
+        budgets = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", createTime=" + createTime +
+                ", accounts=" + accounts +
+                ", transactions=" + transactions +
+                ", plannedPayments=" + plannedPayments +
+                ", categories=" + categories +
+                ", budgets=" + budgets +
+                '}';
     }
 }

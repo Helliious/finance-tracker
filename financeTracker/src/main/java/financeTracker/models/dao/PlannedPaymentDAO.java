@@ -149,6 +149,7 @@ public class PlannedPaymentDAO {
                             result.getString("duration_unit"),
                             result.getDouble("amount"),
                             result.getTimestamp("due_time"),
+                            result.getString("description"),
                             optionalAccount.get(),
                             optionalCategory.get(),
                             optionalUser.get()

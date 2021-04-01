@@ -136,7 +136,8 @@ public class TransactionDAO {
                             result.getString("description"),
                             optionalCategory.get(),
                             optionalAccount.get(),
-                            optionalUser.get(),null
+                            optionalUser.get(),
+                            null
 
                     );
                     transactions.add(transaction);

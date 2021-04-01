@@ -36,6 +36,7 @@ public class Transaction {
     @JsonBackReference
     @ManyToMany(mappedBy = "budgetTransactions")
     List<Budget> budgetsThatHaveTransaction;
+
     public Transaction(AddTransactionRequestDTO dto){
          type=dto.getType();
          amount=dto.getAmount();

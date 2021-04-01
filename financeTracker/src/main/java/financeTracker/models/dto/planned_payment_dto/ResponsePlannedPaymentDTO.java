@@ -21,6 +21,7 @@ public class ResponsePlannedPaymentDTO {
     private String durationUnit;
     private Double amount;
     private Timestamp dueTime;
+    private String description;
     private ResponseCategoryDTO category;
 
     public ResponsePlannedPaymentDTO(PlannedPayment plannedPayment) {
@@ -31,6 +32,7 @@ public class ResponsePlannedPaymentDTO {
         durationUnit = plannedPayment.getDurationUnit();
         amount = plannedPayment.getAmount();
         dueTime = plannedPayment.getDueTime();
+        description = plannedPayment.getDescription();
         category = new ResponseCategoryDTO(plannedPayment.getCategory());
     }
 }

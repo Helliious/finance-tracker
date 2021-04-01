@@ -103,13 +103,16 @@ public class UserService {
         }
     }
 
-    public User deleteUser(int userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
+    public UserWithoutPassDTO deleteUser(int userId) {
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        userRepository.deleteById(userId);
-        return user.get();
+        User u = optUser.get();
+        //cannot map entity after it is deleted
+        UserWithoutPassDTO responseUser = new UserWithoutPassDTO(u);
+        userRepository.delete(u);
+        return responseUser;
     }
 
     public User forgotPass(String email) {

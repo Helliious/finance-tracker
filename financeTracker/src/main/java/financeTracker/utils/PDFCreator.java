@@ -22,7 +22,8 @@ public class PDFCreator {
             document.open();
             Font font = FontFactory.getFont(FontFactory.COURIER, 16, BaseColor.BLACK);
             Chunk chunk = new Chunk(text, font);
-            document.add(chunk);
+            Paragraph paragraph = new Paragraph(text, font);
+            document.add(paragraph);
             document.close();
         } catch (DocumentException | FileNotFoundException e) {
             throw new BadRequestException("I/O exception, reason - " + e.getMessage());

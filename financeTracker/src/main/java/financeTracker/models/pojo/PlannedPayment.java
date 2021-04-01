@@ -25,6 +25,7 @@ public class PlannedPayment {
     private String durationUnit;
     private double amount;
     private Timestamp dueTime;
+    private String description;
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;

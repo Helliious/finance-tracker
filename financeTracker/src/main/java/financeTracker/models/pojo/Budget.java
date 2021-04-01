@@ -42,6 +42,7 @@ public class Budget {
     )
     @JsonManagedReference
     private List<Transaction> budgetTransactions;
+
     public Budget(CreateBudgetRequestDTO dto){
         name=dto.getName();
         label=dto.getLabel();
