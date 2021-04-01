@@ -17,9 +17,9 @@ public class ResponsePlannedPaymentDTO {
     private int id;
     private String name;
     private String paymentType;
-    private int frequency;
+    private Integer frequency;
     private String durationUnit;
-    private double amount;
+    private Double amount;
     private Timestamp dueTime;
     private ResponseCategoryDTO category;
 

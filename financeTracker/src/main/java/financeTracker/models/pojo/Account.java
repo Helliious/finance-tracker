@@ -21,7 +21,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private double balance;
+    private Double balance;
     private Double accLimit;
     private Timestamp createTime;
     @ManyToOne

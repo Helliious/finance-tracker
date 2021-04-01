@@ -82,23 +82,15 @@ public class PlannedPaymentsService {
     }
 
     public PlannedPayment getById(int accountId, int userId, int plannedPaymentId) {
-        boolean isPresent = false;
-        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-        PlannedPayment result = null;
-        if (account == null) {
-            throw new NotFoundException("Account not found!");
-        }
-        for (PlannedPayment p : account.getPlannedPayments()) {
-            if (p.getId() == plannedPaymentId) {
-                isPresent = true;
-                result = p;
-                break;
-            }
-        }
-        if (!isPresent) {
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(
+                plannedPaymentId,
+                accountId,
+                userId
+        );
+        if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
         }
-        return result;
+        return plannedPayment;
     }
 
     public List<PlannedPayment> getAll(int accountId, int userId) {
@@ -107,7 +99,11 @@ public class PlannedPaymentsService {
     }
 
     public PlannedPayment delete(int accountId, int userId, int plannedPaymentId) {
-        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(
+                plannedPaymentId,
+                accountId,
+                userId
+        );
         if (plannedPayment == null) {
             throw new NotFoundException("Planned payment not found!");
         }
@@ -142,7 +138,7 @@ public class PlannedPaymentsService {
                 plannedPayment.setPaymentType(responsePlannedPaymentDTO.getPaymentType());
             }
         }
-        if (responsePlannedPaymentDTO.getFrequency() != 0) {
+        if (responsePlannedPaymentDTO.getFrequency() != null) {
             if (plannedPayment.getFrequency() == responsePlannedPaymentDTO.getFrequency()) {
                 throw new BadRequestException("Entered the same frequency!");
             } else {
@@ -156,7 +152,7 @@ public class PlannedPaymentsService {
                 plannedPayment.setDurationUnit(responsePlannedPaymentDTO.getDurationUnit());
             }
         }
-        if (responsePlannedPaymentDTO.getAmount() != 0) {
+        if (responsePlannedPaymentDTO.getAmount() != null) {
             if (plannedPayment.getAmount() == responsePlannedPaymentDTO.getAmount()) {
                 throw new BadRequestException("Entered the same amount!");
             } else {

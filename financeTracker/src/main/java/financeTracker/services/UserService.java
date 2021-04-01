@@ -140,8 +140,6 @@ public class UserService {
         }
         if (encoder.matches(changePasswordDTO.getPassword(), optUser.get().getPassword())) {
             throw new AuthenticationException("Entered the same password as current one!");
-        } else if (userRepository.findByPassword(changePasswordDTO.getPassword()) != null) {
-            throw new AuthenticationException("Password already exists!");
         } else {
             optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
             userRepository.save(optUser.get());

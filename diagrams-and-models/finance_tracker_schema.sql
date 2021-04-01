@@ -8,77 +8,104 @@ USE finance_tracker;
 **************************************************************** */
 
 CREATE TABLE users (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(80),
-    last_name VARCHAR(80),
-    username VARCHAR(80),
-    password VARCHAR(100),
-    email VARCHAR(100),
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(80) NOT NULL,
+    last_name VARCHAR(80) NOT NULL,
+    username VARCHAR(80) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE accounts (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(80),
-    balance DECIMAL,
-    acc_limit DECIMAL,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    owner_id INT UNSIGNED NOT NULL,
-    CONSTRAINT user_acc_fk FOREIGN KEY (owner_id) REFERENCES users(id)
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80) NOT NULL,
+    balance DECIMAL NOT NULL,
+    acc_limit DECIMAL NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    owner_id INT NOT NULL,
+    CONSTRAINT user_acc_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE categories (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(80),
-    type VARCHAR(80)
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80) NOT NULL,
+    type VARCHAR(80) NOT NULL,
+    owner_id INT NOT NULL,
+    CONSTRAINT users_category_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE budgets (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(80),
-    label VARCHAR(80),
-    amount DECIMAL,
-    due_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    account_id INT UNSIGNED NOT NULL,
-    category_id INT UNSIGNED NOT NULL,
-    owner_id INT UNSIGNED NOT NULL,
-    CONSTRAINT acc_budget_fk FOREIGN KEY (account_id) REFERENCES accounts(id),
-    CONSTRAINT category_budget_fk FOREIGN KEY (category_id) REFERENCES categories(id),
-    CONSTRAINT user_budget_fk FOREIGN KEY (owner_id) REFERENCES users(id)
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80) NOT NULL,
+    label VARCHAR(80) NOT NULL,
+    amount DECIMAL NOT NULL,
+    due_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    desccription VARCHAR(200) NOT NULL,
+    account_id INT NOT NULL,
+    category_id INT NOT NULL,
+    owner_id INT NOT NULL,
+    CONSTRAINT acc_budget_fk FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT category_budget_fk FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT user_budget_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE transactions (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    type VARCHAR(80),
-    amount DECIMAL,
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    account_id INT UNSIGNED NOT NULL,
-    category_id INT UNSIGNED NOT NULL,
-    owner_id INT UNSIGNED NOT NULL,
-    CONSTRAINT acc_transaction_fk FOREIGN KEY (account_id) REFERENCES accounts(id),
-    CONSTRAINT category_transaction_fk FOREIGN KEY (category_id) REFERENCES categories(id),
-    CONSTRAINT user_transaction_fk FOREIGN KEY (owner_id) REFERENCES users(id)
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(80) NOT NULL,
+    amount DECIMAL NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    desccription VARCHAR(200) NOT NULL,
+    account_id INT NOT NULL,
+    category_id INT NOT NULL,
+    owner_id INT NOT NULL,
+    CONSTRAINT acc_transaction_fk FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT category_transaction_fk FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT user_transaction_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE planned_payments (
-	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(80),
-    payment_type VARCHAR(80),
-    frequency INT,
-    duration_unit VARCHAR(20),
-    amount DECIMAL,
-    due_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    account_id INT UNSIGNED NOT NULL,
-    category_id INT UNSIGNED NOT NULL,
-    owner_id INT UNSIGNED NOT NULL,
-    CONSTRAINT acc_planned_pay_fk FOREIGN KEY (account_id) REFERENCES accounts(id),
-    CONSTRAINT category_planned_pay_fk FOREIGN KEY (category_id) REFERENCES categories(id),
-    CONSTRAINT user_planned_pay_fk FOREIGN KEY (owner_id) REFERENCES users(id)
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(80) NOT NULL,
+    payment_type VARCHAR(80) NOT NULL,
+    frequency INT NOT NULL,
+    duration_unit VARCHAR(20) NOT NULL,
+    amount DECIMAL NOT NULL,
+    due_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    desccription VARCHAR(200) NOT NULL,
+    account_id INT NOT NULL,
+    category_id INT NOT NULL,
+    owner_id INT NOT NULL,
+    CONSTRAINT acc_planned_pay_fk FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT category_planned_pay_fk FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT user_planned_pay_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE budgets_have_transactions (
-	budget_id INT UNSIGNED NOT NULL,
-    transaction_id INT UNSIGNED NOT NULL,
-    CONSTRAINT bht_budget_fk FOREIGN KEY (budget_id) REFERENCES budgets(id),
-    CONSTRAINT bht_transaction_fk FOREIGN KEY (transaction_id) REFERENCES transactions(id)
+	budget_id INT NOT NULL,
+    transaction_id INT NOT NULL,
+	CONSTRAINT bht_budget_fk FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT bht_transaction_fk FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE category_images (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	url VARCHAR(200) NOT NULL,
+	category_id INT NOT NULL UNIQUE KEY,
+	INDEX ci_category_fk_idx (category_id ASC),
+	CONSTRAINT ci_category_fk FOREIGN KEY (category_id) REFERENCES categories(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE data_logs (
+	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    login_count INT NOT NULL,
+    logout_count INT NOT NULL,
+    overall_balance DOUBLE NOT NULL,
+    transactions_count INT NOT NULL,
+    planned_payments_count INT NOT NULL,
+    budgets_count INT NOT NULL,
+    accounts_count INT NOT NULL
 );
