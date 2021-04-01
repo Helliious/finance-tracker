@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateRequestAccountDTO {
     private String name;
-    private double balance;
-    private double accLimit;
+    private Double balance;
+    private Double accLimit;
 }

@@ -80,15 +80,15 @@ public class AccountService {
                 account.setName(accountDTO.getName());
             }
         }
-        if (accountDTO.getAccLimit() > 0) {
-            if (account.getAccLimit() == accountDTO.getAccLimit()) {
+        if (accountDTO.getAccLimit() != null) {
+            if (account.getAccLimit().equals(accountDTO.getAccLimit())) {
                 throw new BadRequestException("Entered the same limit!");
             } else {
                 account.setAccLimit(accountDTO.getAccLimit());
             }
         }
-        if (accountDTO.getBalance() > 0) {
-            if (account.getBalance() == accountDTO.getBalance()) {
+        if (accountDTO.getBalance() != null) {
+            if (account.getBalance().equals(accountDTO.getBalance())) {
                 throw new BadRequestException("Entered the same balance!");
             } else {
                 account.setBalance(accountDTO.getBalance());
@@ -102,10 +102,10 @@ public class AccountService {
         if (account.getName() == null) {
             throw new BadRequestException("Must enter valid account name!");
         }
-        if (account.getBalance() <= 0) {
+        if (account.getBalance() == null || account.getBalance() < 0) {
             throw new BadRequestException("Must enter valid account balance!");
         }
-        if (account.getAccLimit() <= 0) {
+        if (account.getAccLimit() < 0) {
             throw new BadRequestException("Must enter valid account limit!");
         }
     }

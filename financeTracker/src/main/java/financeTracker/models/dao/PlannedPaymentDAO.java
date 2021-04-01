@@ -58,9 +58,12 @@ public class PlannedPaymentDAO {
             throw new BadRequestException("Amount from can't be bigger than Amount to!");
         }
         if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() != null) {
-            //TODO: check if amount from > than amount to
-            sql.append("AND amount BETWEEN ? AND ? ");
-            bothAmountsIncluded = true;
+            if (plannedPaymentRequestDTO.getAmountFrom() < plannedPaymentRequestDTO.getAmountTo()) {
+                sql.append("AND amount BETWEEN ? AND ? ");
+                bothAmountsIncluded = true;
+            } else {
+                throw new BadRequestException("Entered invalid amount range!")
+            }
         }
         else {
             if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() == null) {
@@ -73,9 +76,12 @@ public class PlannedPaymentDAO {
             }
         }
         if(plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
-            //TODO: check if timeFrom is > than timeTo
-            sql.append("AND due_time BETWEEN ? AND ?");
-            bothDatesIncluded = true;
+            if (plannedPaymentRequestDTO.getDueTimeFrom().compareTo(plannedPaymentRequestDTO.getDueTimeTo()) < 0) {
+                sql.append("AND due_time BETWEEN ? AND ?");
+                bothDatesIncluded = true;
+            } else {
+                throw new BadRequestException("Entered invalid due time range!");
+            }
         }
         else{
             if (plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() == null) {
@@ -87,7 +93,6 @@ public class PlannedPaymentDAO {
                 dateToIncluded = true;
             }
         }
-        System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;

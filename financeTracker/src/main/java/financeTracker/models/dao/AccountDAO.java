@@ -51,9 +51,12 @@ public class AccountDAO {
             throw new BadRequestException("Balance from can't be bigger than Balance to!");
         }
         if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() != null) {
-            //TODO: check if balance from > than balance to
-            sql.append("AND amount BETWEEN ? AND ? ");
-            bothBalanceIncluded = true;
+            if (accountRequestDTO.getBalanceFrom() < accountRequestDTO.getBalanceTo()) {
+                sql.append("AND amount BETWEEN ? AND ? ");
+                bothBalanceIncluded = true;
+            } else {
+                throw new BadRequestException("Entered invalid balance range!");
+            }
         }
         else {
             if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() == null) {
@@ -66,9 +69,12 @@ public class AccountDAO {
             }
         }
         if (accountRequestDTO.getAccLimitFrom() != null && accountRequestDTO.getAccLimitTo() != null) {
-            //TODO: check if acc limit from > than acc limit to
-            sql.append("AND amount BETWEEN ? AND ? ");
-            bothAccLimitIncluded = true;
+            if (accountRequestDTO.getAccLimitFrom() < accountRequestDTO.getAccLimitTo()) {
+                sql.append("AND amount BETWEEN ? AND ? ");
+                bothAccLimitIncluded = true;
+            } else {
+                throw new BadRequestException("Entered invalid account limit range!");
+            }
         }
         else {
             if (accountRequestDTO.getAccLimitFrom() != null && accountRequestDTO.getAccLimitTo() == null) {
@@ -81,9 +87,12 @@ public class AccountDAO {
             }
         }
         if(accountRequestDTO.getCreateTimeFrom() != null && accountRequestDTO.getCreateTimeTo() != null) {
-            //TODO: check if timeFrom is > than timeTo
-            sql.append("AND create_time BETWEEN ? AND ?");
-            bothCreateTimesIncluded = true;
+            if (accountRequestDTO.getCreateTimeFrom().compareTo(accountRequestDTO.getCreateTimeTo()) < 0) {
+                sql.append("AND create_time BETWEEN ? AND ?");
+                bothCreateTimesIncluded = true;
+            } else {
+                throw new BadRequestException("Entered invalid create time range!");
+            }
         }
         else{
             if (accountRequestDTO.getCreateTimeFrom() != null && accountRequestDTO.getCreateTimeTo() == null) {
@@ -95,7 +104,6 @@ public class AccountDAO {
                 createTimeToIncluded = true;
             }
         }
-        System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
