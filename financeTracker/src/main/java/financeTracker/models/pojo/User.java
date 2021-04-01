@@ -51,4 +51,22 @@ public class User {
         categories = new ArrayList<>();
         budgets = new ArrayList<>();
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", createTime=" + createTime +
+                ", accounts=" + accounts +
+                ", transactions=" + transactions +
+                ", plannedPayments=" + plannedPayments +
+                ", categories=" + categories +
+                ", budgets=" + budgets +
+                '}';
+    }
 }

@@ -31,10 +31,10 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User owner;
-    @ManyToMany(mappedBy = "transactions")
-    //One transaction can be part of more than one budgets..
-    @JsonBackReference
-    private List<Transaction> budgetsThatHaveTransaction;
+//    @ManyToMany(mappedBy = "transactions")
+//    //One transaction can be part of more than one budgets..
+//    @JsonBackReference
+//    private List<Transaction> budgetsThatHaveTransaction;
     public Transaction(AddTransactionRequestDTO dto){
          type=dto.getType();
          amount=dto.getAmount();

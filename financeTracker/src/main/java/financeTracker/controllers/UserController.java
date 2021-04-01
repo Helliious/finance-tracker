@@ -47,7 +47,7 @@ public class UserController extends AbstractController {
     }
 
     @DeleteMapping("/users")
-    public User delete(HttpSession session) {
+    public UserWithoutPassDTO delete(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         return userService.deleteUser(userId);
     }

@@ -34,15 +34,15 @@ public class Budget {
     @ManyToOne
     @JoinColumn(name="category_id")
     private Category category;
-    @ManyToMany
-    @JoinTable(
-            name="budgets_have_transactions",
-            joinColumns = {@JoinColumn(name="budget_id")},
-            inverseJoinColumns = {@JoinColumn(name="transaction_id")}
-
-    )
-    @JsonManagedReference
-    private List<Transaction> transactions;
+//    @ManyToMany
+//    @JoinTable(
+//            name="budgets_have_transactions",
+//            joinColumns = {@JoinColumn(name="budget_id")},
+//            inverseJoinColumns = {@JoinColumn(name="transaction_id")}
+//
+//    )
+//    @JsonManagedReference
+//    private List<Transaction> transactions;
 
 
 
