@@ -125,6 +125,7 @@ public class BudgetDAO {
                             result.getString("label"),
                             result.getDouble("amount"),
                             result.getTimestamp("due_time"),
+                            result.getString("description"),
                             optionalAccount.get(),
                             optionalUser.get(),
                             optionalCategory.get(),null

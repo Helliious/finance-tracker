@@ -25,6 +25,7 @@ public class Budget {
     private String label;
     private double amount;
     private Timestamp dueTime;
+    private String description;
     @ManyToOne
     @JoinColumn(name="account_id")
     private Account account;
@@ -40,7 +41,6 @@ public class Budget {
             joinColumns = {@JoinColumn(name="budget_id")},
             inverseJoinColumns = {@JoinColumn(name="transaction_id")}
     )
-    @JsonManagedReference
     private List<Transaction> budgetTransactions;
 
     public Budget(CreateBudgetRequestDTO dto){
@@ -48,5 +48,6 @@ public class Budget {
         label=dto.getLabel();
         amount=dto.getAmount();
         dueTime=dto.getDueTime();
+        description = dto.getDescription();
     }
 }

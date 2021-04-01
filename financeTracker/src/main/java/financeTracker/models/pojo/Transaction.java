@@ -33,7 +33,6 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User owner;
-    @JsonBackReference
     @ManyToMany(mappedBy = "budgetTransactions")
     List<Budget> budgetsThatHaveTransaction;
 
