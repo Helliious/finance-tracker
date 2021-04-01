@@ -35,6 +35,8 @@ public class User {
     private List<PlannedPayment> plannedPayments;
     @OneToMany(mappedBy = "owner")
     private List<Category> categories;
+    @OneToMany(mappedBy="owner")
+    private List<Budget> budgets;
 
     public User(RegisterRequestUserDTO userDTO) {
         firstName = userDTO.getFirstName();
