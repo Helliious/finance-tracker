@@ -35,6 +35,8 @@ public class User {
     private List<PlannedPayment> plannedPayments;
     @OneToMany(mappedBy = "owner")
     private List<Category> categories;
+    @OneToMany(mappedBy = "owner")
+    private List<Budget> budgets;
 
     public User(RegisterRequestUserDTO userDTO) {
         firstName = userDTO.getFirstName();
@@ -43,6 +45,10 @@ public class User {
         password = userDTO.getPassword();
         email = userDTO.getEmail();
         createTime = userDTO.getCreateTime();
+        accounts = new ArrayList<>();
         transactions = new ArrayList<>();
+        plannedPayments = new ArrayList<>();
+        categories = new ArrayList<>();
+        budgets = new ArrayList<>();
     }
 }

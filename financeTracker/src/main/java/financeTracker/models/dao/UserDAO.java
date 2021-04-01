@@ -30,6 +30,7 @@ public class UserDAO {
                         null,
                         null,
                         null,
+                        null,
                         null
                 );
             }

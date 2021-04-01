@@ -2,17 +2,18 @@ package financeTracker.models.dto.user_dto;
 
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
+import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
-import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.PlannedPayment;
-import financeTracker.models.pojo.Transaction;
-import financeTracker.models.pojo.User;
+import financeTracker.models.pojo.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class UserWithoutPassDTO {
     private List<AccountWithoutOwnerDTO> accounts;
     private List<TransactionWithoutOwnerAndAccountDTO> transactions;
     private List<ResponsePlannedPaymentDTO> plannedPayments;
+    private List<ResponseCategoryDTO> categories;
+    private List<BudgetWithoutAccountAndOwnerDTO> budgets;
 
     public UserWithoutPassDTO(User user) {
         id = user.getId();
@@ -55,6 +58,18 @@ public class UserWithoutPassDTO {
         if (user.getPlannedPayments() != null) {
             for (PlannedPayment p : user.getPlannedPayments()) {
                 plannedPayments.add(new ResponsePlannedPaymentDTO(p));
+            }
+        }
+        categories = new ArrayList<>();
+        if (user.getCategories() != null) {
+            for (Category c : user.getCategories()) {
+                categories.add(new ResponseCategoryDTO(c));
+            }
+        }
+        budgets = new ArrayList<>();
+        if (user.getBudgets() != null) {
+            for (Budget b : user.getBudgets()) {
+                budgets.add(new BudgetWithoutAccountAndOwnerDTO(b));
             }
         }
     }

@@ -105,7 +105,7 @@ public class AccountService {
         if (account.getBalance() == null || account.getBalance() < 0) {
             throw new BadRequestException("Must enter valid account balance!");
         }
-        if (account.getAccLimit() < 0) {
+        if (account.getAccLimit() != null && account.getAccLimit() < 0) {
             throw new BadRequestException("Must enter valid account limit!");
         }
     }

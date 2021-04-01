@@ -104,12 +104,12 @@ public class UserService {
     }
 
     public User deleteUser(int userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
         userRepository.deleteById(userId);
-        return user.get();
+        return optUser.get();
     }
 
     public User forgotPass(String email) {

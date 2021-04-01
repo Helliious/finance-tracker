@@ -47,11 +47,9 @@ public class UserController extends AbstractController {
     }
 
     @DeleteMapping("/users")
-    public UserWithoutPassDTO delete(HttpSession session) {
+    public User delete(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        User user = userService.deleteUser(userId);
-        sessionManager.logoutUser(session);
-        return convertToUserWithoutPassDTO(user);
+        return userService.deleteUser(userId);
     }
 
     @GetMapping("/users/logout")
@@ -71,12 +69,16 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/forgot_password")
-    public UserWithoutPassDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
+    public ForgotPassMessageDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
         User user = userService.forgotPass(forgotPassUserDto.getEmail());
-        return convertToUserWithoutPassDTO(user);
+        return convertToForgotPassMessageDTO(user);
     }
 
     private UserWithoutPassDTO convertToUserWithoutPassDTO(User user) {
         return modelMapper.map(user, UserWithoutPassDTO.class);
+    }
+
+    private ForgotPassMessageDTO convertToForgotPassMessageDTO(User user) {
+        return modelMapper.map(user, ForgotPassMessageDTO.class);
     }
 }
