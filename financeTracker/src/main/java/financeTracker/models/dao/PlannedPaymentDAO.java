@@ -7,6 +7,7 @@ import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -93,7 +95,7 @@ public class PlannedPaymentDAO {
                 dateToIncluded = true;
             }
         }
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, userId);
@@ -131,17 +133,9 @@ public class PlannedPaymentDAO {
             if (result.next()) {
                 do{
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
-                    if (optionalAccount.isEmpty()) {
-                        throw new NotFoundException("Account not found!");
-                    }
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
-                    if (optionalCategory.isEmpty()) {
-                        throw new NotFoundException("Category not found!");
-                    }
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
-                    if (optionalUser.isEmpty()) {
-                        throw new NotFoundException("User not found!");
-                    }
+                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
                     PlannedPayment plannedPayment = new PlannedPayment(result.getInt("id"),
                             result.getString("name"),
                             result.getString("payment_type"),

@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -107,7 +108,7 @@ public class AccountDAO {
                 createTimeToIncluded = true;
             }
         }
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, userId);

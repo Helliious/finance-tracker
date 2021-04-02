@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -37,7 +38,7 @@ public class CategoryDAO {
                                         "LEFT OUTER JOIN planned_payments p ON c.id = p.category_id " +
                                         "LEFT OUTER JOIN budgets b ON c.id = b.category_id " +
                                         "GROUP BY c.name");
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             ps.setString(1, optUser.get().getUsername());
             ResultSet result = ps.executeQuery();

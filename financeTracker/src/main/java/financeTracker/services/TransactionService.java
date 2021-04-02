@@ -58,7 +58,7 @@ public class TransactionService {
         if (transaction == null) {
             throw new NotFoundException("Transaction not found!");
         }
-        ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
+        ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
         TransactionWithoutOwnerAndAccountDTO responseTransaction = new TransactionWithoutOwnerAndAccountDTO(transaction);
         transactionRepository.deleteById(transactionId);
         return responseTransaction;
@@ -86,7 +86,7 @@ public class TransactionService {
         owner.getTransactions().add(transaction);
         account.getTransactions().add(transaction);
         category.getTransactions().add(transaction);
-        ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
+        ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         transactionRepository.save(transaction);
         return transaction;
     }
@@ -97,25 +97,25 @@ public class TransactionService {
             throw new NotFoundException("Transaction not found!");
         }
         if (dto.getType() != null) {
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.setType(dto.getType());
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAmount() != null) {
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.setAmount(dto.getAmount());
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAccountId() != null) {
             Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), ownerId);
             if (account == null) {
                 throw new NotFoundException("Account not found!");
             }
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.getAccount().getTransactions().remove(transaction);
             transaction.setAccount(account);
             account.getTransactions().add(transaction);
-            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         }
         if (dto.getCategoryId() != null) {
             Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);

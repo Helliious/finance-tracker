@@ -8,6 +8,7 @@ import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.BudgetRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -128,6 +129,7 @@ public class TransactionDAO {
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
+                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
                     Transaction transaction = new Transaction(result.getInt("id"),
                             result.getString("type"),
                             result.getDouble("amount"),

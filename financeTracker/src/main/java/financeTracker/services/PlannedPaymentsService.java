@@ -52,7 +52,7 @@ public class PlannedPaymentsService {
         user.getPlannedPayments().add(plannedPayment);
         category.getPlannedPayments().add(plannedPayment);
         account.getPlannedPayments().add(plannedPayment);
-        ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.ADD);
+        ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.ADD);
         plannedPayment.setOwner(user);
         plannedPayment.setAccount(account);
         plannedPayment.setCategory(category);
@@ -111,7 +111,7 @@ public class PlannedPaymentsService {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account != null) {
             if (plannedPayment.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) < 0) {
-                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.REMOVE);
+                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.REMOVE);
             }
         }
         plannedPaymentsRepository.deleteById(plannedPaymentId);
@@ -136,9 +136,9 @@ public class PlannedPaymentsService {
             if (plannedPayment.getPaymentType().equals(responsePlannedPaymentDTO.getPaymentType())) {
                 throw new BadRequestException("Entered the same type!");
             } else {
-                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
+                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
                 plannedPayment.setPaymentType(responsePlannedPaymentDTO.getPaymentType());
-                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
+                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
             }
         }
         if (responsePlannedPaymentDTO.getFrequency() != null) {
@@ -159,9 +159,9 @@ public class PlannedPaymentsService {
             if (plannedPayment.getAmount() == responsePlannedPaymentDTO.getAmount()) {
                 throw new BadRequestException("Entered the same amount!");
             } else {
-                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
+                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
                 plannedPayment.setAmount(responsePlannedPaymentDTO.getAmount());
-                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
+                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
             }
         }
         if (responsePlannedPaymentDTO.getDueTime() != null) {

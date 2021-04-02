@@ -4,7 +4,7 @@ import financeTracker.models.pojo.Account;
 import financeTracker.utils.Action;
 import financeTracker.utils.Constants;
 
-public class ServiceMethod {
+public class ServiceCalculator {
     static void calculateBalance(double amount, String paymentType, Account account, Action action) {
         if (action == Action.ADD) {
             if (paymentType.equals(Constants.INCOME)) {

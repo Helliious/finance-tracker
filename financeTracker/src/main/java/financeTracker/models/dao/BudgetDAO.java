@@ -9,6 +9,7 @@ import financeTracker.models.pojo.User;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -47,23 +49,23 @@ public class BudgetDAO {
             sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
         }
-        if (dto.getCategoryId() > 0) {
+        if (dto.getCategoryId() != null) {
             sql.append("AND category_id = ?");
             categoryIncludedInFilter = true;
         }
-        if (dto.getAmountFrom() > dto.getAmountTo() && dto.getAmountTo() != 0) {
+        if (dto.getAmountFrom() > dto.getAmountTo() && dto.getAmountTo() != null) {
             throw new BadRequestException("Amount from can't be bigger than Amount to");
         }
-        if (dto.getAmountFrom() > 0 && dto.getAmountTo() > 0) {
+        if (dto.getAmountFrom() != null && dto.getAmountTo() != null) {
             sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
         else {
-            if (dto.getAmountFrom() > 0 && dto.getAmountTo() <= 0) {
+            if (dto.getAmountFrom() != null && dto.getAmountTo() == null) {
                 sql.append("AND amount > ? ");
                 amountFromIncluded = true;
             }
-            if (dto.getAmountFrom() <= 0 && dto.getAmountTo() > 0) {
+            if (dto.getAmountFrom() == null && dto.getAmountTo() != null) {
                 amountToIncluded = true;
                 sql.append("AND amount < ? ");
             }
@@ -82,8 +84,7 @@ public class BudgetDAO {
                 dateToIncluded = true;
             }
         }
-        System.out.println(sql);
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
             int paramIdx = 1;
             PreparedStatement ps = connection.prepareStatement(sql.toString());
             ps.setInt(paramIdx++, userId);
@@ -91,7 +92,6 @@ public class BudgetDAO {
                 ps.setString(paramIdx++, dto.getName() + "%");
             }
             if (categoryIncludedInFilter) {
-//                System.out.println(i + " setted " + dto.getCategoryId());
                 ps.setInt(paramIdx++, dto.getCategoryId());
             }
             if (bothAmountsIncluded) {
@@ -120,6 +120,7 @@ public class BudgetDAO {
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
                     Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
+                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
                     Budget budget = new Budget(result.getInt("id"),
                             result.getString("name"),
                             result.getString("label"),

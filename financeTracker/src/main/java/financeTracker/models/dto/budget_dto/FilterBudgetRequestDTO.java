@@ -13,9 +13,9 @@ import java.sql.Timestamp;
 @Component
 public class FilterBudgetRequestDTO {
  private String name;
- private double amountFrom;
- private double amountTo;
- private int categoryId;
+ private Double amountFrom;
+ private Double amountTo;
+ private Integer categoryId;
  private Timestamp dateFrom;
  private Timestamp dateTo;
 }
