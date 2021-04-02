@@ -10,9 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 @RestController
 public class BudgetController extends AbstractController {
@@ -36,16 +35,18 @@ public class BudgetController extends AbstractController {
                                                    HttpSession session) {
        int userId = sessionManager.getLoggedId(session);
        Budget budget = budgetService.getById(userId, budgetId);
-       return convertToBudgetWithoutAccountAndOwnerDTO(budget);
+       return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
     @GetMapping("/budgets")
     public List<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         List<Budget> budgets = budgetService.getByOwnerId(userId);
-        return budgets.stream()
-                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
-                .collect(Collectors.toList());
+        List<BudgetWithoutAccountAndOwnerDTO> resultBudget = new ArrayList<>();
+        for (Budget b : budgets) {
+            resultBudget.add(new BudgetWithoutAccountAndOwnerDTO(b));
+        }
+        return resultBudget;
     }
 
     @GetMapping("/budgets/accounts/{account_id}")
@@ -53,9 +54,11 @@ public class BudgetController extends AbstractController {
                                                                  HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         List<Budget> budgets = budgetService.getByAccountId(userId, accountId);
-        return budgets.stream()
-                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
-                .collect(Collectors.toList());
+        List<BudgetWithoutAccountAndOwnerDTO> resultBudget = new ArrayList<>();
+        for (Budget b : budgets) {
+            resultBudget.add(new BudgetWithoutAccountAndOwnerDTO(b));
+        }
+        return resultBudget;
     }
 
     @DeleteMapping("/accounts/{account_id}/budgets/{budget_id}")
@@ -73,7 +76,7 @@ public class BudgetController extends AbstractController {
                                                 HttpSession session ) {
         int userId = sessionManager.getLoggedId(session);
         Budget budget =  budgetService.editBudget(budgetId, dto, userId, accountId);
-        return convertToBudgetWithoutAccountAndOwnerDTO(budget);
+        return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
     @GetMapping("budgets/category/{category_id}")
@@ -88,9 +91,11 @@ public class BudgetController extends AbstractController {
                                                         HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         List<Budget> budgets = budgetService.filter(userId, dto);
-        return budgets.stream()
-                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
-                .collect(Collectors.toList());
+        List<BudgetWithoutAccountAndOwnerDTO> resultBudget = new ArrayList<>();
+        for (Budget b : budgets) {
+            resultBudget.add(new BudgetWithoutAccountAndOwnerDTO(b));
+        }
+        return resultBudget;
     }
 
     private BudgetWithoutAccountAndOwnerDTO convertToBudgetWithoutAccountAndOwnerDTO(Budget budget) {

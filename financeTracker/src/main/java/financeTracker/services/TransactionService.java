@@ -158,6 +158,7 @@ public class TransactionService {
             throw new BadRequestException("Transaction already exist in budget");
         }
         budget.getBudgetTransactions().add(transaction);
+        transaction.getBudgetsThatHaveTransaction().add(budget);
         budgetRepository.save(budget);
         return transaction;
     }

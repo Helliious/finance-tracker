@@ -1,6 +1,5 @@
 package financeTracker.services;
 
-import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.BudgetDAO;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
@@ -10,14 +9,11 @@ import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.BudgetRepository;
 import financeTracker.models.repository.CategoryRepository;
-import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BudgetService {

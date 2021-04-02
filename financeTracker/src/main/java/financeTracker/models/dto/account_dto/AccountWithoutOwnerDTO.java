@@ -39,7 +39,9 @@ public class AccountWithoutOwnerDTO {
         transactions = new ArrayList<>();
         if (account.getTransactions() != null) {
             for (Transaction t : account.getTransactions()) {
-                transactions.add(new TransactionWithoutOwnerAndAccountDTO(t));
+                if (t.getBudgetsThatHaveTransaction().isEmpty()) {
+                    transactions.add(new TransactionWithoutOwnerAndAccountDTO(t));
+                }
             }
         }
         plannedPayments = new ArrayList<>();

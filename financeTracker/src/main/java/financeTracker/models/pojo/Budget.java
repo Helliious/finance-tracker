@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -48,5 +49,6 @@ public class Budget {
         amount=dto.getAmount();
         dueTime=dto.getDueTime();
         description = dto.getDescription();
+        budgetTransactions = new ArrayList<>();
     }
 }

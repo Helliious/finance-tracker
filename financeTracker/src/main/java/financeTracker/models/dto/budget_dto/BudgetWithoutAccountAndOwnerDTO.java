@@ -22,6 +22,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
     private String label;
     private double amount;
     private Timestamp dueTime;
+    private String description;
     private String categoryName;
     private List<TransactionWithoutOwnerAndAccountDTO> transactionList;
 
@@ -31,9 +32,10 @@ public class BudgetWithoutAccountAndOwnerDTO {
         this.label = budget.getLabel();
         this.amount = budget.getAmount();
         this.dueTime = budget.getDueTime();
+        this.description = budget.getDescription();
         this.categoryName = budget.getCategory().getName();
         this.transactionList = new ArrayList<>();
-        if (budget.getBudgetTransactions() != null){
+        if (!budget.getBudgetTransactions().isEmpty()){
             for (Transaction transaction : budget.getBudgetTransactions()) {
                 transactionList.add(new TransactionWithoutOwnerAndAccountDTO(transaction));
             }
