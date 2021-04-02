@@ -137,28 +137,37 @@ public class TransactionService {
         return transactionDAO.filterTransaction(userId, dto);
     }
 
-    public TransactionWithoutOwnerAndAccountDTO addTransactionToBudget(int ownerId,int budgetId,int transactionId){
-        Optional<Budget> optionalBudget = budgetRepository.findById(budgetId);
-        Optional<Transaction> optionalTransaction = transactionRepository.findById(transactionId);
-        if (optionalBudget.isEmpty()) {
+    public Transaction addTransactionToBudget(int ownerId,
+                                              int accountId,
+                                              int budgetId,
+                                              AddTransactionRequestDTO transactionRequestDTO){
+        transactionRequestDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, ownerId, accountId);
+        Optional<User> optUser = userRepository.findById(ownerId);
+        Category category = categoryRepository.findByIdAndOwnerId(transactionRequestDTO.getCategoryId(), ownerId);
+        if (budget == null) {
             throw new NotFoundException("Budget doesn't exist");
         }
-        if (optionalTransaction.isEmpty()) {
-            throw new NotFoundException("Transaction doesn't exist");
+        if (optUser.isEmpty()) {
+            throw new NotFoundException("User not found!");
         }
-        Budget budget = optionalBudget.get();
-        Transaction transaction = optionalTransaction.get();
-        if (budget.getOwner().getId() != ownerId) {
-            throw new NotFoundException("You don't own budget with such id");
+        if (category == null) {
+            throw new NotFoundException("Category not found!");
         }
-        if (transaction.getOwner().getId() != ownerId) {
-            throw new NotFoundException("You don't own transaction with such id");
-        }
+        Transaction transaction = new Transaction(transactionRequestDTO);
         if (budget.getBudgetTransactions().contains(transaction)) {
             throw new BadRequestException("Transaction already exist in budget");
         }
+        User owner = optUser.get();
+        transaction.setOwner(owner);
+        transaction.setAccount(budget.getAccount());
+        transaction.setCategory(category);
+        transaction.getBudgetsThatHaveTransaction().add(budget);
+        owner.getTransactions().add(transaction);
+        budget.getAccount().getTransactions().add(transaction);
+        category.getTransactions().add(transaction);
         budget.getBudgetTransactions().add(transaction);
         budgetRepository.save(budget);
-        return new TransactionWithoutOwnerAndAccountDTO(transactionRepository.findById(transactionId).get());
+        return transaction;
     }
 }

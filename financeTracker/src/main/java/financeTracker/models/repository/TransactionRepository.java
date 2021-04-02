@@ -11,4 +11,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     ArrayList<Transaction> findTransactionsByOwnerId(int id);
     ArrayList<Transaction> findTransactionsByAccountId(int id);
     Transaction findByIdAndOwnerId(int transactionId, int ownerId);
+    Transaction findByIdAndOwnerIdAndAccountId(int transactionId, int ownerId, int accountId);
 }

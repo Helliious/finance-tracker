@@ -83,12 +83,14 @@ public class TransactionController extends AbstractController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("transactions/{transaction_id}/budgets/{budget_id}")
-    public TransactionWithoutOwnerAndAccountDTO addTransactionToBudget(@PathVariable(name="transaction_id") int transactionId,
+    @PostMapping("/transactions/accounts/{account_id}/budgets/{budget_id}")
+    public TransactionWithoutOwnerAndAccountDTO addTransactionToBudget(@PathVariable(name="account_id") int accountId,
                                                                        @PathVariable(name="budget_id") int budgetId,
+                                                                       @RequestBody AddTransactionRequestDTO transactionRequestDTO,
                                                                        HttpSession session){
         int userId=sessionManager.getLoggedId(session);
-        return transactionService.addTransactionToBudget(userId,budgetId,transactionId);
+        Transaction transaction = transactionService.addTransactionToBudget(userId, accountId, budgetId, transactionRequestDTO);
+        return convertToTransactionWithoutOwnerAndAccountDTO(transaction);
     }
 
     private TransactionWithoutOwnerAndAccountDTO convertToTransactionWithoutOwnerAndAccountDTO(Transaction transaction) {
