@@ -36,9 +36,9 @@ public class Budget {
     private Category category;
     @ManyToMany
     @JoinTable(
-            name="budgets_have_transactions",
-            joinColumns = {@JoinColumn(name="budget_id")},
-            inverseJoinColumns = {@JoinColumn(name="transaction_id")}
+            name = "budgets_have_transactions",
+            joinColumns = {@JoinColumn(name = "budget_id")},
+            inverseJoinColumns = {@JoinColumn(name = "transaction_id")}
     )
     private List<Transaction> budgetTransactions;
 

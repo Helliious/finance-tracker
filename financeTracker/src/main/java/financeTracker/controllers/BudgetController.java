@@ -3,14 +3,15 @@ package financeTracker.controllers;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
 import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
+import financeTracker.models.pojo.Budget;
 import financeTracker.services.BudgetService;
 import financeTracker.utils.SessionManager;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -19,61 +20,80 @@ public class BudgetController extends AbstractController {
     private BudgetService budgetService;
     @Autowired
     private SessionManager sessionManager;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @PutMapping("/budgets")
     public BudgetWithoutAccountAndOwnerDTO addBudget(@RequestBody CreateBudgetRequestDTO dto,
-                                                     HttpSession session){
-        dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                                     HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.addBudgetToAcc(userId, dto);
+        Budget budget = budgetService.addBudgetToAcc(userId, dto);
+        return convertToBudgetWithoutAccountAndOwnerDTO(budget);
     }
 
     @GetMapping("budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name="budget_id") int budgetId,
+    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "budget_id") int budgetId,
                                                    HttpSession session) {
        int userId = sessionManager.getLoggedId(session);
-       return budgetService.getById(userId, budgetId);
+       Budget budget = budgetService.getById(userId, budgetId);
+       return convertToBudgetWithoutAccountAndOwnerDTO(budget);
     }
 
-    @GetMapping("/budgets/users/")
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session){
+    @GetMapping("/budgets")
+    public List<BudgetWithoutAccountAndOwnerDTO> getAllByUser(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.getByOwnerId(userId);
+        List<Budget> budgets = budgetService.getByOwnerId(userId);
+        return budgets.stream()
+                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/budgets/accounts/{account_id}")
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable("account_id") int accountId,
-                                                                      HttpSession session){
+    public List<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable(name = "account_id") int accountId,
+                                                                 HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.getByAccountId(userId, accountId);
+        List<Budget> budgets = budgetService.getByAccountId(userId, accountId);
+        return budgets.stream()
+                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
+                .collect(Collectors.toList());
     }
 
-    @DeleteMapping("/budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name="budget_id") int budgetId,
-                                                  HttpSession session){
+    @DeleteMapping("/accounts/{account_id}/budgets/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO delete(@PathVariable(name = "account_id") int accountId,
+                                                  @PathVariable(name = "budget_id") int budgetId,
+                                                  HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.delete(budgetId, userId);
+        return budgetService.delete(budgetId, accountId, userId);
     }
 
-    @PostMapping("budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO edit(@PathVariable(name="budget_id") int budgetId,
+    @PostMapping("/accounts/{account_id}/budgets/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO edit(@PathVariable(name = "account_id") int accountId,
+                                                @PathVariable(name = "budget_id") int budgetId,
                                                 @RequestBody CreateBudgetRequestDTO dto,
                                                 HttpSession session ) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.editBudget(budgetId,dto, userId);
+        Budget budget =  budgetService.editBudget(budgetId, dto, userId, accountId);
+        return convertToBudgetWithoutAccountAndOwnerDTO(budget);
     }
 
     @GetMapping("budgets/category/{category_id}")
-    public double getSpendingByCategory(@PathVariable(name="category_id") int categoryId,
-                                        HttpSession session){
+    public double getSpendingByCategory(@PathVariable(name = "category_id") int categoryId,
+                                        HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.getSpendings(userId, categoryId);
+        return budgetService.getSpending(userId, categoryId);
     }
 
-    @PostMapping("/budgets/filter")
+    @PostMapping("/budgets")
     public List<BudgetWithoutAccountAndOwnerDTO> filter(@RequestBody FilterBudgetRequestDTO dto,
-                                                        HttpSession session){
+                                                        HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.filter(userId, dto);
+        List<Budget> budgets = budgetService.filter(userId, dto);
+        return budgets.stream()
+                .map(this::convertToBudgetWithoutAccountAndOwnerDTO)
+                .collect(Collectors.toList());
+    }
+
+    private BudgetWithoutAccountAndOwnerDTO convertToBudgetWithoutAccountAndOwnerDTO(Budget budget) {
+        return modelMapper.map(budget, BudgetWithoutAccountAndOwnerDTO.class);
     }
 }

@@ -13,6 +13,8 @@ import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,158 +28,97 @@ public class BudgetService {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private BudgetDAO budgetDao;
 
-    public BudgetWithoutAccountAndOwnerDTO getById(int userId,int id) {
-        Optional<Budget> optionalBudget=budgetRepository.findById(id);
-        if (optionalBudget.isEmpty()){
-            throw new NotFoundException("Budget not found");
-        }
-        if(optionalBudget.get().getOwner().getId()!=userId){
-            throw new BadRequestException("You don't have budget with such id!!");
-        }
-        return new BudgetWithoutAccountAndOwnerDTO(optionalBudget.get());
+    public Budget getById(int userId, int budgetId) {
+        return budgetRepository.findByIdAndOwnerId(budgetId, userId);
     }
 
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getByOwnerId(int ownerId) {
-        ArrayList<Budget> budgets=budgetRepository.findBudgetsByOwnerId(ownerId);
-        if (budgets.isEmpty()){
-            throw new NotFoundException("User don't have budgets");
-        }
-        ArrayList<BudgetWithoutAccountAndOwnerDTO> responseBudgets =new ArrayList<>();
-        for (Budget budget:budgets){
-            BudgetWithoutAccountAndOwnerDTO responseBudget=new BudgetWithoutAccountAndOwnerDTO(budget);
-            responseBudgets.add(responseBudget);
-        }
-        return responseBudgets;
+    public List<Budget> getByOwnerId(int ownerId) {
+        return budgetRepository.findBudgetsByOwnerId(ownerId);
     }
 
-    public ArrayList<BudgetWithoutAccountAndOwnerDTO> getByAccountId(int userId,int accountId) {
-        Optional<Account> optionalAccount=accountRepository.findById(accountId);
-        if (optionalAccount.isEmpty()){
+    public List<Budget> getByAccountId(int userId, int accountId) {
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        if (account == null){
             throw new NotFoundException("Account does not exist..");
         }
-        if(optionalAccount.get().getOwner().getId()!=userId){
-            throw new BadRequestException("You can't see budgets of account that you aren't owner!!");
-        }
-        ArrayList<Budget> budgets=budgetRepository.findBudgetsByAccountId(accountId);
-        if (budgets.isEmpty()){
-            throw new NotFoundException("This account dont'have budgets");
-        }
-        ArrayList<BudgetWithoutAccountAndOwnerDTO> responseBudgets=new ArrayList<>();
-        for (Budget budget:budgets){
-            BudgetWithoutAccountAndOwnerDTO responseTransaction=new BudgetWithoutAccountAndOwnerDTO(budget);
-            responseBudgets.add(responseTransaction);
-        }
-        return responseBudgets;
+        return account.getBudgets();
     }
 
-    public BudgetWithoutAccountAndOwnerDTO delete(int budgetId , int ownerId) {
-        Optional<Budget> optionalBudget=budgetRepository.findById(budgetId);
-        if (optionalBudget.isEmpty()){
+    public BudgetWithoutAccountAndOwnerDTO delete(int budgetId, int accountId, int ownerId) {
+        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, ownerId, accountId);
+        if (budget == null){
             throw new  NotFoundException("Budget doesn't exist");
         }
-        Budget budget=optionalBudget.get();
-        if (budget.getOwner().getId()!=ownerId){
-            throw new NotFoundException("You don't own budget with such Id");
-        }
-        BudgetWithoutAccountAndOwnerDTO responseBudget=new BudgetWithoutAccountAndOwnerDTO(budget);
+        BudgetWithoutAccountAndOwnerDTO responseBudget = new BudgetWithoutAccountAndOwnerDTO(budget);
         budgetRepository.deleteById(budgetId);
         return responseBudget;
     }
 
-    public BudgetWithoutAccountAndOwnerDTO addBudgetToAcc(int userId, CreateBudgetRequestDTO dto) {
-        Optional<Account> optionalAccount= accountRepository.findById(dto.getAccountId());
-        Optional<User> optionalUser=userRepository.findById(userId);
-        Optional<Category> optionalCategory=categoryRepository.findById(dto.getCategoryId());
-        if (optionalAccount.isEmpty()){
+    public Budget addBudgetToAcc(int userId, CreateBudgetRequestDTO dto) {
+        dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        Account account= accountRepository.findByIdAndOwnerId(dto.getAccountId(), userId);
+        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), userId);
+        if (account == null){
             throw new  NotFoundException("Account doesn't exist");
         }
-        if (optionalUser.isEmpty()){
-            throw new NotFoundException("User doesn't exist");
-        }
-        if (optionalCategory.isEmpty()){
+        if (category == null){
             throw new NotFoundException("Category doesn't exist");
         }
-        Budget budget=new Budget(dto);
-        Account account=optionalAccount.get();
-        //validation that check is account owner is current user
-        if(account.getOwner().getId()!=userId){
-            throw new BadRequestException("You can add budgets only to you ");
-        }
-        User owner=optionalUser.get();
-        Category category=optionalCategory.get();
-        budget.setName(dto.getName());
-        budget.setAmount(dto.getAmount());
-        budget.setDueTime(dto.getDueTime());
-        budget.setOwner(owner);
+        Budget budget = new Budget(dto);
+        budget.setOwner(account.getOwner());
         budget.setAccount(account);
         budget.setCategory(category);
         budgetRepository.save(budget);
-        return new BudgetWithoutAccountAndOwnerDTO(budget);
+        return budget;
     }
 
-    public BudgetWithoutAccountAndOwnerDTO editBudget(int budgetId, CreateBudgetRequestDTO dto, int userId) {
-        Optional<Budget> optionalBudget=budgetRepository.findById(budgetId);
-        Optional<Account> optionalAccount=accountRepository.findById(dto.getAccountId());
-        Optional<Category> optionalCategory=categoryRepository.findById(dto.getCategoryId());
-        if (optionalBudget.isEmpty()){
+    public Budget editBudget(int budgetId, CreateBudgetRequestDTO dto, int userId, int accountId) {
+        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, userId, accountId);
+        Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), userId);
+        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), userId);
+        if (budget == null){
             throw new NotFoundException("Budget doesn't exist");
         }
-        if (optionalAccount.isEmpty()){
+        if (account == null){
             throw new NotFoundException("Account doesn't exist");
         }
-        if (optionalCategory.isEmpty()){
+        if (category == null){
             throw new NotFoundException("Category doesn't exist");
         }
-        Budget budget= optionalBudget.get();
-        Account account=optionalAccount.get();
-        Category category=optionalCategory.get();
-        if (account.getOwner().getId()!=userId){
-            throw new BadRequestException("You can't set budget to account that you aren't owner");
-        }
+
         if (dto.getName()!=null){
             budget.setName(dto.getName());
         }
-        if (dto.getAmount()>0){
+        if (dto.getAmount() != null){
             budget.setAmount(dto.getAmount());
         }
-        if (dto.getDueTime()!=null){
+        if (dto.getDueTime() != null){
             budget.setDueTime(dto.getDueTime());
         }
-        if (dto.getLabel()!=null){
+        if (dto.getLabel() != null){
             budget.setLabel(dto.getLabel());
         }
         budget.setAccount(account);
         budget.setCategory(category);
         budgetRepository.save(budget);
-        return new BudgetWithoutAccountAndOwnerDTO(budget);
+        return budget;
     }
 
-    public double getSpendings(int ownerId,int categoryId) {
-        Optional<Category> category=categoryRepository.findById(categoryId);
-        if (category.isEmpty()){
-            throw new NotFoundException("There is not category with such ID");
+    public double getSpending(int ownerId, int categoryId) {
+        List<Budget> budgets = budgetRepository.findBudgetsByOwnerIdAndCategoryId(ownerId,categoryId);
+        if (budgets.isEmpty()) {
+            throw new NotFoundException("This user don't have budgets corresponding to this category");
         }
-        ArrayList<Budget> budgets=budgetRepository.findBudgetsByOwnerIdAndCategoryId(ownerId,categoryId);
-        if (budgets.isEmpty()){
-            throw new NotFoundException("This account don't have budgets corresponding to this category");
-        }
-        double totalSpends=0;
+        double totalSpends = 0;
         for (Budget budget:budgets) {
-            totalSpends+=budget.getAmount();
+            totalSpends += budget.getAmount();
         }
         return totalSpends;
     }
 
-    public List<BudgetWithoutAccountAndOwnerDTO> filter(int userId, FilterBudgetRequestDTO dto) {
-        List<Budget> budgets=budgetDao.filterBudget(userId,dto);
-        List<BudgetWithoutAccountAndOwnerDTO> budgetWithoutAccountAndOwnerDTOS=new ArrayList<>();
-        for (Budget budget:budgets) {
-            budgetWithoutAccountAndOwnerDTOS.add(new BudgetWithoutAccountAndOwnerDTO(budget));
-        }
-         return budgetWithoutAccountAndOwnerDTOS;
+    public List<Budget> filter(int userId, FilterBudgetRequestDTO dto) {
+        return budgetDao.filterBudget(userId, dto);
     }
 }

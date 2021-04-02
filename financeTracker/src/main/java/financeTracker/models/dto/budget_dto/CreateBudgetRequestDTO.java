@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class CreateBudgetRequestDTO {
     private String name;
     private String label;
-    private double amount;
+    private Double amount;
     private Timestamp createTime;
     private Timestamp dueTime;
     private String description;

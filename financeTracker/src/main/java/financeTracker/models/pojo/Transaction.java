@@ -34,7 +34,7 @@ public class Transaction {
     @JoinColumn(name="owner_id")
     private User owner;
     @ManyToMany(mappedBy = "budgetTransactions")
-    List<Budget> budgetsThatHaveTransaction;
+    private List<Budget> budgetsThatHaveTransaction;
 
     public Transaction(AddTransactionRequestDTO dto){
          type = dto.getType();
