@@ -1,6 +1,7 @@
 package financeTracker.controllers;
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
+import financeTracker.models.dto.account_dto.CreateAccountDTO;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
 import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
@@ -43,10 +44,10 @@ public class AccountController extends AbstractController {
     }
 
     @PutMapping("/accounts")
-    public UserWithoutPassDTO create(@RequestBody Account account,
+    public UserWithoutPassDTO create(@RequestBody CreateAccountDTO createAccountDTO,
                                      HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        User user = accountService.createAcc(account, userId);
+        User user = accountService.createAcc(createAccountDTO, userId);
         return convertToUserWithoutPassDTO(user);
     }
 

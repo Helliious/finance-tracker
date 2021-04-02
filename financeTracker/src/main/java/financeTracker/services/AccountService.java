@@ -3,6 +3,7 @@ package financeTracker.services;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.AccountDAO;
+import financeTracker.models.dto.account_dto.CreateAccountDTO;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
 import financeTracker.models.pojo.Account;
@@ -25,21 +26,22 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createAcc(Account account, int ownerId) {
-        account.setCreateTime(new Timestamp(System.currentTimeMillis()));
+    public User createAcc(CreateAccountDTO createAccountDTO, int ownerId) {
+        createAccountDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        for (Account a : optUser.get().getAccounts()) {
-            if (a.getName().equals(account.getName()) || a.getId() == account.getId()) {
+        User user = optUser.get();
+        for (Account a : user.getAccounts()) {
+            if (a.getName().equals(createAccountDTO.getName())) {
                 throw new BadRequestException("Account already exists!");
             }
         }
-        validateAccount(account);
-        User user = optUser.get();
+        validateAccount(createAccountDTO);
+        createAccountDTO.setOwner(user);
+        Account account = new Account(createAccountDTO);
         user.getAccounts().add(account);
-        account.setOwner(user);
         accountRepository.save(account);
         return user;
     }
@@ -98,7 +100,7 @@ public class AccountService {
         return account;
     }
 
-    private void validateAccount(Account account) {
+    private void validateAccount(CreateAccountDTO account) {
         if (account.getName() == null) {
             throw new BadRequestException("Must enter valid account name!");
         }

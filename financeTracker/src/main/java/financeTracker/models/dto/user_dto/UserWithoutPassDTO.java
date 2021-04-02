@@ -30,10 +30,7 @@ public class UserWithoutPassDTO {
     private String email;
     private Timestamp createTime;
     private List<AccountWithoutOwnerDTO> accounts;
-    private List<TransactionWithoutOwnerAndAccountDTO> transactions;
-    private List<ResponsePlannedPaymentDTO> plannedPayments;
     private List<ResponseCategoryDTO> categories;
-    private List<BudgetWithoutAccountAndOwnerDTO> budgets;
 
     public UserWithoutPassDTO(User user) {
         id = user.getId();
@@ -48,28 +45,10 @@ public class UserWithoutPassDTO {
                 accounts.add(new AccountWithoutOwnerDTO(a));
             }
         }
-        transactions = new ArrayList<>();
-        if (user.getTransactions() != null) {
-            for (Transaction t : user.getTransactions()) {
-                transactions.add(new TransactionWithoutOwnerAndAccountDTO(t));
-            }
-        }
-        plannedPayments = new ArrayList<>();
-        if (user.getPlannedPayments() != null) {
-            for (PlannedPayment p : user.getPlannedPayments()) {
-                plannedPayments.add(new ResponsePlannedPaymentDTO(p));
-            }
-        }
         categories = new ArrayList<>();
         if (user.getCategories() != null) {
             for (Category c : user.getCategories()) {
                 categories.add(new ResponseCategoryDTO(c));
-            }
-        }
-        budgets = new ArrayList<>();
-        if (user.getBudgets() != null) {
-            for (Budget b : user.getBudgets()) {
-                budgets.add(new BudgetWithoutAccountAndOwnerDTO(b));
             }
         }
     }

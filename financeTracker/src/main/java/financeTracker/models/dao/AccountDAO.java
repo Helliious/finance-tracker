@@ -4,6 +4,7 @@ import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.pojo.*;
+import financeTracker.models.repository.BudgetRepository;
 import financeTracker.models.repository.PlannedPaymentsRepository;
 import financeTracker.models.repository.TransactionRepository;
 import financeTracker.models.repository.UserRepository;
@@ -29,6 +30,8 @@ public class AccountDAO {
     private TransactionRepository transactionRepository;
     @Autowired
     private PlannedPaymentsRepository plannedPaymentsRepository;
+    @Autowired
+    private BudgetRepository budgetRepository;
 
     public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
         List<Account> accounts = new ArrayList<>();
@@ -150,6 +153,7 @@ public class AccountDAO {
                     }
                     List<Transaction> transactions = transactionRepository.findTransactionsByAccountId(result.getInt("id"));
                     List<PlannedPayment> plannedPayments = plannedPaymentsRepository.findAllByAccountId(result.getInt("id"));
+                    List<Budget> budgets = budgetRepository.findBudgetsByAccountId(result.getInt("id"));
                     Account account = new Account(result.getInt("id"),
                                                 result.getString("name"),
                                                 result.getDouble("balance"),
@@ -157,7 +161,8 @@ public class AccountDAO {
                                                 result.getTimestamp("create_time"),
                                                 optionalUser.get(),
                                                 transactions,
-                                                plannedPayments
+                                                plannedPayments,
+                                                budgets
                                                 );
                     accounts.add(account);
                 }while (result.next());

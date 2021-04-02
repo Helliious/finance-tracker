@@ -1,6 +1,7 @@
 package financeTracker.models.pojo;
 
 import financeTracker.exceptions.BadRequestException;
+import financeTracker.models.dto.account_dto.CreateAccountDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -31,6 +33,19 @@ public class Account {
     private List<Transaction> transactions;
     @OneToMany(mappedBy = "account")
     private List<PlannedPayment> plannedPayments;
+    @OneToMany(mappedBy = "account")
+    private List<Budget> budgets;
+
+    public Account(CreateAccountDTO accountDTO) {
+        name = accountDTO.getName();
+        balance = accountDTO.getBalance();
+        accLimit = accountDTO.getAccLimit();
+        createTime = accountDTO.getCreateTime();
+        owner = accountDTO.getOwner();
+        transactions = new ArrayList<>();
+        plannedPayments = new ArrayList<>();
+        budgets = new ArrayList<>();
+    }
 
     public void reduceBalance(double amount) {
         if (amount > balance) {
