@@ -10,7 +10,6 @@ import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccou
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.*;
 import financeTracker.utils.Action;
-import financeTracker.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +58,7 @@ public class TransactionService {
         if (transaction == null) {
             throw new NotFoundException("Transaction not found!");
         }
-        calculateBalance(transaction, transaction.getAccount(), Action.REMOVE);
+        ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
         TransactionWithoutOwnerAndAccountDTO responseTransaction = new TransactionWithoutOwnerAndAccountDTO(transaction);
         transactionRepository.deleteById(transactionId);
         return responseTransaction;
@@ -87,7 +86,7 @@ public class TransactionService {
         owner.getTransactions().add(transaction);
         account.getTransactions().add(transaction);
         category.getTransactions().add(transaction);
-        calculateBalance(transaction, account, Action.ADD);
+        ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         transactionRepository.save(transaction);
         return transaction;
     }
@@ -98,25 +97,25 @@ public class TransactionService {
             throw new NotFoundException("Transaction not found!");
         }
         if (dto.getType() != null) {
-            calculateBalance(transaction, transaction.getAccount(), Action.REMOVE);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.setType(dto.getType());
-            calculateBalance(transaction, transaction.getAccount(), Action.ADD);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAmount() != null) {
-            calculateBalance(transaction, transaction.getAccount(), Action.REMOVE);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.setAmount(dto.getAmount());
-            calculateBalance(transaction, transaction.getAccount(), Action.ADD);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAccountId() != null) {
             Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), ownerId);
             if (account == null) {
                 throw new NotFoundException("Account not found!");
             }
-            calculateBalance(transaction, transaction.getAccount(), Action.REMOVE);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.getAccount().getTransactions().remove(transaction);
             transaction.setAccount(account);
             account.getTransactions().add(transaction);
-            calculateBalance(transaction, account, Action.ADD);
+            ServiceMethod.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         }
         if (dto.getCategoryId() != null) {
             Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
@@ -161,21 +160,5 @@ public class TransactionService {
         budget.getBudgetTransactions().add(transaction);
         budgetRepository.save(budget);
         return new TransactionWithoutOwnerAndAccountDTO(transactionRepository.findById(transactionId).get());
-    }
-
-    private void calculateBalance(Transaction transaction, Account account, Action action) {
-        if (action == Action.ADD) {
-            if (transaction.getType().equals(Constants.INCOME)) {
-                account.increaseBalance(transaction.getAmount());
-            } else {
-                account.reduceBalance(transaction.getAmount());
-            }
-        } else {
-            if (transaction.getType().equals(Constants.INCOME)) {
-                account.reduceBalance(transaction.getAmount());
-            } else {
-                account.increaseBalance(transaction.getAmount());
-            }
-        }
     }
 }

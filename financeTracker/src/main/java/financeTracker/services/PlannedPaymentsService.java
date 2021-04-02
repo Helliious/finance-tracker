@@ -10,6 +10,7 @@ import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.PlannedPaymentsRepository;
 import financeTracker.models.repository.UserRepository;
+import financeTracker.utils.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class PlannedPaymentsService {
         user.getPlannedPayments().add(plannedPayment);
         category.getPlannedPayments().add(plannedPayment);
         account.getPlannedPayments().add(plannedPayment);
-        account.reduceBalance(plannedPayment.getAmount());
+        ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.ADD);
         plannedPayment.setOwner(user);
         plannedPayment.setAccount(account);
         plannedPayment.setCategory(category);
@@ -110,7 +111,7 @@ public class PlannedPaymentsService {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account != null) {
             if (plannedPayment.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) < 0) {
-                account.increaseBalance(plannedPayment.getAmount());
+                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.REMOVE);
             }
         }
         plannedPaymentsRepository.deleteById(plannedPaymentId);
@@ -135,7 +136,9 @@ public class PlannedPaymentsService {
             if (plannedPayment.getPaymentType().equals(responsePlannedPaymentDTO.getPaymentType())) {
                 throw new BadRequestException("Entered the same type!");
             } else {
+                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
                 plannedPayment.setPaymentType(responsePlannedPaymentDTO.getPaymentType());
+                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
             }
         }
         if (responsePlannedPaymentDTO.getFrequency() != null) {
@@ -156,13 +159,9 @@ public class PlannedPaymentsService {
             if (plannedPayment.getAmount() == responsePlannedPaymentDTO.getAmount()) {
                 throw new BadRequestException("Entered the same amount!");
             } else {
-                Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-                double oldAmount = plannedPayment.getAmount();
+                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
                 plannedPayment.setAmount(responsePlannedPaymentDTO.getAmount());
-                if (account != null) {
-                    account.increaseBalance(oldAmount);
-                    account.reduceBalance(plannedPayment.getAmount());
-                }
+                ServiceMethod.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
             }
         }
         if (responsePlannedPaymentDTO.getDueTime() != null) {
@@ -175,11 +174,15 @@ public class PlannedPaymentsService {
         if (responsePlannedPaymentDTO.getCategory() != null) {
             if (plannedPayment.getCategory().getName().equals(responsePlannedPaymentDTO.getCategory().getName())) {
                 throw new BadRequestException("Entered the same category!");
+            } else if (!plannedPayment.getCategory().getType().equals(responsePlannedPaymentDTO.getCategory().getType())) {
+                throw new BadRequestException("Entered different category type!");
             } else {
+                plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
                 Optional<Category> category = categoryRepository.findById(responsePlannedPaymentDTO.getCategory().getId());
                 if (category.isEmpty()) {
                     throw new NotFoundException("Category not found!");
                 }
+                category.get().getPlannedPayments().add(plannedPayment);
                 plannedPayment.setCategory(category.get());
             }
         }
