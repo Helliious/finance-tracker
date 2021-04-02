@@ -30,7 +30,7 @@ public class PlannedPaymentController extends AbstractController{
                                   HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = plannedPaymentsService.add(plannedPayment, userId, accountId);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @GetMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")
@@ -83,9 +83,5 @@ public class PlannedPaymentController extends AbstractController{
 
     private ResponsePlannedPaymentDTO convertToResponsePlannedPaymentDTO(PlannedPayment plannedPayment) {
         return modelMapper.map(plannedPayment, ResponsePlannedPaymentDTO.class);
-    }
-
-    private UserWithoutPassDTO convertToUserWithoutPassDTO(User user) {
-        return modelMapper.map(user, UserWithoutPassDTO.class);
     }
 }

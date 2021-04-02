@@ -23,8 +23,8 @@ import java.util.List;
 public class AccountWithoutOwnerDTO {
     private int id;
     private String name;
-    private double balance;
-    private double accLimit;
+    private Double balance;
+    private Double accLimit;
     private Timestamp createTime;
     private List<TransactionWithoutOwnerAndAccountDTO> transactions;
     private List<ResponsePlannedPaymentDTO> plannedPayments;

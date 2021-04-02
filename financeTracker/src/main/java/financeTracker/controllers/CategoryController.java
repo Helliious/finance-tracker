@@ -1,6 +1,5 @@
 package financeTracker.controllers;
 
-import financeTracker.models.dao.CategoryDAO;
 import financeTracker.models.dto.category_dto.CategoryExpensesDTO;
 import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import financeTracker.models.pojo.Category;

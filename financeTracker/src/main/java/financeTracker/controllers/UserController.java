@@ -22,20 +22,20 @@ public class UserController extends AbstractController {
     @GetMapping("/users/{id}")
     public UserWithoutPassDTO getById(@PathVariable int id) {
         User user = userService.getUserById(id);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @PutMapping("/users")
     public UserWithoutPassDTO register(@RequestBody RegisterRequestUserDTO userDTO) {
         User user = userService.addUser(userDTO);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @PostMapping("/users")
     public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
         User user = userService.login(loginUserDto);
         sessionManager.loginUser(session, user.getId());
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @PutMapping("/users/edit")
@@ -43,7 +43,7 @@ public class UserController extends AbstractController {
                                    HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = userService.editUser(userDTO, userId);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @DeleteMapping("/users")
@@ -57,7 +57,7 @@ public class UserController extends AbstractController {
         int userId = sessionManager.getLoggedId(session);
         User user = userService.logoutUser(userId);
         sessionManager.logoutUser(session);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @PostMapping("/users/change_password")
@@ -65,20 +65,12 @@ public class UserController extends AbstractController {
                                              HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = userService.changePassword(userId, changePasswordDTO);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @PostMapping("/users/forgot_password")
     public ForgotPassMessageDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
         User user = userService.forgotPass(forgotPassUserDto.getEmail());
-        return convertToForgotPassMessageDTO(user);
-    }
-
-    private UserWithoutPassDTO convertToUserWithoutPassDTO(User user) {
-        return modelMapper.map(user, UserWithoutPassDTO.class);
-    }
-
-    private ForgotPassMessageDTO convertToForgotPassMessageDTO(User user) {
-        return modelMapper.map(user, ForgotPassMessageDTO.class);
+        return new ForgotPassMessageDTO(user);
     }
 }

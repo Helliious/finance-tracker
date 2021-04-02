@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,16 +32,18 @@ public class AccountController extends AbstractController {
                                           HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         Account account = accountService.getById(accountId, userId);
-        return convertToAccWithoutOwnerDTO(account);
+        return new AccountWithoutOwnerDTO(account);
     }
 
     @GetMapping("/accounts")
     public List<AccountWithoutOwnerDTO> getAll(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         List<Account> accounts = accountService.getAll(userId);
-        return accounts.stream()
-                .map(this::convertToAccWithoutOwnerDTO)
-                .collect(Collectors.toList());
+        List<AccountWithoutOwnerDTO> resultAcc = new ArrayList<>();
+        for (Account a : accounts) {
+            resultAcc.add(new AccountWithoutOwnerDTO(a));
+        }
+        return resultAcc;
     }
 
     @PutMapping("/accounts")
@@ -48,7 +51,7 @@ public class AccountController extends AbstractController {
                                      HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = accountService.createAcc(createAccountDTO, userId);
-        return convertToUserWithoutPassDTO(user);
+        return new UserWithoutPassDTO(user);
     }
 
     @DeleteMapping("/accounts/{account_id}")
@@ -56,7 +59,7 @@ public class AccountController extends AbstractController {
                                          HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         Account account = accountService.deleteAccount(accountId, userId);
-        return convertToAccWithoutOwnerDTO(account);
+        return new AccountWithoutOwnerDTO(account);
     }
 
     @PostMapping("/accounts/{account_id}")
@@ -65,7 +68,7 @@ public class AccountController extends AbstractController {
                                    HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         Account account = accountService.editAccount(updateRequestAccountDTO, userId, accountId);
-        return convertToAccWithoutOwnerDTO(account);
+        return new AccountWithoutOwnerDTO(account);
     }
 
     @PostMapping("/accounts/filter")
@@ -73,16 +76,10 @@ public class AccountController extends AbstractController {
                                                HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<Account> accounts = accountService.filter(userId, accountRequestDTO);
-        return accounts.stream()
-                .map(this::convertToAccWithoutOwnerDTO)
-                .collect(Collectors.toList());
-    }
-
-    private AccountWithoutOwnerDTO convertToAccWithoutOwnerDTO(Account account) {
-        return modelMapper.map(account, AccountWithoutOwnerDTO.class);
-    }
-
-    private UserWithoutPassDTO convertToUserWithoutPassDTO(User user) {
-        return modelMapper.map(user, UserWithoutPassDTO.class);
+        List<AccountWithoutOwnerDTO> resultAcc = new ArrayList<>();
+        for (Account a : accounts) {
+            resultAcc.add(new AccountWithoutOwnerDTO(a));
+        }
+        return resultAcc;
     }
 }
