@@ -4,7 +4,6 @@ import financeTracker.models.dto.user_dto.*;
 import financeTracker.models.pojo.User;
 import financeTracker.services.UserService;
 import financeTracker.utils.SessionManager;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +15,11 @@ public class UserController extends AbstractController {
     private UserService userService;
     @Autowired
     private SessionManager sessionManager;
-    @Autowired
-    private ModelMapper modelMapper;
 
-    @GetMapping("/users/{id}")
-    public UserWithoutPassDTO getById(@PathVariable int id) {
-        User user = userService.getUserById(id);
+    @GetMapping("/users")
+    public UserWithoutPassDTO getById(HttpSession session) {
+        int userId = sessionManager.getLoggedId(session);
+        User user = userService.getUserById(userId);
         return new UserWithoutPassDTO(user);
     }
 

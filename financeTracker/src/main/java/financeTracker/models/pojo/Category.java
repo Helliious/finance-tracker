@@ -29,4 +29,9 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    public Category(String name, String type) {
+        this.name = name;
+        this.type = type;
+    }
 }

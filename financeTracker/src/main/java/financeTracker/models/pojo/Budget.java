@@ -32,9 +32,6 @@ public class Budget {
     @ManyToOne
     @JoinColumn(name="owner_id")
     private User owner;
-    @ManyToOne
-    @JoinColumn(name="category_id")
-    private Category category;
     @ManyToMany
     @JoinTable(
             name = "budgets_have_transactions",

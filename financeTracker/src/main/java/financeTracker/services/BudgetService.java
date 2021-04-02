@@ -27,7 +27,11 @@ public class BudgetService {
     private BudgetDAO budgetDao;
 
     public Budget getById(int userId, int budgetId) {
-        return budgetRepository.findByIdAndOwnerId(budgetId, userId);
+        Budget budget = budgetRepository.findByIdAndOwnerId(budgetId, userId);
+        if (budget == null) {
+            throw new NotFoundException("Budget not found!");
+        }
+        return budget;
     }
 
     public List<Budget> getByOwnerId(int ownerId) {
@@ -35,11 +39,7 @@ public class BudgetService {
     }
 
     public List<Budget> getByAccountId(int userId, int accountId) {
-        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-        if (account == null){
-            throw new NotFoundException("Account does not exist..");
-        }
-        return account.getBudgets();
+        return budgetRepository.findAllByOwnerIdAndAccountId(userId, accountId);
     }
 
     public BudgetWithoutAccountAndOwnerDTO delete(int budgetId, int accountId, int ownerId) {
@@ -55,17 +55,12 @@ public class BudgetService {
     public Budget addBudgetToAcc(int userId, CreateBudgetRequestDTO dto) {
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Account account= accountRepository.findByIdAndOwnerId(dto.getAccountId(), userId);
-        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), userId);
         if (account == null){
             throw new  NotFoundException("Account doesn't exist");
-        }
-        if (category == null){
-            throw new NotFoundException("Category doesn't exist");
         }
         Budget budget = new Budget(dto);
         budget.setOwner(account.getOwner());
         budget.setAccount(account);
-        budget.setCategory(category);
         budgetRepository.save(budget);
         return budget;
     }
@@ -73,15 +68,11 @@ public class BudgetService {
     public Budget editBudget(int budgetId, CreateBudgetRequestDTO dto, int userId, int accountId) {
         Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, userId, accountId);
         Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), userId);
-        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), userId);
         if (budget == null){
             throw new NotFoundException("Budget doesn't exist");
         }
         if (account == null){
             throw new NotFoundException("Account doesn't exist");
-        }
-        if (category == null){
-            throw new NotFoundException("Category doesn't exist");
         }
 
         if (dto.getName()!=null){
@@ -97,13 +88,12 @@ public class BudgetService {
             budget.setLabel(dto.getLabel());
         }
         budget.setAccount(account);
-        budget.setCategory(category);
         budgetRepository.save(budget);
         return budget;
     }
 
-    public double getSpending(int ownerId, int categoryId) {
-        List<Budget> budgets = budgetRepository.findBudgetsByOwnerIdAndCategoryId(ownerId,categoryId);
+    public double getSpending(int ownerId) {
+        List<Budget> budgets = budgetRepository.findBudgetsByOwnerId(ownerId);
         if (budgets.isEmpty()) {
             throw new NotFoundException("This user don't have budgets corresponding to this category");
         }

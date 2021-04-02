@@ -50,13 +50,18 @@ public class CategoryService {
     public Category getById(int categoryId, int userId) {
         Category category = categoryRepository.findByIdAndOwnerId(categoryId, userId);
         if (category == null) {
-            throw new NotFoundException("Category not found!");
+            category = categoryRepository.findByIdAndOwnerIsNull(categoryId);
+            if (category == null) {
+                throw new NotFoundException("Category not found!");
+            }
         }
         return category;
     }
 
     public List<Category> getAll(int userId) {
-        return categoryRepository.findAllByOwnerId(userId);
+        List<Category> categories = categoryRepository.findAllByOwnerId(userId);
+        categories.addAll(categoryRepository.findAllByOwnerIsNull());
+        return categories;
     }
 
     private void validateCategory(Category category) {

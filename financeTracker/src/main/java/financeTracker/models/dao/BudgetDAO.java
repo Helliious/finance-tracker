@@ -2,12 +2,10 @@ package financeTracker.models.dao;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
-import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.Budget;
-import financeTracker.models.pojo.Category;
-import financeTracker.models.pojo.User;
+import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;
+import financeTracker.models.repository.TransactionRepository;
 import financeTracker.models.repository.UserRepository;
 import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +28,7 @@ public class BudgetDAO {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private CategoryRepository categoryRepository;
+    private TransactionRepository transactionRepository;
     @Autowired
     private AccountRepository accountRepository;
 
@@ -38,7 +36,6 @@ public class BudgetDAO {
         List<Budget> budgets = new ArrayList<>();
         StringBuilder sql =new StringBuilder("SELECT * FROM budgets WHERE owner_id = ? ");
         boolean nameIncludedInFilter = false;
-        boolean categoryIncludedInFilter = false;
         boolean bothAmountsIncluded = false;
         boolean amountFromIncluded = false;
         boolean amountToIncluded = false;
@@ -48,10 +45,6 @@ public class BudgetDAO {
         if (dto.getName() != null) {
             sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
-        }
-        if (dto.getCategoryId() != null) {
-            sql.append("AND category_id = ?");
-            categoryIncludedInFilter = true;
         }
         if (dto.getAmountFrom() > dto.getAmountTo() && dto.getAmountTo() != null) {
             throw new BadRequestException("Amount from can't be bigger than Amount to");
@@ -91,9 +84,6 @@ public class BudgetDAO {
             if (nameIncludedInFilter) {
                 ps.setString(paramIdx++, dto.getName() + "%");
             }
-            if (categoryIncludedInFilter) {
-                ps.setInt(paramIdx++, dto.getCategoryId());
-            }
             if (bothAmountsIncluded) {
                 ps.setDouble(paramIdx++, dto.getAmountFrom());
                 ps.setDouble(paramIdx++, dto.getAmountTo());
@@ -118,9 +108,13 @@ public class BudgetDAO {
             if (result.next()) {
                 do {
                     Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
-                    Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
-                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
+                    if (optionalAccount.isEmpty()) {
+                        throw new NotFoundException("Account not found!");
+                    }
+                    if (optionalUser.isEmpty()) {
+                        throw new NotFoundException("User not found!");
+                    }
                     Budget budget = new Budget(result.getInt("id"),
                             result.getString("name"),
                             result.getString("label"),
@@ -129,7 +123,7 @@ public class BudgetDAO {
                             result.getString("description"),
                             optionalAccount.get(),
                             optionalUser.get(),
-                            optionalCategory.get(),null
+                            null
                     );
                     budgets.add(budget);
                 } while (result.next());

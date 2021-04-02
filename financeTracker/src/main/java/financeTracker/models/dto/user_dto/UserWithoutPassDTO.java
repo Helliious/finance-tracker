@@ -2,18 +2,13 @@ package financeTracker.models.dto.user_dto;
 
 
 import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
-import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
-import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
-import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
 import financeTracker.models.pojo.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

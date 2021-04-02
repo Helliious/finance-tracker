@@ -79,11 +79,10 @@ public class BudgetController extends AbstractController {
         return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
-    @GetMapping("budgets/category/{category_id}")
-    public double getSpendingByCategory(@PathVariable(name = "category_id") int categoryId,
-                                        HttpSession session) {
+    @GetMapping("budgets/categories")
+    public double getSpendingByCategory(HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        return budgetService.getSpending(userId, categoryId);
+        return budgetService.getSpending(userId);
     }
 
     @PostMapping("/budgets")

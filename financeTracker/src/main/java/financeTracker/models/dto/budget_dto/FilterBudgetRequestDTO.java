@@ -15,7 +15,6 @@ public class FilterBudgetRequestDTO {
  private String name;
  private Double amountFrom;
  private Double amountTo;
- private Integer categoryId;
  private Timestamp dateFrom;
  private Timestamp dateTo;
 }

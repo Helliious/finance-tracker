@@ -42,7 +42,7 @@ public class TransactionService {
     }
 
     public List<Transaction> getByOwnerId(int ownerId) {
-        return transactionRepository.findTransactionsByOwnerId(ownerId);
+        return transactionRepository.findAllByOwnerId(ownerId);
     }
 
     public List<Transaction> getByAccountId(int userId, int accountId) {

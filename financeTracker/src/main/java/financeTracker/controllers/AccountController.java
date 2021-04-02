@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class AccountController extends AbstractController {
@@ -24,8 +23,6 @@ public class AccountController extends AbstractController {
     private AccountService accountService;
     @Autowired
     private SessionManager sessionManager;
-    @Autowired
-    private ModelMapper modelMapper;
 
     @GetMapping("/accounts/{account_id}")
     public AccountWithoutOwnerDTO getById(@PathVariable(name = "account_id") int accountId,

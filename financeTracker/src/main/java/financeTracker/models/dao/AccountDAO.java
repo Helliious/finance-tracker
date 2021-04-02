@@ -152,7 +152,7 @@ public class AccountDAO {
                     if (optionalUser.isEmpty()) {
                         throw new NotFoundException("User not found!");
                     }
-                    List<Transaction> transactions = transactionRepository.findTransactionsByAccountId(result.getInt("id"));
+                    List<Transaction> transactions = transactionRepository.findAllByAccountId(result.getInt("id"));
                     List<PlannedPayment> plannedPayments = plannedPaymentsRepository.findAllByAccountId(result.getInt("id"));
                     List<Budget> budgets = budgetRepository.findBudgetsByAccountId(result.getInt("id"));
                     Account account = new Account(result.getInt("id"),
