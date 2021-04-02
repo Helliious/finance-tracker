@@ -140,11 +140,11 @@ public class TransactionService {
     public Transaction addTransactionToBudget(int ownerId,
                                               int accountId,
                                               int budgetId,
-                                              AddTransactionRequestDTO transactionRequestDTO){
-        transactionRequestDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                              int transactionId){
+        Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, ownerId, accountId);
         Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, ownerId, accountId);
         Optional<User> optUser = userRepository.findById(ownerId);
-        Category category = categoryRepository.findByIdAndOwnerId(transactionRequestDTO.getCategoryId(), ownerId);
+        Category category = categoryRepository.findByIdAndOwnerId(transaction.getCategory().getId(), ownerId);
         if (budget == null) {
             throw new NotFoundException("Budget doesn't exist");
         }
@@ -154,18 +154,9 @@ public class TransactionService {
         if (category == null) {
             throw new NotFoundException("Category not found!");
         }
-        Transaction transaction = new Transaction(transactionRequestDTO);
         if (budget.getBudgetTransactions().contains(transaction)) {
             throw new BadRequestException("Transaction already exist in budget");
         }
-        User owner = optUser.get();
-        transaction.setOwner(owner);
-        transaction.setAccount(budget.getAccount());
-        transaction.setCategory(category);
-        transaction.getBudgetsThatHaveTransaction().add(budget);
-        owner.getTransactions().add(transaction);
-        budget.getAccount().getTransactions().add(transaction);
-        category.getTransactions().add(transaction);
         budget.getBudgetTransactions().add(transaction);
         budgetRepository.save(budget);
         return transaction;

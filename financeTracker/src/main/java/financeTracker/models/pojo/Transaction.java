@@ -1,11 +1,11 @@
 package financeTracker.models.pojo;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,9 +14,7 @@ import java.util.List;
 @Table(name="transactions")
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Transaction {
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
@@ -41,6 +39,7 @@ public class Transaction {
          amount = dto.getAmount();
          createTime = dto.getCreateTime();
          description = dto.getDescription();
+         budgetsThatHaveTransaction = new ArrayList<>();
     }
 }
 
