@@ -34,7 +34,6 @@ public class UserService {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
             throw new BadRequestException("Email already exists!");
         }
-        validateUser(userDTO);
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         userDTO.setPassword(encoder.encode(userDTO.getPassword()));
         User user = new User(userDTO);
@@ -48,37 +47,33 @@ public class UserService {
         if (user.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        if (userDTO.getUsername() != null) {
-            if (user.get().getUsername().equals(userDTO.getUsername())) {
-                throw new BadRequestException("Entered the same username!");
-            } else if (userRepository.findByUsername(userDTO.getUsername()) != null) {
-                throw new BadRequestException("Username already exists!");
-            } else {
-                user.get().setUsername(userDTO.getUsername());
-            }
+
+        if (user.get().getUsername().equals(userDTO.getUsername())) {
+            throw new BadRequestException("Entered the same username!");
+        } else if (userRepository.findByUsername(userDTO.getUsername()) != null) {
+            throw new BadRequestException("Username already exists!");
+        } else {
+            user.get().setUsername(userDTO.getUsername());
         }
-        if (userDTO.getFirstName() != null) {
-            if (user.get().getFirstName().equals(userDTO.getFirstName())) {
-                throw new BadRequestException("Entered the same first name!");
-            } else {
-                user.get().setFirstName(userDTO.getFirstName());
-            }
+
+        if (user.get().getFirstName().equals(userDTO.getFirstName())) {
+            throw new BadRequestException("Entered the same first name!");
+        } else {
+            user.get().setFirstName(userDTO.getFirstName());
         }
-        if (userDTO.getLastName() != null) {
-            if (user.get().getLastName().equals(userDTO.getLastName())) {
-                throw new BadRequestException("Entered the same last name!");
-            } else {
-                user.get().setLastName(userDTO.getLastName());
-            }
+
+        if (user.get().getLastName().equals(userDTO.getLastName())) {
+            throw new BadRequestException("Entered the same last name!");
+        } else {
+            user.get().setLastName(userDTO.getLastName());
         }
-        if (userDTO.getEmail() != null) {
-            if (user.get().getEmail().equals(userDTO.getEmail())) {
-                throw new BadRequestException("Entered the same email!");
-            } else if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-                throw new BadRequestException("Email already exists!");
-            } else {
-                user.get().setEmail(userDTO.getEmail());
-            }
+
+        if (user.get().getEmail().equals(userDTO.getEmail())) {
+            throw new BadRequestException("Entered the same email!");
+        } else if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+            throw new BadRequestException("Email already exists!");
+        } else {
+            user.get().setEmail(userDTO.getEmail());
         }
         user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         User responseUser = userRepository.save(user.get());
@@ -151,11 +146,10 @@ public class UserService {
         }
         if (encoder.matches(changePasswordDTO.getPassword(), optUser.get().getPassword())) {
             throw new AuthenticationException("Entered the same password as current one!");
-        } else {
-            optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
-            userRepository.save(optUser.get());
-            return optUser.get();
         }
+        optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
+        userRepository.save(optUser.get());
+        return optUser.get();
     }
 
     public User logoutUser(int userId) {
@@ -165,23 +159,5 @@ public class UserService {
         }
         user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         return user.get();
-    }
-
-    private void validateUser(RegisterRequestUserDTO userDTO) {
-        if (userDTO.getFirstName() == null) {
-            throw new BadRequestException("Must enter valid first name!");
-        }
-        if (userDTO.getLastName() == null) {
-            throw new BadRequestException("Must enter valid last name!");
-        }
-        if (userDTO.getUsername() == null) {
-            throw new BadRequestException("Must enter valid username!");
-        }
-        if (userDTO.getPassword() == null) {
-            throw new BadRequestException("Must enter valid password!");
-        }
-        if (userDTO.getEmail() == null) {
-            throw new BadRequestException("Must enter valid email!");
-        }
     }
 }

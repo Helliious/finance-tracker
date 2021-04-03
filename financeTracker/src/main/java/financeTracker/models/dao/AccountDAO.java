@@ -36,7 +36,7 @@ public class AccountDAO {
 
     public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {
         List<Account> accounts = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM accounts WHERE owner_id = ?");
+        StringBuilder sql = new StringBuilder("SELECT * FROM accounts WHERE owner_id = ? ");
         boolean nameIncludedInFilter = false;
         boolean bothBalanceIncluded = false;
         boolean balanceFromIncluded = false;
@@ -48,39 +48,30 @@ public class AccountDAO {
         boolean createTimeFromIncluded = false;
         boolean createTimeToIncluded = false;
         if (accountRequestDTO.getName() != null) {
-            sql.append("AND name LIKE ?") ;
+            sql.append("AND name LIKE ? ") ;
             nameIncludedInFilter = true;
         }
         if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() != null) {
-            if (accountRequestDTO.getBalanceFrom() < 0 || accountRequestDTO.getBalanceTo() < 0) {
-                throw new BadRequestException("Invalid balance entered!");
-            }
             if (accountRequestDTO.getBalanceFrom() < accountRequestDTO.getBalanceTo()) {
-                sql.append("AND amount BETWEEN ? AND ? ");
+                sql.append("AND balance BETWEEN ? AND ? ");
                 bothBalanceIncluded = true;
             } else {
                 throw new BadRequestException("Entered invalid balance range!");
             }
         } else {
             if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() == null) {
-                if (accountRequestDTO.getBalanceFrom() < 0) {
-                    throw new BadRequestException("Invalid balance from!");
-                }
-                sql.append("AND amount > ? ");
+                sql.append("AND balance > ? ");
                 balanceFromIncluded = true;
             }
             if (accountRequestDTO.getBalanceFrom() == null && accountRequestDTO.getBalanceTo() != null) {
-                if (accountRequestDTO.getBalanceTo() < 0) {
-                    throw new BadRequestException("Invalid balance to!");
-                }
-                sql.append("AND amount < ? ");
+                sql.append("AND balance < ? ");
                 balanceToIncluded = true;
             }
         }
 
         if (accountRequestDTO.getAccLimitFrom() != null && accountRequestDTO.getAccLimitTo() != null) {
             if (accountRequestDTO.getAccLimitFrom() < accountRequestDTO.getAccLimitTo()) {
-                sql.append("AND amount BETWEEN ? AND ? ");
+                sql.append("AND acc_limit BETWEEN ? AND ? ");
                 bothAccLimitIncluded = true;
             } else {
                 throw new BadRequestException("Entered invalid account limit range!");
@@ -88,11 +79,11 @@ public class AccountDAO {
         }
         else {
             if (accountRequestDTO.getAccLimitFrom() != null && accountRequestDTO.getAccLimitTo() == null) {
-                sql.append("AND amount > ? ");
+                sql.append("AND acc_limit > ? ");
                 accLimitFromIncluded = true;
             }
             if (accountRequestDTO.getAccLimitFrom() == null && accountRequestDTO.getAccLimitTo() != null) {
-                sql.append("AND amount < ? ");
+                sql.append("AND acc_limit < ? ");
                 accLimitToIncluded = true;
             }
         }
@@ -114,7 +105,7 @@ public class AccountDAO {
                 createTimeToIncluded = true;
             }
         }
-        try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIdx = 1;
             ps.setInt(paramIdx++, userId);
@@ -153,7 +144,7 @@ public class AccountDAO {
             }
             ResultSet result = ps.executeQuery();
             if (result.next()) {
-                do{
+                do {
                     Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
                     if (optionalUser.isEmpty()) {
                         throw new NotFoundException("User not found!");
@@ -172,7 +163,7 @@ public class AccountDAO {
                                                 budgets
                                                 );
                     accounts.add(account);
-                }while (result.next());
+                } while (result.next());
             } else {
                 throw new NotFoundException("Account not found!");
             }

@@ -53,13 +53,12 @@ public class AccountController extends AbstractController {
     public AccountWithoutOwnerDTO delete(@PathVariable(name = "account_id") int accountId,
                                          HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        Account account = accountService.deleteAccount(accountId, userId);
-        return new AccountWithoutOwnerDTO(account);
+        return accountService.deleteAccount(accountId, userId);
     }
 
     @PostMapping("/accounts/{account_id}")
     public AccountWithoutOwnerDTO edit(@PathVariable(name = "account_id") int accountId,
-                                       @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
+                                       @Valid @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
                                        HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         Account account = accountService.editAccount(updateRequestAccountDTO, userId, accountId);
@@ -67,7 +66,7 @@ public class AccountController extends AbstractController {
     }
 
     @PostMapping("/accounts/filter")
-    public List<AccountWithoutOwnerDTO> filter(@RequestBody FilterAccountRequestDTO accountRequestDTO,
+    public List<AccountWithoutOwnerDTO> filter(@Valid @RequestBody FilterAccountRequestDTO accountRequestDTO,
                                                HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<Account> accounts = accountService.filter(userId, accountRequestDTO);

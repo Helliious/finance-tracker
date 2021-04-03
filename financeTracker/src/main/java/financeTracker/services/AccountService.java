@@ -3,6 +3,7 @@ package financeTracker.services;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.AccountDAO;
+import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.account_dto.CreateAccountDTO;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
@@ -61,17 +62,18 @@ public class AccountService {
         return accountRepository.findAllByOwnerId(userId);
     }
 
-    public Account deleteAccount(int accountId, int userId) {
+    public AccountWithoutOwnerDTO deleteAccount(int accountId, int userId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");
         }
+        //cannot map entity after it is deleted
+        AccountWithoutOwnerDTO resultAccount = new AccountWithoutOwnerDTO(account);
         accountRepository.deleteById(accountId);
-        return account;
+        return resultAccount;
     }
 
     public Account editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
-        accountDTO.validate();
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");

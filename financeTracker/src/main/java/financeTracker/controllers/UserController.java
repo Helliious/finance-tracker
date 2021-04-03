@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @RestController
 public class UserController extends AbstractController {
@@ -24,20 +25,20 @@ public class UserController extends AbstractController {
     }
 
     @PutMapping("/users")
-    public UserWithoutPassDTO register(@RequestBody RegisterRequestUserDTO userDTO) {
+    public UserWithoutPassDTO register(@Valid @RequestBody RegisterRequestUserDTO userDTO) {
         User user = userService.addUser(userDTO);
         return new UserWithoutPassDTO(user);
     }
 
     @PostMapping("/users")
-    public UserWithoutPassDTO login(@RequestBody LoginUserDTO loginUserDto, HttpSession session) {
+    public UserWithoutPassDTO login(@Valid @RequestBody LoginUserDTO loginUserDto, HttpSession session) {
         User user = userService.login(loginUserDto);
         sessionManager.loginUser(session, user.getId());
         return new UserWithoutPassDTO(user);
     }
 
     @PutMapping("/users/edit")
-    public UserWithoutPassDTO edit(@RequestBody UpdateRequestUserDTO userDTO,
+    public UserWithoutPassDTO edit(@Valid @RequestBody UpdateRequestUserDTO userDTO,
                                    HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = userService.editUser(userDTO, userId);
@@ -59,7 +60,7 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/change_password")
-    public UserWithoutPassDTO changePassword(@RequestBody ChangePassUserDTO changePasswordDTO,
+    public UserWithoutPassDTO changePassword(@Valid @RequestBody ChangePassUserDTO changePasswordDTO,
                                              HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         User user = userService.changePassword(userId, changePasswordDTO);
@@ -67,7 +68,7 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/users/forgot_password")
-    public ForgotPassMessageDTO forgotPassword(@RequestBody ForgotPassUserDTO forgotPassUserDto) {
+    public ForgotPassMessageDTO forgotPassword(@Valid @RequestBody ForgotPassUserDTO forgotPassUserDto) {
         User user = userService.forgotPass(forgotPassUserDto.getEmail());
         return new ForgotPassMessageDTO(user);
     }

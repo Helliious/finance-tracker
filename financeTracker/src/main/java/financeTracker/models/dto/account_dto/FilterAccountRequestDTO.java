@@ -1,12 +1,10 @@
 package financeTracker.models.dto.account_dto;
 
-import financeTracker.exceptions.BadRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -24,11 +25,11 @@ import java.util.List;
 @NoArgsConstructor
 @Component
 public class AccountWithoutOwnerDTO {
-    @NotNull(message = "Account id cannot be null")
+    @NotNull(message = "Account id cannot be empty")
     private int id;
-    @NotNull(message = "Account name cannot be null")
+    @NotBlank(message = "Account name cannot be empty")
     private String name;
-    @NotNull(message = "Account balance cannot be null")
+    @NotNull(message = "Account balance cannot be empty")
     @PositiveOrZero(message = "Account balance must be positive or zero")
     private Double balance;
     @Positive(message = "Account limit must be positive")
