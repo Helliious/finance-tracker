@@ -5,11 +5,9 @@ import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.user_dto.*;
-import financeTracker.models.pojo.Category;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
-import financeTracker.utils.Constants;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,9 +38,8 @@ public class UserService {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         userDTO.setPassword(encoder.encode(userDTO.getPassword()));
         User user = new User(userDTO);
-        user.setCategories(categoryRepository.findAllByOwnerIsNull());
+        user.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         user = userRepository.save(user);
-        initialCategoriesLoad(user);
         return user;
     }
 
@@ -85,7 +80,7 @@ public class UserService {
                 user.get().setEmail(userDTO.getEmail());
             }
         }
-        user.get().setCategories(categoryRepository.findAllByOwnerIsNull());
+        user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         User responseUser = userRepository.save(user.get());
         return responseUser;
     }
@@ -93,7 +88,7 @@ public class UserService {
     public User getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
-            user.get().setCategories(categoryRepository.findAllByOwnerIsNull());
+            user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
             return user.get();
         } else {
             throw new NotFoundException("User not found");
@@ -107,7 +102,7 @@ public class UserService {
         } else {
             PasswordEncoder encoder = new BCryptPasswordEncoder();
             if (encoder.matches(loginUserDto.getPassword(), user.getPassword())) {
-                user.setCategories(categoryRepository.findAllByOwnerIsNull());
+                user.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
                 return user;
             } else {
                 throw new AuthenticationException("Wrong credentials");
@@ -121,7 +116,7 @@ public class UserService {
             throw new NotFoundException("User not found!");
         }
         User user = optUser.get();
-        user.setCategories(categoryRepository.findAllByOwnerIsNull());
+        user.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         //cannot map entity after it is deleted
         UserWithoutPassDTO responseUser = new UserWithoutPassDTO(user);
         userRepository.delete(user);
@@ -168,7 +163,7 @@ public class UserService {
         if (user.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        user.get().setCategories(categoryRepository.findAllByOwnerIsNull());
+        user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         return user.get();
     }
 
@@ -188,19 +183,5 @@ public class UserService {
         if (userDTO.getEmail() == null) {
             throw new BadRequestException("Must enter valid email!");
         }
-    }
-
-    private void initialCategoriesLoad(User user) {
-        List<Category> categories = new ArrayList<>();
-        categories.add(new Category("car", Constants.OUTCOME));
-        categories.add(new Category("clothes", Constants.OUTCOME));
-        categories.add(new Category("salary", Constants.INCOME));
-        categories.add(new Category("deposit", Constants.INCOME));
-        categories.add(new Category("loan", Constants.OUTCOME));
-        for (Category c : categories) {
-            c.setOwner(user);
-        }
-        user.getCategories().addAll(categories);
-        categoryRepository.saveAll(categories);
     }
 }

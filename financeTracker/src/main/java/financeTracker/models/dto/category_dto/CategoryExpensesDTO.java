@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class CategoryExpensesDTO {
+    private String username;
     private String name;
     private Double expenses;
 }

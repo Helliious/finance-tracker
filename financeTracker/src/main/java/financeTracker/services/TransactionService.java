@@ -142,17 +142,23 @@ public class TransactionService {
                                               int budgetId,
                                               int transactionId){
         Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, ownerId, accountId);
-        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, ownerId, accountId);
-        Optional<User> optUser = userRepository.findById(ownerId);
-        Category category = categoryRepository.findByIdAndOwnerId(transaction.getCategory().getId(), ownerId);
-        if (budget == null) {
-            throw new NotFoundException("Budget doesn't exist");
+        if (transaction == null) {
+            throw new NotFoundException("Transaction not found!");
         }
+        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, ownerId, accountId);
+        if (budget == null) {
+            throw new NotFoundException("Budget not found!");
+        }
+        Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
+        Category category = categoryRepository.findByIdAndOwnerId(transaction.getCategory().getId(), ownerId);
         if (category == null) {
-            throw new NotFoundException("Category not found!");
+            category = categoryRepository.findByIdAndOwnerIsNull(transaction.getCategory().getId());
+            if (category == null) {
+                throw new NotFoundException("Category not found!");
+            }
         }
         if (budget.getBudgetTransactions().contains(transaction)) {
             throw new BadRequestException("Transaction already exist in budget");

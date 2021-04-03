@@ -18,7 +18,6 @@ public class CategoryImageService {
     @Autowired
     private CategoryImageRepository categoryImageRepository;
 
-
     public CategoryImageDTO upload(int id, File pFile) {
         CategoryImage categoryImage = new CategoryImage();
         categoryImage.setUrl(pFile.getAbsolutePath());

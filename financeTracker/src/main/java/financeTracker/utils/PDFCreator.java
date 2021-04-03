@@ -15,13 +15,12 @@ public class PDFCreator {
     @Value("${file.path.pdf}")
     private String filePath;
 
-    public void insertTextInPDF(String text, int userId) {
+    public void insertTextInPDF(String text, String username) {
         Document document = new Document();
         try {
-            PdfWriter.getInstance(document, new FileOutputStream(filePath + File.separator + "User_" + userId + ".pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream(filePath + File.separator + username + ".pdf"));
             document.open();
             Font font = FontFactory.getFont(FontFactory.COURIER, 16, BaseColor.BLACK);
-            Chunk chunk = new Chunk(text, font);
             Paragraph paragraph = new Paragraph(text, font);
             document.add(paragraph);
             document.close();

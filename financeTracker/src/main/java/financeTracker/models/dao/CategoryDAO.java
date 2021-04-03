@@ -16,36 +16,28 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class CategoryDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private UserRepository userRepository;
 
-    public List<CategoryExpensesDTO> referenceOverallExpensesByCategory(int userId) {
+    public List<CategoryExpensesDTO> referenceOverallExpensesByCategory() {
         List<CategoryExpensesDTO> expenses = new ArrayList<>();
-        Optional<User> optUser = userRepository.findById(userId);
-        if (optUser.isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-        StringBuilder sql = new StringBuilder("SELECT c.name, COALESCE(SUM(t.amount),0) + COALESCE(SUM(p.amount),0) + COALESCE(SUM(b.amount),0) AS expense " +
-                                        "FROM categories c " +
-                                        "JOIN users u ON c.owner_id = u.id AND u.username LIKE ? " +
-                                        "LEFT OUTER JOIN transactions t ON c.id = t.category_id " +
-                                        "LEFT OUTER JOIN planned_payments p ON c.id = p.category_id " +
-                                        "LEFT OUTER JOIN budgets b ON c.id = b.category_id " +
-                                        "GROUP BY c.name");
+        StringBuilder sql = new StringBuilder("SELECT u.username, c.name AS category, COALESCE(SUM(t.amount), 0) + COALESCE(SUM(p.amount), 0) AS expense FROM users u\n" +
+                "LEFT OUTER JOIN categories c ON c.owner_id IS NULL OR c.owner_id = u.id\n" +
+                "LEFT OUTER JOIN transactions t ON c.id = t.category_id\n" +
+                "LEFT OUTER JOIN planned_payments p ON c.id = p.category_id\n" +
+                "GROUP BY u.first_name, u.last_name, c.name;");
+
         try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
-            ps.setString(1, optUser.get().getUsername());
             ResultSet result = ps.executeQuery();
             if (result.next()) {
                 do{
                     CategoryExpensesDTO expense = new CategoryExpensesDTO(
-                            result.getString("name"),
+                            result.getString("username"),
+                            result.getString("category"),
                             result.getDouble("expense")
                     );
                     expenses.add(expense);

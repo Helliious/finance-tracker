@@ -11,8 +11,10 @@ import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import financeTracker.utils.PDFCreator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,13 +78,20 @@ public class CategoryService {
         }
     }
 
-    public List<CategoryExpensesDTO> referenceOverallExpensesByCategory(int userId) {
-        List<CategoryExpensesDTO> expenses = categoryDAO.referenceOverallExpensesByCategory(userId);
-        StringBuilder text = new StringBuilder();
-        for (CategoryExpensesDTO e : expenses) {
-            text.append(e.getName()).append(" : ").append(e.getExpenses()).append(";\n");
+    @Scheduled(fixedRate = 10000)
+    public void referenceOverallExpensesByCategory() {
+        List<CategoryExpensesDTO> expenses = categoryDAO.referenceOverallExpensesByCategory();
+        if (!expenses.isEmpty()) {
+            String currUsername = expenses.get(0).getUsername();
+            StringBuilder text = new StringBuilder();
+            for (CategoryExpensesDTO e : expenses) {
+                if (!currUsername.equals(e.getUsername())) {
+                    pdfCreator.insertTextInPDF(text.toString(), currUsername);
+                    currUsername = e.getUsername();
+                    text.delete(0, text.length());
+                }
+                text.append(e.getName()).append(" : ").append(e.getExpenses()).append(";\n");
+            }
         }
-        pdfCreator.insertTextInPDF(text.toString(), userId);
-        return expenses;
     }
 }
