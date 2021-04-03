@@ -93,14 +93,14 @@ public class BudgetDAO {
             if (amountToIncluded) {
                 ps.setDouble(paramIdx++, dto.getAmountTo());
             }
-            if(bothDatesIncluded){
+            if (bothDatesIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDateFrom());
                 ps.setTimestamp(paramIdx++, dto.getDateTo());
             }
-            if(dateFromIncluded){
+            if (dateFromIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDateFrom());
             }
-            if(dateToIncluded){
+            if (dateToIncluded) {
                 ps.setTimestamp(paramIdx, dto.getDateTo());
             }
             ResultSet result = ps.executeQuery();
