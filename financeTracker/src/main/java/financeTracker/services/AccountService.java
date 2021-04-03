@@ -27,6 +27,10 @@ public class AccountService {
     private UserRepository userRepository;
 
     public Account createAcc(CreateAccountDTO createAccountDTO, int ownerId) {
+        if (createAccountDTO.getAccLimit() != null &&
+                createAccountDTO.getBalance() > createAccountDTO.getAccLimit()) {
+            throw new BadRequestException("Balance cannot be bigger than account limit");
+        }
         createAccountDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
@@ -85,6 +89,9 @@ public class AccountService {
             if (account.getAccLimit().equals(accountDTO.getAccLimit())) {
                 throw new BadRequestException("Entered the same limit!");
             } else {
+                if (account.getBalance() > accountDTO.getAccLimit()) {
+                    throw new BadRequestException("Balance cannot be bigger than account limit");
+                }
                 account.setAccLimit(accountDTO.getAccLimit());
             }
         }
@@ -92,6 +99,9 @@ public class AccountService {
             if (account.getBalance().equals(accountDTO.getBalance())) {
                 throw new BadRequestException("Entered the same balance!");
             } else {
+                if (account.getAccLimit() < accountDTO.getBalance()) {
+                    throw new BadRequestException("Balance cannot be bigger than account limit");
+                }
                 account.setBalance(accountDTO.getBalance());
             }
         }
