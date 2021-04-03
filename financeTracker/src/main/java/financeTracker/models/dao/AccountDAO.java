@@ -51,27 +51,33 @@ public class AccountDAO {
             sql.append("AND name LIKE ?") ;
             nameIncludedInFilter = true;
         }
-        if (accountRequestDTO.getBalanceTo() != null && accountRequestDTO.getBalanceFrom() > accountRequestDTO.getBalanceTo()) {
-            throw new BadRequestException("Balance from can't be bigger than Balance to!");
-        }
         if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() != null) {
+            if (accountRequestDTO.getBalanceFrom() < 0 || accountRequestDTO.getBalanceTo() < 0) {
+                throw new BadRequestException("Invalid balance entered!");
+            }
             if (accountRequestDTO.getBalanceFrom() < accountRequestDTO.getBalanceTo()) {
                 sql.append("AND amount BETWEEN ? AND ? ");
                 bothBalanceIncluded = true;
             } else {
                 throw new BadRequestException("Entered invalid balance range!");
             }
-        }
-        else {
+        } else {
             if (accountRequestDTO.getBalanceFrom() != null && accountRequestDTO.getBalanceTo() == null) {
+                if (accountRequestDTO.getBalanceFrom() < 0) {
+                    throw new BadRequestException("Invalid balance from!");
+                }
                 sql.append("AND amount > ? ");
                 balanceFromIncluded = true;
             }
             if (accountRequestDTO.getBalanceFrom() == null && accountRequestDTO.getBalanceTo() != null) {
+                if (accountRequestDTO.getBalanceTo() < 0) {
+                    throw new BadRequestException("Invalid balance to!");
+                }
                 sql.append("AND amount < ? ");
                 balanceToIncluded = true;
             }
         }
+
         if (accountRequestDTO.getAccLimitFrom() != null && accountRequestDTO.getAccLimitTo() != null) {
             if (accountRequestDTO.getAccLimitFrom() < accountRequestDTO.getAccLimitTo()) {
                 sql.append("AND amount BETWEEN ? AND ? ");

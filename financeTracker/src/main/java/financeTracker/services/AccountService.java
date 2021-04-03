@@ -26,7 +26,7 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
-    public User createAcc(CreateAccountDTO createAccountDTO, int ownerId) {
+    public Account createAcc(CreateAccountDTO createAccountDTO, int ownerId) {
         createAccountDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(ownerId);
         if (optUser.isEmpty()) {
@@ -38,12 +38,10 @@ public class AccountService {
                 throw new BadRequestException("Account already exists!");
             }
         }
-        validateAccount(createAccountDTO);
-        createAccountDTO.setOwner(user);
         Account account = new Account(createAccountDTO);
+        account.setOwner(user);
         user.getAccounts().add(account);
-        accountRepository.save(account);
-        return user;
+        return accountRepository.save(account);
     }
 
     public Account getById(int accountId, int userId) {
@@ -69,6 +67,7 @@ public class AccountService {
     }
 
     public Account editAccount(UpdateRequestAccountDTO accountDTO, int userId, int accountId) {
+        accountDTO.validate();
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
             throw new NotFoundException("Account not found!");
@@ -98,18 +97,6 @@ public class AccountService {
         }
         accountRepository.save(account);
         return account;
-    }
-
-    private void validateAccount(CreateAccountDTO account) {
-        if (account.getName() == null) {
-            throw new BadRequestException("Must enter valid account name!");
-        }
-        if (account.getBalance() == null || account.getBalance() < 0) {
-            throw new BadRequestException("Must enter valid account balance!");
-        }
-        if (account.getAccLimit() != null && account.getAccLimit() < 0) {
-            throw new BadRequestException("Must enter valid account limit!");
-        }
     }
 
     public List<Account> filter(int userId, FilterAccountRequestDTO accountRequestDTO) {

@@ -4,16 +4,14 @@ import financeTracker.models.dto.account_dto.AccountWithoutOwnerDTO;
 import financeTracker.models.dto.account_dto.CreateAccountDTO;
 import financeTracker.models.dto.account_dto.FilterAccountRequestDTO;
 import financeTracker.models.dto.account_dto.UpdateRequestAccountDTO;
-import financeTracker.models.dto.user_dto.UserWithoutPassDTO;
 import financeTracker.models.pojo.Account;
-import financeTracker.models.pojo.User;
 import financeTracker.services.AccountService;
 import financeTracker.utils.SessionManager;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +42,11 @@ public class AccountController extends AbstractController {
     }
 
     @PutMapping("/accounts")
-    public UserWithoutPassDTO create(@RequestBody CreateAccountDTO createAccountDTO,
+    public AccountWithoutOwnerDTO create(@Valid @RequestBody CreateAccountDTO createAccountDTO,
                                      HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
-        User user = accountService.createAcc(createAccountDTO, userId);
-        return new UserWithoutPassDTO(user);
+        Account account = accountService.createAcc(createAccountDTO, userId);
+        return new AccountWithoutOwnerDTO(account);
     }
 
     @DeleteMapping("/accounts/{account_id}")
@@ -61,8 +59,8 @@ public class AccountController extends AbstractController {
 
     @PostMapping("/accounts/{account_id}")
     public AccountWithoutOwnerDTO edit(@PathVariable(name = "account_id") int accountId,
-                                   @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
-                                   HttpSession session) {
+                                       @RequestBody UpdateRequestAccountDTO updateRequestAccountDTO,
+                                       HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         Account account = accountService.editAccount(updateRequestAccountDTO, userId, accountId);
         return new AccountWithoutOwnerDTO(account);

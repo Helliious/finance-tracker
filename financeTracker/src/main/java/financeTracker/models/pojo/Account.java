@@ -41,7 +41,6 @@ public class Account {
         balance = accountDTO.getBalance();
         accLimit = accountDTO.getAccLimit();
         createTime = accountDTO.getCreateTime();
-        owner = accountDTO.getOwner();
         transactions = new ArrayList<>();
         plannedPayments = new ArrayList<>();
         budgets = new ArrayList<>();

@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +24,14 @@ import java.util.List;
 @NoArgsConstructor
 @Component
 public class AccountWithoutOwnerDTO {
+    @NotNull(message = "Account id cannot be null")
     private int id;
+    @NotNull(message = "Account name cannot be null")
     private String name;
+    @NotNull(message = "Account balance cannot be null")
+    @PositiveOrZero(message = "Account balance must be positive or zero")
     private Double balance;
+    @Positive(message = "Account limit must be positive")
     private Double accLimit;
     private Timestamp createTime;
     private List<TransactionWithoutOwnerAndAccountDTO> transactions;
