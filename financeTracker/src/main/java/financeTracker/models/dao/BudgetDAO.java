@@ -1,13 +1,11 @@
 package financeTracker.models.dao;
+
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
-import financeTracker.models.repository.CategoryRepository;
-import financeTracker.models.repository.TransactionRepository;
 import financeTracker.models.repository.UserRepository;
-import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -28,8 +26,6 @@ public class BudgetDAO {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
     private AccountRepository accountRepository;
 
     public List<Budget> filterBudget(int userId, FilterBudgetRequestDTO dto) {
@@ -46,10 +42,10 @@ public class BudgetDAO {
             sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
         }
-        if (dto.getAmountFrom() > dto.getAmountTo() && dto.getAmountTo() != null) {
-            throw new BadRequestException("Amount from can't be bigger than Amount to");
-        }
         if (dto.getAmountFrom() != null && dto.getAmountTo() != null) {
+            if (dto.getAmountFrom() > dto.getAmountTo()) {
+                throw new BadRequestException("Amount from can't be bigger than Amount to");
+            }
             sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
@@ -59,21 +55,24 @@ public class BudgetDAO {
                 amountFromIncluded = true;
             }
             if (dto.getAmountFrom() == null && dto.getAmountTo() != null) {
-                amountToIncluded = true;
                 sql.append("AND amount < ? ");
+                amountToIncluded = true;
             }
         }
         if(dto.getDateFrom() != null && dto.getDateTo() != null) {
-            sql.append("AND create_time BETWEEN ? AND ?");
+            if (dto.getDateFrom().compareTo(dto.getDateTo()) > 0) {
+                throw new BadRequestException("Date from cannot be bigger than Date to");
+            }
+            sql.append("AND due_time BETWEEN ? AND ?");
             bothDatesIncluded = true;
         }
         else{
             if (dto.getDateFrom() != null && dto.getDateTo() == null) {
-                sql.append("AND create_time >= ?");
+                sql.append("AND due_time >= ?");
                 dateFromIncluded = true;
             }
             if (dto.getDateFrom() == null && dto.getDateTo() != null) {
-                sql.append("AND create_time <= ?");
+                sql.append("AND due_time <= ?");
                 dateToIncluded = true;
             }
         }
@@ -133,7 +132,7 @@ public class BudgetDAO {
             }
         }
         catch (SQLException e){
-            e.getMessage();
+            throw new BadRequestException("Connection error, reason - " + e.getMessage());
         }
         return budgets;
     }

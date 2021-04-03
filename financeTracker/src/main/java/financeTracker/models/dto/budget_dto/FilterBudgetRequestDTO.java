@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.sql.Timestamp;
 
 @Getter
@@ -12,9 +14,11 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Component
 public class FilterBudgetRequestDTO {
- private String name;
- private Double amountFrom;
- private Double amountTo;
- private Timestamp dateFrom;
- private Timestamp dateTo;
+    private String name;
+    @PositiveOrZero(message = "Amount from must be positive or zero")
+    private Double amountFrom;
+    @Positive(message = "Amount to must be positive or zero")
+    private Double amountTo;
+    private Timestamp dateFrom;
+    private Timestamp dateTo;
 }

@@ -1,10 +1,12 @@
 package financeTracker.services;
 
+import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.BudgetDAO;
 import financeTracker.models.dto.budget_dto.CreateBudgetRequestDTO;
 import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.budget_dto.FilterBudgetRequestDTO;
+import financeTracker.models.dto.budget_dto.UpdateBudgetRequestDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.BudgetRepository;
@@ -19,8 +21,6 @@ import java.util.List;
 public class BudgetService {
     @Autowired
     private BudgetRepository budgetRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
@@ -58,6 +58,14 @@ public class BudgetService {
         if (account == null){
             throw new  NotFoundException("Account doesn't exist");
         }
+        if (dto.getCreateTime().compareTo(dto.getDueTime()) >= 0) {
+            throw new BadRequestException("Due time must be bigger than create time");
+        }
+        for (Budget b : account.getBudgets()) {
+            if (b.getName().equals(dto.getName())) {
+                throw new BadRequestException("Budget name already taken");
+            }
+        }
         Budget budget = new Budget(dto);
         budget.setOwner(account.getOwner());
         budget.setAccount(account);
@@ -65,26 +73,42 @@ public class BudgetService {
         return budget;
     }
 
-    public Budget editBudget(int budgetId, CreateBudgetRequestDTO dto, int userId, int accountId) {
+    public Budget editBudget(int budgetId, UpdateBudgetRequestDTO dto, int userId, int accountId) {
         Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, userId, accountId);
-        Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), userId);
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (budget == null){
             throw new NotFoundException("Budget doesn't exist");
         }
         if (account == null){
             throw new NotFoundException("Account doesn't exist");
         }
-
-        if (dto.getName()!=null){
+        if (dto.getName() != null) {
+            if (budget.getName().equals(dto.getName())) {
+                throw new BadRequestException("Entered the same name");
+            }
+            for (Budget b : account.getBudgets()) {
+                if (b.getName().equals(dto.getName())) {
+                    throw new BadRequestException("Budget name already taken");
+                }
+            }
             budget.setName(dto.getName());
         }
-        if (dto.getAmount() != null){
+        if (dto.getAmount() != null) {
+            if (budget.getAmount() == dto.getAmount()) {
+                throw new BadRequestException("Entered the same amount");
+            }
             budget.setAmount(dto.getAmount());
         }
-        if (dto.getDueTime() != null){
+        if (dto.getDueTime() != null) {
+            if (dto.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) <= 0) {
+                throw new BadRequestException("Invalid due time");
+            }
             budget.setDueTime(dto.getDueTime());
         }
-        if (dto.getLabel() != null){
+        if (dto.getLabel() != null) {
+            if (budget.getLabel().equals(dto.getLabel())) {
+                throw new BadRequestException("Entered the same label");
+            }
             budget.setLabel(dto.getLabel());
         }
         budget.setAccount(account);
