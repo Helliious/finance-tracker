@@ -31,8 +31,6 @@ public class TransactionDAO {
     private CategoryRepository categoryRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private BudgetRepository budgetRepository;
 
     public List<Transaction> filterTransaction(int userId, FilterTransactionRequestDTO dto) {
         List<Transaction> transactions = new ArrayList<>();
@@ -47,21 +45,21 @@ public class TransactionDAO {
         boolean dateFromIncluded = false;
         boolean dateToIncluded = false;
         if (dto.getName() != null){
-            sql.append("AND name LIKE ?");
+            sql.append("AND name LIKE ? ");
             nameIncludedInFilter = true;
         }
         if (dto.getType() != null){
-            sql.append("AND type = ?");
+            sql.append("AND type = ? ");
             typeIncluded = true;
         }
         if (dto.getCategoryId() != null){
             sql.append("AND category_id = ? ");
             categoryIncludedInFilter = true;
         }
-        if (dto.getAmountFrom() > dto.getAmountTo()){
-            throw new BadRequestException("Amount from can't be bigger than Amount to");
-        }
         if (dto.getAmountFrom() != null && dto.getAmountTo() != null){
+            if (dto.getAmountFrom() > dto.getAmountTo()){
+                throw new BadRequestException("Invalid amount range");
+            }
             sql.append("AND amount BETWEEN ? AND ? ");
             bothAmountsIncluded = true;
         }
@@ -71,25 +69,27 @@ public class TransactionDAO {
                 amountFromIncluded = true;
             }
             if (dto.getAmountFrom() == null && dto.getAmountTo() != null) {
+                sql.append("AND amount < ? ");
                 amountToIncluded = true;
-                sql.append("AND amount< ? ");
             }
         }
         if (dto.getDateFrom() != null && dto.getDateTo() != null){
-            sql.append("AND create_time BETWEEN ? AND ?");
+            if (dto.getDateFrom().compareTo(dto.getDateTo()) >= 0) {
+                throw new BadRequestException("Invalid date range");
+            }
+            sql.append("AND create_time BETWEEN ? AND ? ");
             bothDatesIncluded = true;
         }
         else {
             if (dto.getDateFrom() != null && dto.getDateTo() == null) {
-                sql.append("AND create_time >= ?");
+                sql.append("AND create_time >= ? ");
                 dateFromIncluded = true;
             }
             if (dto.getDateFrom() == null && dto.getDateTo() != null) {
-                sql.append("AND create_time <= ?");
+                sql.append("AND create_time <= ? ");
                 dateToIncluded = true;
             }
         }
-        System.out.println(sql);
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             int paramIdx = 1;
             PreparedStatement ps = connection.prepareStatement(sql.toString());

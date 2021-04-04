@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Component
-public class TransactionWithoutOwnerAndAccountDTO {
+public class RasponseTransactionDTO {
     private int id;
     private String type;
     private double amount;
@@ -20,7 +20,7 @@ public class TransactionWithoutOwnerAndAccountDTO {
     private String categoryName;
     private String description;
 
-    public TransactionWithoutOwnerAndAccountDTO(Transaction transaction) {
+    public RasponseTransactionDTO(Transaction transaction) {
         id = transaction.getId();
         type = transaction.getType();
         amount = transaction.getAmount();

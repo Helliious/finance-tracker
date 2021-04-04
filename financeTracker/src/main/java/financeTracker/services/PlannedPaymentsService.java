@@ -6,7 +6,6 @@ import financeTracker.models.dao.PlannedPaymentDAO;
 import financeTracker.models.dto.planned_payment_dto.AddPlannedPaymentDTO;
 import financeTracker.models.dto.planned_payment_dto.EditPlannedPaymentDTO;
 import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
-import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.CategoryRepository;

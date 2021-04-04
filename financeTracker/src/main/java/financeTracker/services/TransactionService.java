@@ -6,7 +6,7 @@ import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.EditTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
-import financeTracker.models.dto.transaction_dto.TransactionWithoutOwnerAndAccountDTO;
+import financeTracker.models.dto.transaction_dto.RasponseTransactionDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.*;
 import financeTracker.utils.Action;
@@ -33,10 +33,10 @@ public class TransactionService {
     @Autowired
     private BudgetRepository budgetRepository;
 
-    public Transaction getById(int userId, int transactionId){
-        Transaction transaction = transactionRepository.findByIdAndOwnerId(transactionId, userId);
+    public Transaction getById(int userId, int transactionId, int accountId){
+        Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, userId, accountId);
         if (transaction == null) {
-            throw new NotFoundException("Transaction not found!");
+            throw new NotFoundException("Transaction not found");
         }
         return transaction;
     }
@@ -48,18 +48,18 @@ public class TransactionService {
     public List<Transaction> getByAccountId(int userId, int accountId) {
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account == null) {
-            throw new NotFoundException("Account not found!");
+            throw new NotFoundException("Account not found");
         }
         return account.getTransactions();
     }
 
-    public TransactionWithoutOwnerAndAccountDTO delete(int transactionId, int userId) {
-        Transaction transaction = transactionRepository.findByIdAndOwnerId(transactionId, userId);
+    public RasponseTransactionDTO delete(int transactionId, int userId, int accountId) {
+        Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, userId, accountId);
         if (transaction == null) {
-            throw new NotFoundException("Transaction not found!");
+            throw new NotFoundException("Transaction not found");
         }
         ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
-        TransactionWithoutOwnerAndAccountDTO responseTransaction = new TransactionWithoutOwnerAndAccountDTO(transaction);
+        RasponseTransactionDTO responseTransaction = new RasponseTransactionDTO(transaction);
         transactionRepository.deleteById(transactionId);
         return responseTransaction;
     }
@@ -70,13 +70,13 @@ public class TransactionService {
         Category category = categoryRepository.findByIdAndType(dto.getCategoryId(), dto.getType());
         Optional<User> optUser = userRepository.findById(ownerId);
         if (account == null){
-            throw new NotFoundException("Account not found!");
+            throw new NotFoundException("Account not found");
         }
         if (category == null) {
-            throw new NotFoundException("Category not found!");
+            throw new NotFoundException("Category not found");
         }
         if (optUser.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
         Transaction transaction = new Transaction(dto);
         User owner = optUser.get();
@@ -91,12 +91,15 @@ public class TransactionService {
         return transaction;
     }
 
-    public Transaction editTransaction(int transactionId, EditTransactionRequestDTO dto, int ownerId) {
-        Transaction transaction = transactionRepository.findByIdAndOwnerId(transactionId, ownerId);
+    public Transaction editTransaction(int transactionId, EditTransactionRequestDTO dto, int ownerId, int accountId) {
+        Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, ownerId, accountId);
         if (transaction == null) {
-            throw new NotFoundException("Transaction not found!");
+            throw new NotFoundException("Transaction not found");
         }
         if (dto.getType() != null) {
+            if (dto.getType().equals(transaction.getType())) {
+                throw new BadRequestException("Entered the same type");
+            }
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.setType(dto.getType());
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
@@ -107,9 +110,12 @@ public class TransactionService {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAccountId() != null) {
+            if (accountId == dto.getAccountId()) {
+                throw new BadRequestException("Entered the same account id");
+            }
             Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), ownerId);
             if (account == null) {
-                throw new NotFoundException("Account not found!");
+                throw new NotFoundException("Account not found");
             }
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.getAccount().getTransactions().remove(transaction);
@@ -118,6 +124,9 @@ public class TransactionService {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         }
         if (dto.getCategoryId() != null) {
+            if (transaction.getCategory().getId() == dto.getCategoryId()) {
+                throw new BadRequestException("Entered the same category id");
+            }
             Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
             if (category == null) {
                 throw new NotFoundException("Category not found!");
