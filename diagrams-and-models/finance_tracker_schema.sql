@@ -21,7 +21,7 @@ CREATE TABLE accounts (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80) NOT NULL,
     balance DECIMAL NOT NULL,
-    acc_limit DECIMAL NOT NULL,
+    acc_limit DECIMAL,
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     owner_id INT NOT NULL,
     CONSTRAINT user_acc_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -31,7 +31,7 @@ CREATE TABLE categories (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(80) NOT NULL,
     type VARCHAR(80) NOT NULL,
-    owner_id INT NOT NULL,
+    owner_id INT,
     CONSTRAINT users_category_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -41,12 +41,10 @@ CREATE TABLE budgets (
     label VARCHAR(80) NOT NULL,
     amount DECIMAL NOT NULL,
     due_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    desccription VARCHAR(200) NOT NULL,
+    desccription VARCHAR(200),
     account_id INT NOT NULL,
-    category_id INT NOT NULL,
     owner_id INT NOT NULL,
     CONSTRAINT acc_budget_fk FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT category_budget_fk FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_budget_fk FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -55,7 +53,7 @@ CREATE TABLE transactions (
     type VARCHAR(80) NOT NULL,
     amount DECIMAL NOT NULL,
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    desccription VARCHAR(200) NOT NULL,
+    desccription VARCHAR(200),
     account_id INT NOT NULL,
     category_id INT NOT NULL,
     owner_id INT NOT NULL,
@@ -72,7 +70,7 @@ CREATE TABLE planned_payments (
     duration_unit VARCHAR(20) NOT NULL,
     amount DECIMAL NOT NULL,
     due_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    desccription VARCHAR(200) NOT NULL,
+    desccription VARCHAR(200),
     account_id INT NOT NULL,
     category_id INT NOT NULL,
     owner_id INT NOT NULL,
@@ -84,6 +82,7 @@ CREATE TABLE planned_payments (
 CREATE TABLE budgets_have_transactions (
 	budget_id INT NOT NULL,
     transaction_id INT NOT NULL,
+    PRIMARY KEY (budget_id, transaction_id),
 	CONSTRAINT bht_budget_fk FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT bht_transaction_fk FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -100,12 +99,10 @@ CREATE TABLE category_images (
 
 CREATE TABLE data_logs (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    login_count INT NOT NULL,
-    logout_count INT NOT NULL,
+    username VARCHAR(80) NOT NULL,
     overall_balance DOUBLE NOT NULL,
+    accounts_count INT NOT NULL,
     transactions_count INT NOT NULL,
     planned_payments_count INT NOT NULL,
-    budgets_count INT NOT NULL,
-    accounts_count INT NOT NULL
+    budgets_count INT NOT NULL
 );
