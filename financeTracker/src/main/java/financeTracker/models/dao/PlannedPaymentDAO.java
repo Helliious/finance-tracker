@@ -41,9 +41,12 @@ public class PlannedPaymentDAO {
         boolean bothAmountsIncluded = false;
         boolean amountFromIncluded = false;
         boolean amountToIncluded = false;
-        boolean bothDatesIncluded = false;
-        boolean dateFromIncluded = false;
-        boolean dateToIncluded = false;
+        boolean bothCreateTimesIncluded = false;
+        boolean createTimeFromIncluded = false;
+        boolean createTimeToIncluded = false;
+        boolean bothDueTimesIncluded = false;
+        boolean dueTimeFromIncluded = false;
+        boolean dueTimeToIncluded = false;
         if (plannedPaymentRequestDTO.getName() != null) {
             sql.append("AND name LIKE ? ");
             nameIncludedInFilter = true;
@@ -74,10 +77,28 @@ public class PlannedPaymentDAO {
                 amountToIncluded = true;
             }
         }
+        if(plannedPaymentRequestDTO.getCreateTimeFrom() != null && plannedPaymentRequestDTO.getCreateTimeTo() != null) {
+            if (plannedPaymentRequestDTO.getCreateTimeFrom().compareTo(plannedPaymentRequestDTO.getCreateTimeTo()) < 0) {
+                sql.append("AND create_time BETWEEN ? AND ? ");
+                bothCreateTimesIncluded = true;
+            } else {
+                throw new BadRequestException("Invalid create time range");
+            }
+        }
+        else{
+            if (plannedPaymentRequestDTO.getCreateTimeFrom() != null && plannedPaymentRequestDTO.getCreateTimeTo() == null) {
+                sql.append("AND create_time >= ? ");
+                createTimeFromIncluded = true;
+            }
+            if (plannedPaymentRequestDTO.getCreateTimeFrom() == null && plannedPaymentRequestDTO.getCreateTimeTo() != null) {
+                sql.append("AND create_time <= ? ");
+                createTimeToIncluded = true;
+            }
+        }
         if(plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
             if (plannedPaymentRequestDTO.getDueTimeFrom().compareTo(plannedPaymentRequestDTO.getDueTimeTo()) < 0) {
                 sql.append("AND due_time BETWEEN ? AND ? ");
-                bothDatesIncluded = true;
+                bothDueTimesIncluded = true;
             } else {
                 throw new BadRequestException("Invalid due time range");
             }
@@ -85,11 +106,11 @@ public class PlannedPaymentDAO {
         else{
             if (plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() == null) {
                 sql.append("AND due_time >= ? ");
-                dateFromIncluded = true;
+                dueTimeFromIncluded = true;
             }
             if (plannedPaymentRequestDTO.getDueTimeFrom() == null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
                 sql.append("AND due_time <= ? ");
-                dateToIncluded = true;
+                dueTimeToIncluded = true;
             }
         }
         try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
@@ -116,14 +137,24 @@ public class PlannedPaymentDAO {
             if (amountToIncluded) {
                 ps.setDouble(paramIdx++, plannedPaymentRequestDTO.getAmountTo());
             }
-            if(bothDatesIncluded){
+            if (bothCreateTimesIncluded) {
+                ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getCreateTimeFrom());
+                ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getCreateTimeTo());
+            }
+            if (createTimeFromIncluded) {
+                ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getCreateTimeFrom());
+            }
+            if (createTimeToIncluded) {
+                ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getCreateTimeTo());
+            }
+            if (bothDueTimesIncluded) {
                 ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getDueTimeFrom());
                 ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getDueTimeTo());
             }
-            if(dateFromIncluded){
+            if (dueTimeFromIncluded) {
                 ps.setTimestamp(paramIdx++, plannedPaymentRequestDTO.getDueTimeFrom());
             }
-            if(dateToIncluded){
+            if (dueTimeToIncluded) {
                 ps.setTimestamp(paramIdx, plannedPaymentRequestDTO.getDueTimeTo());
             }
             ResultSet result = ps.executeQuery();
@@ -148,6 +179,7 @@ public class PlannedPaymentDAO {
                             result.getInt("frequency"),
                             result.getString("duration_unit"),
                             result.getDouble("amount"),
+                            result.getTimestamp("create_time"),
                             result.getTimestamp("due_time"),
                             result.getString("description"),
                             account,

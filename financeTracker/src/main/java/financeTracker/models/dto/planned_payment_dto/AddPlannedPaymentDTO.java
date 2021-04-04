@@ -24,6 +24,7 @@ public class AddPlannedPaymentDTO {
     private String durationUnit;
     @NotNull(message = "Amount is mandatory")
     private double amount;
+    private Timestamp createTime;
     @NotNull(message = "Due time is mandatory")
     private Timestamp dueTime;
     private String description;

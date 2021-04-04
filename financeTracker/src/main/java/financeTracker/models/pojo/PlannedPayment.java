@@ -25,6 +25,7 @@ public class PlannedPayment {
     private int frequency;
     private String durationUnit;
     private double amount;
+    private Timestamp createTime;
     private Timestamp dueTime;
     private String description;
     @ManyToOne
@@ -43,6 +44,7 @@ public class PlannedPayment {
         frequency = plannedPaymentDTO.getFrequency();
         durationUnit = plannedPaymentDTO.getDurationUnit();
         amount = plannedPaymentDTO.getAmount();
+        createTime = plannedPaymentDTO.getCreateTime();
         dueTime = plannedPaymentDTO.getDueTime();
         description = plannedPaymentDTO.getDescription();
     }

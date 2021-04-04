@@ -20,6 +20,7 @@ public class ResponsePlannedPaymentDTO {
     private Integer frequency;
     private String durationUnit;
     private Double amount;
+    private Timestamp createTime;
     private Timestamp dueTime;
     private String description;
     private ResponseCategoryDTO category;
@@ -31,6 +32,7 @@ public class ResponsePlannedPaymentDTO {
         frequency = plannedPayment.getFrequency();
         durationUnit = plannedPayment.getDurationUnit();
         amount = plannedPayment.getAmount();
+        createTime = plannedPayment.getCreateTime();
         dueTime = plannedPayment.getDueTime();
         description = plannedPayment.getDescription();
         category = new ResponseCategoryDTO(plannedPayment.getCategory());

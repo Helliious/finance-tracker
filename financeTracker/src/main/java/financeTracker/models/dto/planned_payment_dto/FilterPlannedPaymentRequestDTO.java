@@ -23,6 +23,8 @@ public class FilterPlannedPaymentRequestDTO {
     private Double amountFrom;
     @Positive(message = "Amount to must be positive")
     private Double amountTo;
+    private Timestamp createTimeFrom;
+    private Timestamp createTimeTo;
     private Timestamp dueTimeFrom;
     private Timestamp dueTimeTo;
 }

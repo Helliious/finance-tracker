@@ -35,9 +35,12 @@ public class BudgetDAO {
         boolean bothAmountsIncluded = false;
         boolean amountFromIncluded = false;
         boolean amountToIncluded = false;
-        boolean bothDatesIncluded = false;
-        boolean dateFromIncluded = false;
-        boolean dateToIncluded = false;
+        boolean bothCreateTimesIncluded = false;
+        boolean createTimeFromIncluded = false;
+        boolean createTimeToIncluded = false;
+        boolean bothDueTimesIncluded = false;
+        boolean dueTimeFromIncluded = false;
+        boolean dueTimeToIncluded = false;
         if (dto.getName() != null) {
             sql.append("AND name LIKE ?");
             nameIncludedInFilter = true;
@@ -61,36 +64,36 @@ public class BudgetDAO {
         }
         if(dto.getCreateTimeFrom() != null && dto.getCreateTimeTo() != null) {
             if (dto.getCreateTimeFrom().compareTo(dto.getCreateTimeTo()) > 0) {
-                throw new BadRequestException("Date from cannot be bigger than Date to");
+                throw new BadRequestException("Invalid create time range");
             }
             sql.append("AND create_time BETWEEN ? AND ? ");
-            bothDatesIncluded = true;
+            bothCreateTimesIncluded = true;
         }
         else{
             if (dto.getCreateTimeFrom() != null && dto.getCreateTimeTo() == null) {
                 sql.append("AND create_time >= ? ");
-                dateFromIncluded = true;
+                createTimeFromIncluded = true;
             }
             if (dto.getCreateTimeFrom() == null && dto.getCreateTimeTo() != null) {
                 sql.append("AND create_time <= ? ");
-                dateToIncluded = true;
+                createTimeToIncluded = true;
             }
         }
         if(dto.getDueTimeFrom() != null && dto.getDueTimeTo() != null) {
             if (dto.getDueTimeFrom().compareTo(dto.getDueTimeTo()) > 0) {
-                throw new BadRequestException("Date from cannot be bigger than Date to");
+                throw new BadRequestException("Invalid due time range");
             }
             sql.append("AND due_time BETWEEN ? AND ? ");
-            bothDatesIncluded = true;
+            bothDueTimesIncluded = true;
         }
         else{
             if (dto.getDueTimeFrom() != null && dto.getDueTimeTo() == null) {
                 sql.append("AND due_time >= ? ");
-                dateFromIncluded = true;
+                dueTimeFromIncluded = true;
             }
             if (dto.getDueTimeFrom() == null && dto.getDueTimeTo() != null) {
                 sql.append("AND due_time <= ? ");
-                dateToIncluded = true;
+                dueTimeToIncluded = true;
             }
         }
         try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
@@ -110,14 +113,24 @@ public class BudgetDAO {
             if (amountToIncluded) {
                 ps.setDouble(paramIdx++, dto.getAmountTo());
             }
-            if (bothDatesIncluded) {
+            if (bothCreateTimesIncluded) {
+                ps.setTimestamp(paramIdx++, dto.getCreateTimeFrom());
+                ps.setTimestamp(paramIdx++, dto.getCreateTimeTo());
+            }
+            if (createTimeFromIncluded) {
+                ps.setTimestamp(paramIdx++, dto.getCreateTimeFrom());
+            }
+            if (createTimeToIncluded) {
+                ps.setTimestamp(paramIdx, dto.getCreateTimeTo());
+            }
+            if (bothDueTimesIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDueTimeFrom());
                 ps.setTimestamp(paramIdx++, dto.getDueTimeTo());
             }
-            if (dateFromIncluded) {
+            if (dueTimeFromIncluded) {
                 ps.setTimestamp(paramIdx++, dto.getDueTimeFrom());
             }
-            if (dateToIncluded) {
+            if (dueTimeToIncluded) {
                 ps.setTimestamp(paramIdx, dto.getDueTimeTo());
             }
             ResultSet result = ps.executeQuery();
