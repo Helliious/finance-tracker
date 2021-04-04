@@ -32,11 +32,12 @@ public class BudgetController extends AbstractController {
         return convertToBudgetWithoutAccountAndOwnerDTO(budget);
     }
 
-    @GetMapping("budgets/{budget_id}")
-    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "budget_id") int budgetId,
+    @GetMapping("/accounts/{account_id}/budgets/{budget_id}")
+    public BudgetWithoutAccountAndOwnerDTO getById(@PathVariable(name = "account_id") int accountId,
+                                                   @PathVariable(name = "budget_id") int budgetId,
                                                    HttpSession session) {
        int userId = sessionManager.getLoggedId(session);
-       Budget budget = budgetService.getById(userId, budgetId);
+       Budget budget = budgetService.getById(userId, budgetId, accountId);
        return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
@@ -51,7 +52,7 @@ public class BudgetController extends AbstractController {
         return resultBudget;
     }
 
-    @GetMapping("/budgets/accounts/{account_id}")
+    @GetMapping("/accounts/{account_id}/budgets")
     public List<BudgetWithoutAccountAndOwnerDTO> getAllByAccount(@PathVariable(name = "account_id") int accountId,
                                                                  HttpSession session) {
         int userId = sessionManager.getLoggedId(session);

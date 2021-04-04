@@ -34,7 +34,7 @@ public class PlannedPaymentDAO {
 
     public List<PlannedPayment> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
         List<PlannedPayment> plannedPayments = new ArrayList<>();
-        StringBuilder sql =new StringBuilder("SELECT * FROM planned_payments WHERE owner_id = ?");
+        StringBuilder sql = new StringBuilder("SELECT * FROM planned_payments WHERE owner_id = ? ");
         boolean nameIncludedInFilter = false;
         boolean paymentTypeIncluded = false;
         boolean frequencyIncluded = false;
@@ -45,26 +45,23 @@ public class PlannedPaymentDAO {
         boolean dateFromIncluded = false;
         boolean dateToIncluded = false;
         if (plannedPaymentRequestDTO.getName() != null) {
-            sql.append("AND name LIKE ?");
+            sql.append("AND name LIKE ? ");
             nameIncludedInFilter = true;
         }
         if (plannedPaymentRequestDTO.getPaymentType() != null){
-            sql.append("AND payment_type = ?");
+            sql.append("AND payment_type = ? ");
             paymentTypeIncluded = true;
         }
         if (plannedPaymentRequestDTO.getFrequency() != null && plannedPaymentRequestDTO.getDurationUnit() != null) {
-            sql.append("AND frequency = ? AND duration_unit = ?");
+            sql.append("AND frequency = ? AND duration_unit = ? ");
             frequencyIncluded = true;
-        }
-        if (plannedPaymentRequestDTO.getAmountTo() != null && plannedPaymentRequestDTO.getAmountFrom() > plannedPaymentRequestDTO.getAmountTo()) {
-            throw new BadRequestException("Amount from can't be bigger than Amount to!");
         }
         if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() != null) {
             if (plannedPaymentRequestDTO.getAmountFrom() < plannedPaymentRequestDTO.getAmountTo()) {
                 sql.append("AND amount BETWEEN ? AND ? ");
                 bothAmountsIncluded = true;
             } else {
-                throw new BadRequestException("Entered invalid amount range!");
+                throw new BadRequestException("Invalid amount range");
             }
         }
         else {
@@ -79,19 +76,19 @@ public class PlannedPaymentDAO {
         }
         if(plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
             if (plannedPaymentRequestDTO.getDueTimeFrom().compareTo(plannedPaymentRequestDTO.getDueTimeTo()) < 0) {
-                sql.append("AND due_time BETWEEN ? AND ?");
+                sql.append("AND due_time BETWEEN ? AND ? ");
                 bothDatesIncluded = true;
             } else {
-                throw new BadRequestException("Entered invalid due time range!");
+                throw new BadRequestException("Invalid due time range");
             }
         }
         else{
             if (plannedPaymentRequestDTO.getDueTimeFrom() != null && plannedPaymentRequestDTO.getDueTimeTo() == null) {
-                sql.append("AND due_time >= ?");
+                sql.append("AND due_time >= ? ");
                 dateFromIncluded = true;
             }
             if (plannedPaymentRequestDTO.getDueTimeFrom() == null && plannedPaymentRequestDTO.getDueTimeTo() != null) {
-                sql.append("AND due_time <= ?");
+                sql.append("AND due_time <= ? ");
                 dateToIncluded = true;
             }
         }
@@ -132,10 +129,19 @@ public class PlannedPaymentDAO {
             ResultSet result = ps.executeQuery();
             if (result.next()) {
                 do{
-                    Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
-                    Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
-                    Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
-                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
+                    Optional<User> optionalUser = userRepository.findById(userId);
+                    if (optionalUser.isEmpty()) {
+                        throw new NotFoundException("User not found");
+                    }
+                    Account account = accountRepository.findByIdAndOwnerId(
+                            result.getInt("account_id"),
+                            userId
+                    );
+                    Category category = categoryRepository.findByIdAndOwnerId(
+                            result.getInt("category_id"),
+                            userId
+                    );
+                    Validator.validateData(account, category);
                     PlannedPayment plannedPayment = new PlannedPayment(result.getInt("id"),
                             result.getString("name"),
                             result.getString("payment_type"),
@@ -144,14 +150,12 @@ public class PlannedPaymentDAO {
                             result.getDouble("amount"),
                             result.getTimestamp("due_time"),
                             result.getString("description"),
-                            optionalAccount.get(),
-                            optionalCategory.get(),
+                            account,
+                            category,
                             optionalUser.get()
                     );
                     plannedPayments.add(plannedPayment);
                 }while (result.next());
-            } else {
-                throw new NotFoundException("Planned payment not found!");
             }
         } catch (SQLException e) {
             throw new BadRequestException("Connection error, reason - " + e.getMessage());

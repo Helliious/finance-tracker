@@ -127,9 +127,6 @@ public class BudgetDAO {
                     budgets.add(budget);
                 } while (result.next());
             }
-            else{
-                throw new NotFoundException("There is not budgets corresponding to current filter");
-            }
         }
         catch (SQLException e){
             throw new BadRequestException("Connection error, reason - " + e.getMessage());

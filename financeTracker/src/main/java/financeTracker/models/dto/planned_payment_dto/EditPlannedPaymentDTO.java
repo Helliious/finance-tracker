@@ -1,5 +1,6 @@
 package financeTracker.models.dto.planned_payment_dto;
 
+import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,16 +14,14 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Component
-public class FilterPlannedPaymentRequestDTO {
+public class EditPlannedPaymentDTO {
     private String name;
-    private String paymentType;
     @Positive(message = "Frequency must be positive")
     private Integer frequency;
     private String durationUnit;
-    @PositiveOrZero(message = "Amount from must be positive or zero")
-    private Double amountFrom;
-    @Positive(message = "Amount to must be positive")
-    private Double amountTo;
-    private Timestamp dueTimeFrom;
-    private Timestamp dueTimeTo;
+    @PositiveOrZero(message = "Amount must be positive or zero")
+    private Double amount;
+    private Timestamp dueTime;
+    private String description;
+    private ResponseCategoryDTO category;
 }

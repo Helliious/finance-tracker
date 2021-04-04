@@ -126,28 +126,34 @@ public class TransactionDAO {
             ResultSet result = ps.executeQuery();
             if (result.next()) {
                 do {
-                    Optional<Account> optionalAccount = accountRepository.findById(result.getInt("account_id"));
-                    Optional<Category> optionalCategory = categoryRepository.findById(result.getInt("category_id"));
-                    Optional<User> optionalUser = userRepository.findById(result.getInt("owner_id"));
-                    Validator.validateData(optionalAccount, optionalCategory, optionalUser);
+                    Optional<User> optionalUser = userRepository.findById(userId);
+                    if (optionalUser.isEmpty()) {
+                        throw new NotFoundException("User not found");
+                    }
+                    Account account = accountRepository.findByIdAndOwnerId(
+                            result.getInt("account_id"),
+                            userId
+                    );
+                    Category category = categoryRepository.findByIdAndOwnerId(
+                            result.getInt("category_id"),
+                            userId
+                    );
+                    Validator.validateData(account, category);
                     Transaction transaction = new Transaction(result.getInt("id"),
                             result.getString("type"),
                             result.getDouble("amount"),
                             result.getTimestamp("create_time"),
                             result.getString("description"),
-                            optionalCategory.get(),
-                            optionalAccount.get(),
+                            category,
+                            account,
                             optionalUser.get(),
                             null
-
                     );
                     transactions.add(transaction);
                 } while (result.next());
-            } else {
-                throw new NotFoundException("There is not transactions corresponding to current filter");
             }
         } catch (SQLException e){
-            e.getMessage();
+            throw new BadRequestException("Connection error, reason - " + e.getMessage());
         }
         return transactions;
     }

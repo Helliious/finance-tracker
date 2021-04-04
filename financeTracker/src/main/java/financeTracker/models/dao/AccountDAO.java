@@ -164,8 +164,6 @@ public class AccountDAO {
                                                 );
                     accounts.add(account);
                 } while (result.next());
-            } else {
-                throw new NotFoundException("Account not found!");
             }
         } catch (SQLException e) {
             throw new BadRequestException("Connection error, reason - " + e.getMessage());

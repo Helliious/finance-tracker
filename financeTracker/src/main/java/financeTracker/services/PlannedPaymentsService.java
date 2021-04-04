@@ -3,6 +3,8 @@ package financeTracker.services;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dao.PlannedPaymentDAO;
+import financeTracker.models.dto.planned_payment_dto.AddPlannedPaymentDTO;
+import financeTracker.models.dto.planned_payment_dto.EditPlannedPaymentDTO;
 import financeTracker.models.dto.planned_payment_dto.FilterPlannedPaymentRequestDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
 import financeTracker.models.pojo.*;
@@ -31,55 +33,37 @@ public class PlannedPaymentsService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public User add(PlannedPayment plannedPayment, int userId, int accountId) {
-        plannedPayment.setDueTime(new Timestamp(System.currentTimeMillis()));
+    public PlannedPayment add(AddPlannedPaymentDTO plannedPaymentDTO, int userId, int accountId) {
+        plannedPaymentDTO.setDueTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(userId);
-        Optional<Account> optAccount = accountRepository.findById(accountId);
-        Optional<Category> optCategory = categoryRepository.findById(plannedPayment.getCategory().getId());
+        Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
+        Category category = categoryRepository.findByIdAndOwnerId(plannedPaymentDTO.getCategoryId(), userId);
         if (optUser.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
-        if (optAccount.isEmpty()) {
-            throw new NotFoundException("Account not found!");
+        if (account == null) {
+            throw new NotFoundException("Account not found");
         }
-        if (optCategory.isEmpty()) {
-            throw new NotFoundException("Category not found!");
+        if (category == null) {
+            category = categoryRepository.findByIdAndOwnerIsNull(plannedPaymentDTO.getCategoryId());
+            if (category == null) {
+                throw new NotFoundException("Category not found");
+            }
+        }
+        if (!plannedPaymentDTO.getPaymentType().equals(category.getType())) {
+            throw new BadRequestException("Payment type and category type must match");
         }
         User user = optUser.get();
-        Account account = optAccount.get();
-        Category category = optCategory.get();
-        validatePlannedPayment(user, account, category);
+        PlannedPayment plannedPayment = new PlannedPayment(plannedPaymentDTO);
+        plannedPayment.setCategory(category);
         user.getPlannedPayments().add(plannedPayment);
         category.getPlannedPayments().add(plannedPayment);
         account.getPlannedPayments().add(plannedPayment);
-        ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), account, Action.ADD);
+        ServiceCalculator.calculateBalance(plannedPaymentDTO.getAmount(), plannedPaymentDTO.getPaymentType(), account, Action.ADD);
         plannedPayment.setOwner(user);
         plannedPayment.setAccount(account);
         plannedPayment.setCategory(category);
-        plannedPaymentsRepository.save(plannedPayment);
-        return user;
-    }
-
-    private void validatePlannedPayment(User user, Account account, Category category) {
-        boolean isPresent = false;
-        for (Account a : user.getAccounts()) {
-            if (a.getId() == account.getId() && a.getName().equals(account.getName())) {
-                isPresent = true;
-                break;
-            }
-        }
-        if (!isPresent) {
-            throw new NotFoundException("Account not found!");
-        }
-        isPresent = false;
-        for (Category c : user.getCategories()) {
-            if (c.getName().equals(category.getName())) {
-                isPresent = true;
-            }
-        }
-        if (!isPresent) {
-            throw new NotFoundException("Category not found!");
-        }
+        return plannedPaymentsRepository.save(plannedPayment);
     }
 
     public PlannedPayment getById(int accountId, int userId, int plannedPaymentId) {
@@ -89,7 +73,7 @@ public class PlannedPaymentsService {
                 userId
         );
         if (plannedPayment == null) {
-            throw new NotFoundException("Planned payment not found!");
+            throw new NotFoundException("Planned payment not found");
         }
         return plannedPayment;
     }
@@ -106,7 +90,7 @@ public class PlannedPaymentsService {
                 userId
         );
         if (plannedPayment == null) {
-            throw new NotFoundException("Planned payment not found!");
+            throw new NotFoundException("Planned payment not found");
         }
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
         if (account != null) {
@@ -118,72 +102,77 @@ public class PlannedPaymentsService {
         return plannedPayment;
     }
 
-    public PlannedPayment edit(ResponsePlannedPaymentDTO responsePlannedPaymentDTO, int accountId, int userId, int plannedPaymentId) {
-        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(plannedPaymentId, accountId, userId);
+    public PlannedPayment edit(EditPlannedPaymentDTO editPlannedPaymentDTO, int accountId, int userId, int plannedPaymentId) {
+        PlannedPayment plannedPayment = plannedPaymentsRepository.findPlannedPaymentByIdAndAccountIdAndOwnerId(
+                plannedPaymentId,
+                accountId,
+                userId
+        );
         if (plannedPayment == null) {
-            throw new NotFoundException("Planned payment not found!");
+            throw new NotFoundException("Planned payment not found");
         }
-        if (responsePlannedPaymentDTO.getName() != null) {
-            if (plannedPaymentsRepository.findPlannedPaymentByNameAndAccountId(responsePlannedPaymentDTO.getName(), accountId) != null) {
-                throw new BadRequestException("Planned payment name already exists!");
-            } else if (plannedPayment.getName().equals(responsePlannedPaymentDTO.getName())) {
-                throw new BadRequestException("Entered the same planned payment name!");
+        if (editPlannedPaymentDTO.getName() != null) {
+            if (plannedPaymentsRepository.findPlannedPaymentByNameAndAccountId(editPlannedPaymentDTO.getName(), accountId) != null) {
+                throw new BadRequestException("Planned payment name already exists");
+            } else if (plannedPayment.getName().equals(editPlannedPaymentDTO.getName())) {
+                throw new BadRequestException("Entered the same planned payment name");
             } else {
-                plannedPayment.setName(responsePlannedPaymentDTO.getName());
+                plannedPayment.setName(editPlannedPaymentDTO.getName());
             }
         }
-        if (responsePlannedPaymentDTO.getPaymentType() != null) {
-            if (plannedPayment.getPaymentType().equals(responsePlannedPaymentDTO.getPaymentType())) {
-                throw new BadRequestException("Entered the same type!");
+        if (editPlannedPaymentDTO.getFrequency() != null) {
+            if (editPlannedPaymentDTO.getDurationUnit() == null) {
+                throw new BadRequestException("Frequency and duration unit must be both set");
+            }
+            if (plannedPayment.getFrequency() == editPlannedPaymentDTO.getFrequency()) {
+                throw new BadRequestException("Entered the same frequency");
             } else {
-                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
-                plannedPayment.setPaymentType(responsePlannedPaymentDTO.getPaymentType());
-                ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
+                plannedPayment.setFrequency(editPlannedPaymentDTO.getFrequency());
             }
         }
-        if (responsePlannedPaymentDTO.getFrequency() != null) {
-            if (plannedPayment.getFrequency() == responsePlannedPaymentDTO.getFrequency()) {
-                throw new BadRequestException("Entered the same frequency!");
+        if (editPlannedPaymentDTO.getDurationUnit() != null) {
+            if (editPlannedPaymentDTO.getFrequency() == null) {
+                throw new BadRequestException("Frequency and duration unit must be both set");
+            }
+            if (plannedPayment.getDurationUnit().equals(editPlannedPaymentDTO.getDurationUnit())) {
+                throw new BadRequestException("Entered the same duration unit");
             } else {
-                plannedPayment.setFrequency(responsePlannedPaymentDTO.getFrequency());
+                plannedPayment.setDurationUnit(editPlannedPaymentDTO.getDurationUnit());
             }
         }
-        if (responsePlannedPaymentDTO.getDurationUnit() != null) {
-            if (plannedPayment.getDurationUnit().equals(responsePlannedPaymentDTO.getDurationUnit())) {
-                throw new BadRequestException("Entered the same duration unit!");
-            } else {
-                plannedPayment.setDurationUnit(responsePlannedPaymentDTO.getDurationUnit());
-            }
-        }
-        if (responsePlannedPaymentDTO.getAmount() != null) {
-            if (plannedPayment.getAmount() == responsePlannedPaymentDTO.getAmount()) {
+        if (editPlannedPaymentDTO.getAmount() != null) {
+            if (plannedPayment.getAmount() == editPlannedPaymentDTO.getAmount()) {
                 throw new BadRequestException("Entered the same amount!");
             } else {
                 ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
-                plannedPayment.setAmount(responsePlannedPaymentDTO.getAmount());
+                plannedPayment.setAmount(editPlannedPaymentDTO.getAmount());
                 ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
             }
         }
-        if (responsePlannedPaymentDTO.getDueTime() != null) {
-            if (plannedPayment.getDueTime() == responsePlannedPaymentDTO.getDueTime()) {
-                throw new BadRequestException("Entered the same time!");
+        if (editPlannedPaymentDTO.getDueTime() != null) {
+            if (plannedPayment.getDueTime() == editPlannedPaymentDTO.getDueTime()) {
+                throw new BadRequestException("Entered the same time");
+            } else if (editPlannedPaymentDTO.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) <= 0) {
+                throw new BadRequestException("Invalid due time");
             } else {
-                plannedPayment.setDueTime(responsePlannedPaymentDTO.getDueTime());
+                plannedPayment.setDueTime(editPlannedPaymentDTO.getDueTime());
             }
         }
-        if (responsePlannedPaymentDTO.getCategory() != null) {
-            if (plannedPayment.getCategory().getName().equals(responsePlannedPaymentDTO.getCategory().getName())) {
-                throw new BadRequestException("Entered the same category!");
-            } else if (!plannedPayment.getCategory().getType().equals(responsePlannedPaymentDTO.getCategory().getType())) {
-                throw new BadRequestException("Entered different category type!");
+        if (editPlannedPaymentDTO.getCategory() != null) {
+            if (plannedPayment.getCategory().getName().equals(editPlannedPaymentDTO.getCategory().getName())) {
+                throw new BadRequestException("Entered the same category");
             } else {
-                plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
-                Optional<Category> category = categoryRepository.findById(responsePlannedPaymentDTO.getCategory().getId());
-                if (category.isEmpty()) {
+                Category category = categoryRepository.findByIdAndOwnerId(
+                        editPlannedPaymentDTO.getCategory().getId(),
+                        userId
+                );
+                if (category == null) {
                     throw new NotFoundException("Category not found!");
                 }
-                category.get().getPlannedPayments().add(plannedPayment);
-                plannedPayment.setCategory(category.get());
+                plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
+                plannedPayment.setPaymentType(category.getType());
+                category.getPlannedPayments().add(plannedPayment);
+                plannedPayment.setCategory(category);
             }
         }
         plannedPaymentsRepository.save(plannedPayment);
@@ -191,6 +180,6 @@ public class PlannedPaymentsService {
     }
 
     public List<PlannedPayment> filter(int userId, FilterPlannedPaymentRequestDTO plannedPaymentRequestDTO) {
-        return plannedPaymentDAO.filter(userId,plannedPaymentRequestDTO);
+        return plannedPaymentDAO.filter(userId, plannedPaymentRequestDTO);
     }
 }

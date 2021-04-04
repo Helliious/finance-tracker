@@ -26,8 +26,8 @@ public class BudgetService {
     @Autowired
     private BudgetDAO budgetDao;
 
-    public Budget getById(int userId, int budgetId) {
-        Budget budget = budgetRepository.findByIdAndOwnerId(budgetId, userId);
+    public Budget getById(int userId, int budgetId, int accountId) {
+        Budget budget = budgetRepository.findByIdAndOwnerIdAndAccountId(budgetId, userId, accountId);
         if (budget == null) {
             throw new NotFoundException("Budget not found!");
         }

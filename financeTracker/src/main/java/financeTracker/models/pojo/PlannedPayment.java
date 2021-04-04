@@ -1,5 +1,6 @@
 package financeTracker.models.pojo;
 
+import financeTracker.models.dto.planned_payment_dto.AddPlannedPaymentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,4 +36,14 @@ public class PlannedPayment {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    public PlannedPayment(AddPlannedPaymentDTO plannedPaymentDTO) {
+        name = plannedPaymentDTO.getName();
+        paymentType = plannedPaymentDTO.getPaymentType();
+        frequency = plannedPaymentDTO.getFrequency();
+        durationUnit = plannedPaymentDTO.getDurationUnit();
+        amount = plannedPaymentDTO.getAmount();
+        dueTime = plannedPaymentDTO.getDueTime();
+        description = plannedPaymentDTO.getDescription();
+    }
 }

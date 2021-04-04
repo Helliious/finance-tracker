@@ -65,7 +65,7 @@ public class AccountController extends AbstractController {
         return new AccountWithoutOwnerDTO(account);
     }
 
-    @PostMapping("/accounts/filter")
+    @PostMapping("/accounts")
     public List<AccountWithoutOwnerDTO> filter(@Valid @RequestBody FilterAccountRequestDTO accountRequestDTO,
                                                HttpSession session){
         int userId = sessionManager.getLoggedId(session);
