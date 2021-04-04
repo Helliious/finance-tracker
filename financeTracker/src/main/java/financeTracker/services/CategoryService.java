@@ -77,10 +77,11 @@ public class CategoryService {
                 if (!currUsername.equals(e.getUsername())) {
                     pdfCreator.insertTextInPDF(text.toString(), currUsername);
                     currUsername = e.getUsername();
-                    text.delete(0, text.length());
+                    text.setLength(0);
                 }
                 text.append(e.getName()).append(" : ").append(e.getExpenses()).append(";\n");
             }
+            pdfCreator.insertTextInPDF(text.toString(), currUsername);
         }
     }
 }

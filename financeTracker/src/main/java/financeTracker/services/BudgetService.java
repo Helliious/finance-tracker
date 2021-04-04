@@ -116,18 +116,6 @@ public class BudgetService {
         return budget;
     }
 
-    public double getSpending(int ownerId) {
-        List<Budget> budgets = budgetRepository.findBudgetsByOwnerId(ownerId);
-        if (budgets.isEmpty()) {
-            throw new NotFoundException("This user don't have budgets corresponding to this category");
-        }
-        double totalSpends = 0;
-        for (Budget budget:budgets) {
-            totalSpends += budget.getAmount();
-        }
-        return totalSpends;
-    }
-
     public List<Budget> filter(int userId, FilterBudgetRequestDTO dto) {
         return budgetDao.filterBudget(userId, dto);
     }

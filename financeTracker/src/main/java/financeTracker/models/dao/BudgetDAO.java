@@ -59,20 +59,37 @@ public class BudgetDAO {
                 amountToIncluded = true;
             }
         }
-        if(dto.getDateFrom() != null && dto.getDateTo() != null) {
-            if (dto.getDateFrom().compareTo(dto.getDateTo()) > 0) {
+        if(dto.getCreateTimeFrom() != null && dto.getCreateTimeTo() != null) {
+            if (dto.getCreateTimeFrom().compareTo(dto.getCreateTimeTo()) > 0) {
                 throw new BadRequestException("Date from cannot be bigger than Date to");
             }
-            sql.append("AND due_time BETWEEN ? AND ?");
+            sql.append("AND create_time BETWEEN ? AND ? ");
             bothDatesIncluded = true;
         }
         else{
-            if (dto.getDateFrom() != null && dto.getDateTo() == null) {
-                sql.append("AND due_time >= ?");
+            if (dto.getCreateTimeFrom() != null && dto.getCreateTimeTo() == null) {
+                sql.append("AND create_time >= ? ");
                 dateFromIncluded = true;
             }
-            if (dto.getDateFrom() == null && dto.getDateTo() != null) {
-                sql.append("AND due_time <= ?");
+            if (dto.getCreateTimeFrom() == null && dto.getCreateTimeTo() != null) {
+                sql.append("AND create_time <= ? ");
+                dateToIncluded = true;
+            }
+        }
+        if(dto.getDueTimeFrom() != null && dto.getDueTimeTo() != null) {
+            if (dto.getDueTimeFrom().compareTo(dto.getDueTimeTo()) > 0) {
+                throw new BadRequestException("Date from cannot be bigger than Date to");
+            }
+            sql.append("AND due_time BETWEEN ? AND ? ");
+            bothDatesIncluded = true;
+        }
+        else{
+            if (dto.getDueTimeFrom() != null && dto.getDueTimeTo() == null) {
+                sql.append("AND due_time >= ? ");
+                dateFromIncluded = true;
+            }
+            if (dto.getDueTimeFrom() == null && dto.getDueTimeTo() != null) {
+                sql.append("AND due_time <= ? ");
                 dateToIncluded = true;
             }
         }
@@ -94,14 +111,14 @@ public class BudgetDAO {
                 ps.setDouble(paramIdx++, dto.getAmountTo());
             }
             if (bothDatesIncluded) {
-                ps.setTimestamp(paramIdx++, dto.getDateFrom());
-                ps.setTimestamp(paramIdx++, dto.getDateTo());
+                ps.setTimestamp(paramIdx++, dto.getDueTimeFrom());
+                ps.setTimestamp(paramIdx++, dto.getDueTimeTo());
             }
             if (dateFromIncluded) {
-                ps.setTimestamp(paramIdx++, dto.getDateFrom());
+                ps.setTimestamp(paramIdx++, dto.getDueTimeFrom());
             }
             if (dateToIncluded) {
-                ps.setTimestamp(paramIdx, dto.getDateTo());
+                ps.setTimestamp(paramIdx, dto.getDueTimeTo());
             }
             ResultSet result = ps.executeQuery();
             if (result.next()) {
@@ -118,6 +135,7 @@ public class BudgetDAO {
                             result.getString("name"),
                             result.getString("label"),
                             result.getDouble("amount"),
+                            result.getTimestamp("create_time"),
                             result.getTimestamp("due_time"),
                             result.getString("description"),
                             optionalAccount.get(),

@@ -82,12 +82,6 @@ public class BudgetController extends AbstractController {
         return new BudgetWithoutAccountAndOwnerDTO(budget);
     }
 
-    @GetMapping("budgets/categories")
-    public double getSpendingByCategory(HttpSession session) {
-        int userId = sessionManager.getLoggedId(session);
-        return budgetService.getSpending(userId);
-    }
-
     @PostMapping("/budgets")
     public List<BudgetWithoutAccountAndOwnerDTO> filter(@Valid @RequestBody FilterBudgetRequestDTO dto,
                                                         HttpSession session) {

@@ -1,10 +1,7 @@
 package financeTracker.models.dao;
 
 import financeTracker.exceptions.BadRequestException;
-import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.category_dto.CategoryExpensesDTO;
-import financeTracker.models.pojo.User;
-import financeTracker.models.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -26,9 +23,9 @@ public class CategoryDAO {
         List<CategoryExpensesDTO> expenses = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT u.username, c.name AS category, COALESCE(SUM(t.amount), 0) + COALESCE(SUM(p.amount), 0) AS expense FROM users u\n" +
                 "LEFT OUTER JOIN categories c ON c.owner_id IS NULL OR c.owner_id = u.id\n" +
-                "LEFT OUTER JOIN transactions t ON c.id = t.category_id\n" +
-                "LEFT OUTER JOIN planned_payments p ON c.id = p.category_id\n" +
-                "GROUP BY u.first_name, u.last_name, c.name;");
+                "LEFT OUTER JOIN transactions t ON u.id = t.owner_id AND c.id = t.category_id AND t.create_time >= NOW() - INTERVAL 1 MONTH\n" +
+                "LEFT OUTER JOIN planned_payments p ON u.id = p.owner_id AND c.id = p.category_id AND p.create_time >= NOW() - INTERVAL 1 MONTH\n" +
+                "GROUP BY u.username, c.name;");
 
         try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
              PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -42,8 +39,6 @@ public class CategoryDAO {
                     );
                     expenses.add(expense);
                 }while (result.next());
-            } else {
-                throw new NotFoundException("No data for expenses by category!");
             }
         } catch (SQLException e) {
             throw new BadRequestException("Connection error, reason - " + e.getMessage());

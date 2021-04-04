@@ -19,6 +19,8 @@ public class FilterBudgetRequestDTO {
     private Double amountFrom;
     @Positive(message = "Amount to must be positive or zero")
     private Double amountTo;
-    private Timestamp dateFrom;
-    private Timestamp dateTo;
+    private Timestamp createTimeFrom;
+    private Timestamp createTimeTo;
+    private Timestamp dueTimeFrom;
+    private Timestamp dueTimeTo;
 }

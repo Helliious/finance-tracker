@@ -21,6 +21,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
     private String name;
     private String label;
     private double amount;
+    private Timestamp createTime;
     private Timestamp dueTime;
     private String description;
     private List<ResponseTransactionDTO> transactionList;
@@ -30,6 +31,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
         this.name = budget.getName();
         this.label = budget.getLabel();
         this.amount = budget.getAmount();
+        this.createTime = budget.getCreateTime();
         this.dueTime = budget.getDueTime();
         this.description = budget.getDescription();
         this.transactionList = new ArrayList<>();

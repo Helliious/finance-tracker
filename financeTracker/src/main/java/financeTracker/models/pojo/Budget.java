@@ -24,6 +24,7 @@ public class Budget {
     private String name;
     private String label;
     private double amount;
+    private Timestamp createTime;
     private Timestamp dueTime;
     private String description;
     @ManyToOne
@@ -41,10 +42,11 @@ public class Budget {
     private List<Transaction> budgetTransactions;
 
     public Budget(CreateBudgetRequestDTO dto){
-        name=dto.getName();
-        label=dto.getLabel();
-        amount=dto.getAmount();
-        dueTime=dto.getDueTime();
+        name = dto.getName();
+        label = dto.getLabel();
+        amount = dto.getAmount();
+        createTime = dto.getCreateTime();
+        dueTime = dto.getDueTime();
         description = dto.getDescription();
         budgetTransactions = new ArrayList<>();
     }
