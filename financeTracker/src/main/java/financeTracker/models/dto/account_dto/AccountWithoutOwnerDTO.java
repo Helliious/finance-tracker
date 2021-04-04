@@ -2,7 +2,7 @@ package financeTracker.models.dto.account_dto;
 
 import financeTracker.models.dto.budget_dto.BudgetWithoutAccountAndOwnerDTO;
 import financeTracker.models.dto.planned_payment_dto.ResponsePlannedPaymentDTO;
-import financeTracker.models.dto.transaction_dto.RasponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.Account;
 import financeTracker.models.pojo.Budget;
 import financeTracker.models.pojo.PlannedPayment;
@@ -35,7 +35,7 @@ public class AccountWithoutOwnerDTO {
     @Positive(message = "Account limit must be positive")
     private Double accLimit;
     private Timestamp createTime;
-    private List<RasponseTransactionDTO> transactions;
+    private List<ResponseTransactionDTO> transactions;
     private List<ResponsePlannedPaymentDTO> plannedPayments;
     private List<BudgetWithoutAccountAndOwnerDTO> budgets;
 
@@ -49,7 +49,7 @@ public class AccountWithoutOwnerDTO {
         if (account.getTransactions() != null) {
             for (Transaction t : account.getTransactions()) {
                 if (t.getBudgetsThatHaveTransaction().isEmpty()) {
-                    transactions.add(new RasponseTransactionDTO(t));
+                    transactions.add(new ResponseTransactionDTO(t));
                 }
             }
         }

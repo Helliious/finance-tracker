@@ -1,6 +1,6 @@
 package financeTracker.models.dto.budget_dto;
 
-import financeTracker.models.dto.transaction_dto.RasponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.Budget;
 import financeTracker.models.pojo.Transaction;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
     private double amount;
     private Timestamp dueTime;
     private String description;
-    private List<RasponseTransactionDTO> transactionList;
+    private List<ResponseTransactionDTO> transactionList;
 
     public BudgetWithoutAccountAndOwnerDTO(Budget budget) {
         this.id = budget.getId();
@@ -35,7 +35,7 @@ public class BudgetWithoutAccountAndOwnerDTO {
         this.transactionList = new ArrayList<>();
         if (budget.getBudgetTransactions() != null){
             for (Transaction transaction : budget.getBudgetTransactions()) {
-                transactionList.add(new RasponseTransactionDTO(transaction));
+                transactionList.add(new ResponseTransactionDTO(transaction));
             }
         }
     }

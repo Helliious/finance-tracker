@@ -6,7 +6,7 @@ import financeTracker.models.dao.TransactionDAO;
 import financeTracker.models.dto.transaction_dto.AddTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.EditTransactionRequestDTO;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
-import financeTracker.models.dto.transaction_dto.RasponseTransactionDTO;
+import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.*;
 import financeTracker.utils.Action;
@@ -53,13 +53,13 @@ public class TransactionService {
         return account.getTransactions();
     }
 
-    public RasponseTransactionDTO delete(int transactionId, int userId, int accountId) {
+    public ResponseTransactionDTO delete(int transactionId, int userId, int accountId) {
         Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, userId, accountId);
         if (transaction == null) {
             throw new NotFoundException("Transaction not found");
         }
         ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
-        RasponseTransactionDTO responseTransaction = new RasponseTransactionDTO(transaction);
+        ResponseTransactionDTO responseTransaction = new ResponseTransactionDTO(transaction);
         transactionRepository.deleteById(transactionId);
         return responseTransaction;
     }
@@ -67,16 +67,22 @@ public class TransactionService {
     public Transaction addTransactionToAccount(int accountId, AddTransactionRequestDTO dto, int ownerId) {
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Account account = accountRepository.findByIdAndOwnerId(accountId, ownerId);
-        Category category = categoryRepository.findByIdAndType(dto.getCategoryId(), dto.getType());
+        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
         Optional<User> optUser = userRepository.findById(ownerId);
         if (account == null){
             throw new NotFoundException("Account not found");
         }
         if (category == null) {
-            throw new NotFoundException("Category not found");
+            category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
+            if (category == null) {
+                throw new NotFoundException("Category not found");
+            }
         }
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found");
+        }
+        if (!category.getType().equals(dto.getType())) {
+            throw new BadRequestException("Transaction type and category type must match");
         }
         Transaction transaction = new Transaction(dto);
         User owner = optUser.get();
@@ -95,14 +101,6 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findByIdAndOwnerIdAndAccountId(transactionId, ownerId, accountId);
         if (transaction == null) {
             throw new NotFoundException("Transaction not found");
-        }
-        if (dto.getType() != null) {
-            if (dto.getType().equals(transaction.getType())) {
-                throw new BadRequestException("Entered the same type");
-            }
-            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
-            transaction.setType(dto.getType());
-            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAmount() != null) {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
@@ -126,14 +124,19 @@ public class TransactionService {
         if (dto.getCategoryId() != null) {
             if (transaction.getCategory().getId() == dto.getCategoryId()) {
                 throw new BadRequestException("Entered the same category id");
+            } else {
+                Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
+                if (category == null) {
+                    category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
+                    if (category == null) {
+                        throw new NotFoundException("Category not found!");
+                    }
+                }
+                transaction.getCategory().getTransactions().remove(transaction);
+                transaction.setType(category.getType());
+                transaction.setCategory(category);
+                category.getTransactions().add(transaction);
             }
-            Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
-            if (category == null) {
-                throw new NotFoundException("Category not found!");
-            }
-            transaction.getCategory().getTransactions().remove(transaction);
-            transaction.setCategory(category);
-            category.getTransactions().add(transaction);
         }
         if (dto.getDescription() != null) {
             transaction.setDescription(dto.getDescription());

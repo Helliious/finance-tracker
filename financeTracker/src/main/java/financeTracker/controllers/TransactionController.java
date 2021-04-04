@@ -23,7 +23,7 @@ public class TransactionController extends AbstractController {
     private ModelMapper modelMapper;
 
     @PutMapping("/accounts/{account_id}/transactions")
-    public RasponseTransactionDTO addTransaction(@Valid @RequestBody AddTransactionRequestDTO dto,
+    public ResponseTransactionDTO addTransaction(@Valid @RequestBody AddTransactionRequestDTO dto,
                                                  @PathVariable(name = "account_id") int accountId,
                                                  HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
@@ -32,7 +32,7 @@ public class TransactionController extends AbstractController {
     }
 
     @GetMapping("/accounts/{account_id}/transactions/{transaction_id}")
-    public RasponseTransactionDTO getById(@PathVariable(name = "account_id") int accountId,
+    public ResponseTransactionDTO getById(@PathVariable(name = "account_id") int accountId,
                                           @PathVariable(name = "transaction_id") int transactionId,
                                           HttpSession session){
         int userId = sessionManager.getLoggedId(session);
@@ -41,7 +41,7 @@ public class TransactionController extends AbstractController {
     }
 
     @GetMapping("/transactions")
-    public List<RasponseTransactionDTO> getAllByUser(HttpSession session){
+    public List<ResponseTransactionDTO> getAllByUser(HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<Transaction> transactions = transactionService.getByOwnerId(userId);
         return transactions.stream()
@@ -50,7 +50,7 @@ public class TransactionController extends AbstractController {
     }
 
     @GetMapping("/accounts/{account_id}/transactions")
-    public List<RasponseTransactionDTO> getAllByAccount(@PathVariable(name = "account_id") int accountId,
+    public List<ResponseTransactionDTO> getAllByAccount(@PathVariable(name = "account_id") int accountId,
                                                         HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<Transaction> transactions = transactionService.getByAccountId(userId, accountId);
@@ -60,7 +60,7 @@ public class TransactionController extends AbstractController {
     }
 
     @DeleteMapping("/accounts/{account_id}/transactions/{transaction_id}")
-    public RasponseTransactionDTO delete(@PathVariable(name = "account_id") int accountId,
+    public ResponseTransactionDTO delete(@PathVariable(name = "account_id") int accountId,
                                          @PathVariable(name = "transaction_id") int transactionId,
                                          HttpSession session){
         int userId = sessionManager.getLoggedId(session);
@@ -68,7 +68,7 @@ public class TransactionController extends AbstractController {
     }
 
     @PostMapping("/accounts/{account_id}/transactions/{transaction_id}")
-    public RasponseTransactionDTO edit(@PathVariable(name = "account_id") int accountId,
+    public ResponseTransactionDTO edit(@PathVariable(name = "account_id") int accountId,
                                        @PathVariable(name = "transaction_id") int transactionId,
                                        @Valid @RequestBody EditTransactionRequestDTO dto,
                                        HttpSession session) {
@@ -78,7 +78,7 @@ public class TransactionController extends AbstractController {
     }
 
     @PostMapping("/transactions")
-    public List<RasponseTransactionDTO> filter(@Valid @RequestBody FilterTransactionRequestDTO dto,
+    public List<ResponseTransactionDTO> filter(@Valid @RequestBody FilterTransactionRequestDTO dto,
                                                HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<Transaction> transactions = transactionService.filter(userId, dto);
@@ -88,7 +88,7 @@ public class TransactionController extends AbstractController {
     }
 
     @PostMapping("/accounts/{account_id}/budgets/{budget_id}/transactions/{transaction_id}")
-    public RasponseTransactionDTO addTransactionToBudget(@PathVariable(name="account_id") int accountId,
+    public ResponseTransactionDTO addTransactionToBudget(@PathVariable(name="account_id") int accountId,
                                                          @PathVariable(name="budget_id") int budgetId,
                                                          @PathVariable(name = "transaction_id") int transactionId,
                                                          HttpSession session){
@@ -97,7 +97,7 @@ public class TransactionController extends AbstractController {
         return convertToTransactionWithoutOwnerAndAccountDTO(transaction);
     }
 
-    private RasponseTransactionDTO convertToTransactionWithoutOwnerAndAccountDTO(Transaction transaction) {
-        return modelMapper.map(transaction, RasponseTransactionDTO.class);
+    private ResponseTransactionDTO convertToTransactionWithoutOwnerAndAccountDTO(Transaction transaction) {
+        return modelMapper.map(transaction, ResponseTransactionDTO.class);
     }
 }

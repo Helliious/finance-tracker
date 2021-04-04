@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @Component
-public class RasponseTransactionDTO {
+public class ResponseTransactionDTO {
     private int id;
     private String type;
     private double amount;
@@ -20,7 +20,7 @@ public class RasponseTransactionDTO {
     private String categoryName;
     private String description;
 
-    public RasponseTransactionDTO(Transaction transaction) {
+    public ResponseTransactionDTO(Transaction transaction) {
         id = transaction.getId();
         type = transaction.getType();
         amount = transaction.getAmount();

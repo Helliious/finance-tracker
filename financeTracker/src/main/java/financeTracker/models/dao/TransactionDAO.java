@@ -5,7 +5,6 @@ import financeTracker.exceptions.NotFoundException;
 import financeTracker.models.dto.transaction_dto.FilterTransactionRequestDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
-import financeTracker.models.repository.BudgetRepository;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import financeTracker.utils.Validator;
@@ -138,6 +137,9 @@ public class TransactionDAO {
                             result.getInt("category_id"),
                             userId
                     );
+                    if (category == null) {
+                        category = categoryRepository.findByIdAndOwnerIsNull(result.getInt("category_id"));
+                    }
                     Validator.validateData(account, category);
                     Transaction transaction = new Transaction(result.getInt("id"),
                             result.getString("type"),
