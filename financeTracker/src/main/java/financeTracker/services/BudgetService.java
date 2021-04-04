@@ -10,7 +10,6 @@ import financeTracker.models.dto.budget_dto.UpdateBudgetRequestDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.AccountRepository;
 import financeTracker.models.repository.BudgetRepository;
-import financeTracker.models.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
