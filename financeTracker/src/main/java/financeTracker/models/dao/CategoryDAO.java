@@ -23,8 +23,8 @@ public class CategoryDAO {
         List<CategoryExpensesDTO> expenses = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT u.username, c.name AS category, COALESCE(SUM(t.amount), 0) + COALESCE(SUM(p.amount), 0) AS expense FROM users u\n" +
                 "LEFT OUTER JOIN categories c ON c.owner_id IS NULL OR c.owner_id = u.id\n" +
-                "LEFT OUTER JOIN transactions t ON u.id = t.owner_id AND c.id = t.category_id AND t.create_time >= NOW() - INTERVAL 1 MONTH\n" +
-                "LEFT OUTER JOIN planned_payments p ON u.id = p.owner_id AND c.id = p.category_id AND p.create_time >= NOW() - INTERVAL 1 MONTH\n" +
+                "LEFT OUTER JOIN transactions t ON u.id = t.owner_id AND c.id = t.category_id AND t.create_time BETWEEN NOW() - INTERVAL 1 MONTH AND NOW()\n" +
+                "LEFT OUTER JOIN planned_payments p ON u.id = p.owner_id AND c.id = p.category_id AND p.create_time BETWEEN NOW() - INTERVAL 1 MONTH AND NOW()\n" +
                 "GROUP BY u.username, c.name;");
 
         try (Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
