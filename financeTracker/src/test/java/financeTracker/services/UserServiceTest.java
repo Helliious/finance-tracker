@@ -1,7 +1,9 @@
 package financeTracker.services;
 
+import financeTracker.exceptions.AuthenticationException;
 import financeTracker.exceptions.BadRequestException;
 import financeTracker.exceptions.NotFoundException;
+import financeTracker.models.dto.user_dto.LoginUserDTO;
 import financeTracker.models.dto.user_dto.RegisterRequestUserDTO;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
@@ -107,5 +109,48 @@ public class UserServiceTest {
         Mockito.when(userRepository.findById(userId))
                 .thenReturn(Optional.empty());
         userService.getUserById(userId);
+    }
+
+    @Test
+    public void testGetUserByIdSuccess() {
+        int userId = 1;
+        User user = new User(new RegisterRequestUserDTO(
+                "test",
+                "test",
+                "dummy",
+                "tesT_1",
+                "tesT_1",
+                "dummy@abv.bg",
+                null
+        ));
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+        User resultUser = userService.getUserById(userId);
+
+        assert(user.getUsername().equals(resultUser.getUsername()));
+        assert(user.getEmail().equals(resultUser.getEmail()));
+        assert(user.getPassword().equals(resultUser.getPassword()));
+        assert(user.getId() == resultUser.getId());
+        assert(user.getFirstName().equals(resultUser.getFirstName()));
+        assert(user.getLastName().equals(resultUser.getLastName()));
+    }
+
+    @Test(expected = AuthenticationException.class)
+    public void testLoginThrowsAuthenticationExceptionWhenUserIsNull() {
+        String username = "test";
+        Mockito.when(userRepository.findByUsername(username))
+                .thenReturn(null);
+        userService.login(new LoginUserDTO());
+    }
+
+    @Test(expected = AuthenticationException.class)
+    public void testLoginThrowsNotFoundExceptionWhenPassNotMatch() {
+        LoginUserDTO loginUserDTO = new LoginUserDTO(
+                "test",
+                "tesT_1"
+        );
+        Mockito.when(userRepository.findByUsername(loginUserDTO.getUsername()))
+                .thenReturn(new User());
+        userService.login(loginUserDTO);
     }
 }
