@@ -78,14 +78,11 @@ public class AccountService {
         if (account == null) {
             throw new NotFoundException("Account not found!");
         }
-        if (accountDTO.getName() != null) {
-            if (account.getName().equals(accountDTO.getName())) {
-                throw new BadRequestException("New account has the same name!");
-            } else if (accountRepository.findAccountByNameAndOwnerId(accountDTO.getName(), userId) != null) {
+        if (accountDTO.getName() != null && !account.getName().equals(accountDTO.getName())) {
+            if (accountRepository.findAccountByNameAndOwnerId(accountDTO.getName(), userId) != null) {
                 throw new BadRequestException("Account name already exists!");
-            } else {
-                account.setName(accountDTO.getName());
             }
+            account.setName(accountDTO.getName());
         }
         if (accountDTO.getAccLimit() != null) {
             if (account.getAccLimit().equals(accountDTO.getAccLimit())) {
