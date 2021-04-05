@@ -108,9 +108,6 @@ public class TransactionService {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getAccountId() != null) {
-            if (accountId == dto.getAccountId()) {
-                throw new BadRequestException("Entered the same account id");
-            }
             Account account = accountRepository.findByIdAndOwnerId(dto.getAccountId(), ownerId);
             if (account == null) {
                 throw new NotFoundException("Account not found");
@@ -122,23 +119,19 @@ public class TransactionService {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         }
         if (dto.getCategoryId() != null) {
-            if (transaction.getCategory().getId() == dto.getCategoryId()) {
-                throw new BadRequestException("Entered the same category id");
-            } else {
-                Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
+            Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
+            if (category == null) {
+                category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
                 if (category == null) {
-                    category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
-                    if (category == null) {
-                        throw new NotFoundException("Category not found!");
-                    }
+                    throw new NotFoundException("Category not found!");
                 }
-                ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
-                transaction.getCategory().getTransactions().remove(transaction);
-                transaction.setType(category.getType());
-                transaction.setCategory(category);
-                category.getTransactions().add(transaction);
-                ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
             }
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
+            transaction.getCategory().getTransactions().remove(transaction);
+            transaction.setType(category.getType());
+            transaction.setCategory(category);
+            category.getTransactions().add(transaction);
+            ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
         }
         if (dto.getDescription() != null) {
             transaction.setDescription(dto.getDescription());

@@ -69,7 +69,7 @@ public class PlannedPaymentController extends AbstractController{
                                           HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.edit(editPlannedPaymentDTO, accountId, userId, plannedPaymentId);
-        return convertToResponsePlannedPaymentDTO(plannedPayment);
+        return new ResponsePlannedPaymentDTO(plannedPayment);
     }
 
     @PostMapping("/planned_payments")

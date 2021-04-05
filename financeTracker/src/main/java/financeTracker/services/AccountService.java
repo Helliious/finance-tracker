@@ -78,31 +78,28 @@ public class AccountService {
         if (account == null) {
             throw new NotFoundException("Account not found!");
         }
-        if (accountDTO.getName() != null && !account.getName().equals(accountDTO.getName())) {
+        if (accountDTO.getName() != null) {
             if (accountRepository.findAccountByNameAndOwnerId(accountDTO.getName(), userId) != null) {
                 throw new BadRequestException("Account name already exists!");
             }
             account.setName(accountDTO.getName());
         }
-        if (accountDTO.getAccLimit() != null) {
-            if (account.getAccLimit().equals(accountDTO.getAccLimit())) {
-                throw new BadRequestException("Entered the same limit!");
-            } else {
-                if (account.getBalance() > accountDTO.getAccLimit()) {
-                    throw new BadRequestException("Balance cannot be bigger than account limit");
-                }
-                account.setAccLimit(accountDTO.getAccLimit());
+        if (accountDTO.getAccLimit() == null) {
+            if (account.getAccLimit() != null) {
+                account.setAccLimit(null);
             }
         }
-        if (accountDTO.getBalance() != null) {
-            if (account.getBalance().equals(accountDTO.getBalance())) {
-                throw new BadRequestException("Entered the same balance!");
-            } else {
-                if (account.getAccLimit() < accountDTO.getBalance()) {
-                    throw new BadRequestException("Balance cannot be bigger than account limit");
-                }
-                account.setBalance(accountDTO.getBalance());
+        if (accountDTO.getAccLimit() != null) {
+            if (account.getAccLimit() != null && account.getBalance() > accountDTO.getAccLimit()) {
+                throw new BadRequestException("Balance cannot be bigger than account limit");
             }
+            account.setAccLimit(accountDTO.getAccLimit());
+        }
+        if (accountDTO.getBalance() != null) {
+            if (account.getAccLimit() != null && account.getAccLimit() < accountDTO.getBalance()) {
+                throw new BadRequestException("Balance cannot be bigger than account limit");
+            }
+            account.setBalance(accountDTO.getBalance());
         }
         accountRepository.save(account);
         return account;

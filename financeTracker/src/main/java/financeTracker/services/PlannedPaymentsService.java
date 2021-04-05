@@ -113,66 +113,47 @@ public class PlannedPaymentsService {
         if (editPlannedPaymentDTO.getName() != null) {
             if (plannedPaymentsRepository.findPlannedPaymentByNameAndAccountId(editPlannedPaymentDTO.getName(), accountId) != null) {
                 throw new BadRequestException("Planned payment name already exists");
-            } else if (plannedPayment.getName().equals(editPlannedPaymentDTO.getName())) {
-                throw new BadRequestException("Entered the same planned payment name");
-            } else {
-                plannedPayment.setName(editPlannedPaymentDTO.getName());
             }
+            plannedPayment.setName(editPlannedPaymentDTO.getName());
         }
         if (editPlannedPaymentDTO.getFrequency() != null) {
             if (editPlannedPaymentDTO.getDurationUnit() == null) {
                 throw new BadRequestException("Frequency and duration unit must be both set");
             }
-            if (plannedPayment.getFrequency() == editPlannedPaymentDTO.getFrequency()) {
-                throw new BadRequestException("Entered the same frequency");
-            } else {
-                plannedPayment.setFrequency(editPlannedPaymentDTO.getFrequency());
-            }
+            plannedPayment.setFrequency(editPlannedPaymentDTO.getFrequency());
         }
         if (editPlannedPaymentDTO.getDurationUnit() != null) {
             if (editPlannedPaymentDTO.getFrequency() == null) {
                 throw new BadRequestException("Frequency and duration unit must be both set");
             }
-            if (plannedPayment.getDurationUnit().equals(editPlannedPaymentDTO.getDurationUnit())) {
-                throw new BadRequestException("Entered the same duration unit");
-            } else {
-                plannedPayment.setDurationUnit(editPlannedPaymentDTO.getDurationUnit());
-            }
+            plannedPayment.setDurationUnit(editPlannedPaymentDTO.getDurationUnit());
         }
         if (editPlannedPaymentDTO.getAmount() != null) {
-            if (plannedPayment.getAmount() == editPlannedPaymentDTO.getAmount()) {
-                throw new BadRequestException("Entered the same amount!");
-            } else {
                 ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.REMOVE);
                 plannedPayment.setAmount(editPlannedPaymentDTO.getAmount());
                 ServiceCalculator.calculateBalance(plannedPayment.getAmount(), plannedPayment.getPaymentType(), plannedPayment.getAccount(), Action.ADD);
-            }
         }
         if (editPlannedPaymentDTO.getDueTime() != null) {
-            if (plannedPayment.getDueTime() == editPlannedPaymentDTO.getDueTime()) {
-                throw new BadRequestException("Entered the same time");
-            } else if (editPlannedPaymentDTO.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) <= 0) {
+            if (editPlannedPaymentDTO.getDueTime().compareTo(new Timestamp(System.currentTimeMillis())) <= 0) {
                 throw new BadRequestException("Invalid due time");
-            } else {
-                plannedPayment.setDueTime(editPlannedPaymentDTO.getDueTime());
             }
+            plannedPayment.setDueTime(editPlannedPaymentDTO.getDueTime());
         }
-        if (editPlannedPaymentDTO.getCategory() != null) {
-            if (plannedPayment.getCategory().getName().equals(editPlannedPaymentDTO.getCategory().getName())) {
-                throw new BadRequestException("Entered the same category");
-            } else {
-                Category category = categoryRepository.findByIdAndOwnerId(
-                        editPlannedPaymentDTO.getCategory().getId(),
-                        userId
-                );
+        if (editPlannedPaymentDTO.getCategoryId() != null) {
+            Category category = categoryRepository.findByIdAndOwnerId(
+                    editPlannedPaymentDTO.getCategoryId(),
+                    userId
+            );
+            if (category == null) {
+                category = categoryRepository.findByIdAndOwnerIsNull(editPlannedPaymentDTO.getCategoryId());
                 if (category == null) {
                     throw new NotFoundException("Category not found!");
                 }
-                plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
-                plannedPayment.setPaymentType(category.getType());
-                category.getPlannedPayments().add(plannedPayment);
-                plannedPayment.setCategory(category);
             }
+            plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
+            plannedPayment.setPaymentType(category.getType());
+            category.getPlannedPayments().add(plannedPayment);
+            plannedPayment.setCategory(category);
         }
         plannedPaymentsRepository.save(plannedPayment);
         return plannedPayment;

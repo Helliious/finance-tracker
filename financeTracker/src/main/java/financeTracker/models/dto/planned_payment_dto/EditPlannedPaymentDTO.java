@@ -23,5 +23,5 @@ public class EditPlannedPaymentDTO {
     private Double amount;
     private Timestamp dueTime;
     private String description;
-    private ResponseCategoryDTO category;
+    private Integer categoryId;
 }

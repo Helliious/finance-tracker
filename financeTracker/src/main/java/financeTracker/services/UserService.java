@@ -55,36 +55,22 @@ public class UserService {
             throw new NotFoundException("User not found");
         }
         if (userDTO.getUsername() != null) {
-            if (user.get().getUsername().equals(userDTO.getUsername())) {
-                throw new BadRequestException("Entered the same username");
-            } else if (userRepository.findByUsername(userDTO.getUsername()) != null) {
+            if (userRepository.findByUsername(userDTO.getUsername()) != null) {
                 throw new BadRequestException("Username already exists");
-            } else {
-                user.get().setUsername(userDTO.getUsername());
             }
+            user.get().setUsername(userDTO.getUsername());
         }
         if (userDTO.getFirstName() != null) {
-            if (user.get().getFirstName().equals(userDTO.getFirstName())) {
-                throw new BadRequestException("Entered the same first name");
-            } else {
-                user.get().setFirstName(userDTO.getFirstName());
-            }
+            user.get().setFirstName(userDTO.getFirstName());
         }
         if (userDTO.getLastName() != null) {
-            if (user.get().getLastName().equals(userDTO.getLastName())) {
-                throw new BadRequestException("Entered the same last name");
-            } else {
-                user.get().setLastName(userDTO.getLastName());
-            }
+            user.get().setLastName(userDTO.getLastName());
         }
         if (userDTO.getEmail() != null) {
-            if (user.get().getEmail().equals(userDTO.getEmail())) {
-                throw new BadRequestException("Entered the same email");
-            } else if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+            if (userRepository.findByEmail(userDTO.getEmail()) != null) {
                 throw new BadRequestException("Email already exists");
-            } else {
-                user.get().setEmail(userDTO.getEmail());
             }
+            user.get().setEmail(userDTO.getEmail());
         }
         User responseUser = userRepository.save(user.get());
         user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());

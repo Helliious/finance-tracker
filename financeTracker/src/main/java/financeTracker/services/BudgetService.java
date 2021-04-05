@@ -82,9 +82,6 @@ public class BudgetService {
             throw new NotFoundException("Account doesn't exist");
         }
         if (dto.getName() != null) {
-            if (budget.getName().equals(dto.getName())) {
-                throw new BadRequestException("Entered the same name");
-            }
             for (Budget b : account.getBudgets()) {
                 if (b.getName().equals(dto.getName())) {
                     throw new BadRequestException("Budget name already taken");
@@ -93,9 +90,6 @@ public class BudgetService {
             budget.setName(dto.getName());
         }
         if (dto.getAmount() != null) {
-            if (budget.getAmount() == dto.getAmount()) {
-                throw new BadRequestException("Entered the same amount");
-            }
             budget.setAmount(dto.getAmount());
         }
         if (dto.getDueTime() != null) {
@@ -105,10 +99,10 @@ public class BudgetService {
             budget.setDueTime(dto.getDueTime());
         }
         if (dto.getLabel() != null) {
-            if (budget.getLabel().equals(dto.getLabel())) {
-                throw new BadRequestException("Entered the same label");
-            }
             budget.setLabel(dto.getLabel());
+        }
+        if (dto.getDescription() != null) {
+            budget.setDescription(dto.getDescription());
         }
         budget.setAccount(account);
         budgetRepository.save(budget);
