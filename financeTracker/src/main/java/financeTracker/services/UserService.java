@@ -8,7 +8,6 @@ import financeTracker.models.dto.user_dto.*;
 import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
-import net.bytebuddy.utility.RandomString;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;

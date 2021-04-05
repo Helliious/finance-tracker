@@ -1,6 +1,7 @@
 package financeTracker.models.dto.user_dto;
 
 import financeTracker.utils.ValidPassword;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Component
 public class RegisterRequestUserDTO {
     @NotBlank(message = "First Name is mandatory")
