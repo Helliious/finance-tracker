@@ -79,8 +79,8 @@ public class UserService {
                 user.get().setEmail(userDTO.getEmail());
             }
         }
-        user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         User responseUser = userRepository.save(user.get());
+        user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         return responseUser;
     }
 
@@ -151,9 +151,11 @@ public class UserService {
         if (encoder.matches(changePasswordDTO.getPassword(), optUser.get().getPassword())) {
             throw new AuthenticationException("Entered the same password as current one!");
         } else {
-            optUser.get().setPassword(encoder.encode(changePasswordDTO.getPassword()));
-            userRepository.save(optUser.get());
-            return optUser.get();
+            User user = optUser.get();
+            user.setPassword(encoder.encode(changePasswordDTO.getPassword()));
+            userRepository.save(user);
+            user.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
+            return user;
         }
     }
 

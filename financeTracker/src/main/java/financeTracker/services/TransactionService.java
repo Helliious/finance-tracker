@@ -132,10 +132,12 @@ public class TransactionService {
                         throw new NotFoundException("Category not found!");
                     }
                 }
+                ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
                 transaction.getCategory().getTransactions().remove(transaction);
                 transaction.setType(category.getType());
                 transaction.setCategory(category);
                 category.getTransactions().add(transaction);
+                ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.ADD);
             }
         }
         if (dto.getDescription() != null) {
