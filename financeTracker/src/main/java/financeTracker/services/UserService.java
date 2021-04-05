@@ -9,12 +9,17 @@ import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import net.bytebuddy.utility.RandomString;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,10 +34,13 @@ public class UserService {
     public User addUser(RegisterRequestUserDTO userDTO) {
         userDTO.setCreateTime(new Timestamp(System.currentTimeMillis()));
         if (userRepository.findByUsername(userDTO.getUsername()) != null) {
-            throw new BadRequestException("Username already exists!");
+            throw new BadRequestException("Username already exists");
         }
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-            throw new BadRequestException("Email already exists!");
+            throw new BadRequestException("Email already exists");
+        }
+        if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
+            throw new BadRequestException("Confirm password doesn't match");
         }
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         userDTO.setPassword(encoder.encode(userDTO.getPassword()));
@@ -45,36 +53,36 @@ public class UserService {
     public User editUser(UpdateRequestUserDTO userDTO, int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
         if (userDTO.getUsername() != null) {
             if (user.get().getUsername().equals(userDTO.getUsername())) {
-                throw new BadRequestException("Entered the same username!");
+                throw new BadRequestException("Entered the same username");
             } else if (userRepository.findByUsername(userDTO.getUsername()) != null) {
-                throw new BadRequestException("Username already exists!");
+                throw new BadRequestException("Username already exists");
             } else {
                 user.get().setUsername(userDTO.getUsername());
             }
         }
         if (userDTO.getFirstName() != null) {
             if (user.get().getFirstName().equals(userDTO.getFirstName())) {
-                throw new BadRequestException("Entered the same first name!");
+                throw new BadRequestException("Entered the same first name");
             } else {
                 user.get().setFirstName(userDTO.getFirstName());
             }
         }
         if (userDTO.getLastName() != null) {
             if (user.get().getLastName().equals(userDTO.getLastName())) {
-                throw new BadRequestException("Entered the same last name!");
+                throw new BadRequestException("Entered the same last name");
             } else {
                 user.get().setLastName(userDTO.getLastName());
             }
         }
         if (userDTO.getEmail() != null) {
             if (user.get().getEmail().equals(userDTO.getEmail())) {
-                throw new BadRequestException("Entered the same email!");
+                throw new BadRequestException("Entered the same email");
             } else if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-                throw new BadRequestException("Email already exists!");
+                throw new BadRequestException("Email already exists");
             } else {
                 user.get().setEmail(userDTO.getEmail());
             }
@@ -112,7 +120,7 @@ public class UserService {
     public UserWithoutPassDTO deleteUser(int userId) {
         Optional<User> optUser = userRepository.findById(userId);
         if (optUser.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
         User user = optUser.get();
         user.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
@@ -125,12 +133,17 @@ public class UserService {
     public User forgotPass(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
-        String generatedPass = RandomString.make(20);
-        String mailMessage = "New password: " + generatedPass;
+        List<CharacterRule> characterRules = new ArrayList<>();
+        characterRules.add(new CharacterRule(EnglishCharacterData.Digit));
+        characterRules.add(new CharacterRule(EnglishCharacterData.Alphabetical));
+        characterRules.add(new CharacterRule(EnglishCharacterData.Special));
+        PasswordGenerator passwordGenerator = new PasswordGenerator();
+        String password = passwordGenerator.generatePassword(15, characterRules);
+        String mailMessage = "New password: " + password;
         PasswordEncoder encoder = new BCryptPasswordEncoder();
-        user.setPassword(encoder.encode(generatedPass));
+        user.setPassword(encoder.encode(password));
         userRepository.save(user);
         emailService.sendPassword(email, "Forgot password", mailMessage);
         return user;
@@ -140,16 +153,16 @@ public class UserService {
         Optional<User> optUser = userRepository.findById(userId);
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         if (optUser.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
         if (!encoder.matches(changePasswordDTO.getCurrentPassword(), optUser.get().getPassword())) {
-            throw new AuthenticationException("Invalid current password!");
+            throw new AuthenticationException("Invalid current password");
         }
         if (!changePasswordDTO.getPassword().equals(changePasswordDTO.getConfirmPassword())) {
-            throw new AuthenticationException("Confirm password doesn't match!");
+            throw new AuthenticationException("Confirm password doesn't match");
         }
         if (encoder.matches(changePasswordDTO.getPassword(), optUser.get().getPassword())) {
-            throw new AuthenticationException("Entered the same password as current one!");
+            throw new AuthenticationException("Entered the same password as current one");
         } else {
             User user = optUser.get();
             user.setPassword(encoder.encode(changePasswordDTO.getPassword()));
@@ -162,7 +175,7 @@ public class UserService {
     public User logoutUser(int userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User not found");
         }
         user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         return user.get();
