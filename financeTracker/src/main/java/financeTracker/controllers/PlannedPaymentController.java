@@ -40,7 +40,7 @@ public class PlannedPaymentController extends AbstractController{
                                              HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.getById(accountId, userId, plannedPaymentId);
-        return convertToResponsePlannedPaymentDTO(plannedPayment);
+        return new ResponsePlannedPaymentDTO(plannedPayment);
     }
 
     @GetMapping("/accounts/{account_id}/planned_payments")
@@ -59,7 +59,7 @@ public class PlannedPaymentController extends AbstractController{
                                             HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         PlannedPayment plannedPayment = plannedPaymentsService.delete(accountId, userId, plannedPaymentId);
-        return convertToResponsePlannedPaymentDTO(plannedPayment);
+        return new ResponsePlannedPaymentDTO(plannedPayment);
     }
 
     @PostMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")

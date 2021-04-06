@@ -1,6 +1,5 @@
 package financeTracker.models.dto.planned_payment_dto;
 
-import financeTracker.models.dto.category_dto.ResponseCategoryDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
