@@ -12,6 +12,7 @@ import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.PlannedPaymentsRepository;
 import financeTracker.models.repository.UserRepository;
 import financeTracker.utils.Action;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,19 +37,14 @@ public class PlannedPaymentsService {
         plannedPaymentDTO.setDueTime(new Timestamp(System.currentTimeMillis()));
         Optional<User> optUser = userRepository.findById(userId);
         Account account = accountRepository.findByIdAndOwnerId(accountId, userId);
-        Category category = categoryRepository.findByIdAndOwnerId(plannedPaymentDTO.getCategoryId(), userId);
+        Category category = categoryRepository.findById(plannedPaymentDTO.getCategoryId());
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found");
         }
         if (account == null) {
             throw new NotFoundException("Account not found");
         }
-        if (category == null) {
-            category = categoryRepository.findByIdAndOwnerIsNull(plannedPaymentDTO.getCategoryId());
-            if (category == null) {
-                throw new NotFoundException("Category not found");
-            }
-        }
+        Validator.validateCategory(category, userId);
         if (!plannedPaymentDTO.getPaymentType().equals(category.getType())) {
             throw new BadRequestException("Payment type and category type must match");
         }
@@ -140,16 +136,8 @@ public class PlannedPaymentsService {
             plannedPayment.setDueTime(editPlannedPaymentDTO.getDueTime());
         }
         if (editPlannedPaymentDTO.getCategoryId() != null) {
-            Category category = categoryRepository.findByIdAndOwnerId(
-                    editPlannedPaymentDTO.getCategoryId(),
-                    userId
-            );
-            if (category == null) {
-                category = categoryRepository.findByIdAndOwnerIsNull(editPlannedPaymentDTO.getCategoryId());
-                if (category == null) {
-                    throw new NotFoundException("Category not found!");
-                }
-            }
+            Category category = categoryRepository.findById(editPlannedPaymentDTO.getCategoryId().intValue());
+            Validator.validateCategory(category, userId);
             plannedPayment.getCategory().getPlannedPayments().remove(plannedPayment);
             plannedPayment.setPaymentType(category.getType());
             category.getPlannedPayments().add(plannedPayment);

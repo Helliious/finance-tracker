@@ -58,6 +58,11 @@ public class PlannedPaymentDAO {
         if (plannedPaymentRequestDTO.getFrequency() != null && plannedPaymentRequestDTO.getDurationUnit() != null) {
             sql.append("AND frequency = ? AND duration_unit = ? ");
             frequencyIncluded = true;
+        } else {
+            if (plannedPaymentRequestDTO.getFrequency() != null && plannedPaymentRequestDTO.getDurationUnit() == null ||
+                    plannedPaymentRequestDTO.getFrequency() == null && plannedPaymentRequestDTO.getDurationUnit() != null) {
+                throw new BadRequestException("Filter needs both frequency and duration unit to work properly");
+            }
         }
         if (plannedPaymentRequestDTO.getAmountFrom() != null && plannedPaymentRequestDTO.getAmountTo() != null) {
             if (plannedPaymentRequestDTO.getAmountFrom() < plannedPaymentRequestDTO.getAmountTo()) {
@@ -168,10 +173,8 @@ public class PlannedPaymentDAO {
                             result.getInt("account_id"),
                             userId
                     );
-                    Category category = categoryRepository.findByIdAndOwnerId(
-                            result.getInt("category_id"),
-                            userId
-                    );
+                    Category category = categoryRepository.findById(result.getInt("category_id"));
+                    Validator.validateCategory(category, userId);
                     Validator.validateData(account, category);
                     PlannedPayment plannedPayment = new PlannedPayment(result.getInt("id"),
                             result.getString("name"),

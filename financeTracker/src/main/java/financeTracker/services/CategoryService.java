@@ -10,6 +10,7 @@ import financeTracker.models.pojo.User;
 import financeTracker.models.repository.CategoryRepository;
 import financeTracker.models.repository.UserRepository;
 import financeTracker.utils.PDFCreator;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -50,13 +51,8 @@ public class CategoryService {
     }
 
     public Category getById(int categoryId, int userId) {
-        Category category = categoryRepository.findByIdAndOwnerId(categoryId, userId);
-        if (category == null) {
-            category = categoryRepository.findByIdAndOwnerIsNull(categoryId);
-            if (category == null) {
-                throw new NotFoundException("Category not found!");
-            }
-        }
+        Category category = categoryRepository.findById(categoryId);
+        Validator.validateCategory(category, userId);
         return category;
     }
 

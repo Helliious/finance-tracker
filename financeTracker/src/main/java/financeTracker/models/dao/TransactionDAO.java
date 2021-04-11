@@ -133,13 +133,8 @@ public class TransactionDAO {
                             result.getInt("account_id"),
                             userId
                     );
-                    Category category = categoryRepository.findByIdAndOwnerId(
-                            result.getInt("category_id"),
-                            userId
-                    );
-                    if (category == null) {
-                        category = categoryRepository.findByIdAndOwnerIsNull(result.getInt("category_id"));
-                    }
+                    Category category = categoryRepository.findById(result.getInt("category_id"));
+                    Validator.validateCategory(category, userId);
                     Validator.validateData(account, category);
                     Transaction transaction = new Transaction(result.getInt("id"),
                             result.getString("type"),

@@ -10,6 +10,7 @@ import financeTracker.models.dto.transaction_dto.ResponseTransactionDTO;
 import financeTracker.models.pojo.*;
 import financeTracker.models.repository.*;
 import financeTracker.utils.Action;
+import financeTracker.utils.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,17 +68,12 @@ public class TransactionService {
     public Transaction addTransactionToAccount(int accountId, AddTransactionRequestDTO dto, int ownerId) {
         dto.setCreateTime(new Timestamp(System.currentTimeMillis()));
         Account account = accountRepository.findByIdAndOwnerId(accountId, ownerId);
-        Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
+        Category category = categoryRepository.findById(dto.getCategoryId());
         Optional<User> optUser = userRepository.findById(ownerId);
         if (account == null){
             throw new NotFoundException("Account not found");
         }
-        if (category == null) {
-            category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
-            if (category == null) {
-                throw new NotFoundException("Category not found");
-            }
-        }
+        Validator.validateCategory(category, ownerId);
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found");
         }
@@ -119,13 +115,8 @@ public class TransactionService {
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), account, Action.ADD);
         }
         if (dto.getCategoryId() != null) {
-            Category category = categoryRepository.findByIdAndOwnerId(dto.getCategoryId(), ownerId);
-            if (category == null) {
-                category = categoryRepository.findByIdAndOwnerIsNull(dto.getCategoryId());
-                if (category == null) {
-                    throw new NotFoundException("Category not found!");
-                }
-            }
+            Category category = categoryRepository.findById(dto.getCategoryId().intValue());
+            Validator.validateCategory(category, ownerId);
             ServiceCalculator.calculateBalance(transaction.getAmount(), transaction.getType(), transaction.getAccount(), Action.REMOVE);
             transaction.getCategory().getTransactions().remove(transaction);
             transaction.setType(category.getType());
@@ -160,13 +151,8 @@ public class TransactionService {
         if (optUser.isEmpty()) {
             throw new NotFoundException("User not found!");
         }
-        Category category = categoryRepository.findByIdAndOwnerId(transaction.getCategory().getId(), ownerId);
-        if (category == null) {
-            category = categoryRepository.findByIdAndOwnerIsNull(transaction.getCategory().getId());
-            if (category == null) {
-                throw new NotFoundException("Category not found!");
-            }
-        }
+        Category category = categoryRepository.findById(transaction.getCategory().getId());
+        Validator.validateCategory(category, ownerId);
         if (budget.getBudgetTransactions().contains(transaction)) {
             throw new BadRequestException("Transaction already exist in budget");
         }

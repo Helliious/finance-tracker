@@ -73,7 +73,7 @@ public class UserService {
             user.get().setEmail(userDTO.getEmail());
         }
         User responseUser = userRepository.save(user.get());
-        user.get().getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
+        responseUser.getCategories().addAll(categoryRepository.findAllByOwnerIsNull());
         return responseUser;
     }
 

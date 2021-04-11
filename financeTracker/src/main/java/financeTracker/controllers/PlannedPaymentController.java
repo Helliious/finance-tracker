@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class PlannedPaymentController extends AbstractController{
@@ -48,9 +48,11 @@ public class PlannedPaymentController extends AbstractController{
                                                   HttpSession session) {
         int userId = sessionManager.getLoggedId(session);
         List<PlannedPayment> plannedPayments = plannedPaymentsService.getAll(accountId, userId);
-        return plannedPayments.stream()
-                .map(this::convertToResponsePlannedPaymentDTO)
-                .collect(Collectors.toList());
+        List<ResponsePlannedPaymentDTO> response = new ArrayList<>();
+        for (PlannedPayment p : plannedPayments) {
+            response.add(new ResponsePlannedPaymentDTO(p));
+        }
+        return response;
     }
 
     @DeleteMapping("/accounts/{account_id}/planned_payments/{planned_payment_id}")
@@ -77,12 +79,10 @@ public class PlannedPaymentController extends AbstractController{
                                                   HttpSession session){
         int userId = sessionManager.getLoggedId(session);
         List<PlannedPayment> plannedPayments = plannedPaymentsService.filter(userId, plannedPaymentRequestDTO);
-        return plannedPayments.stream()
-                .map(this::convertToResponsePlannedPaymentDTO)
-                .collect(Collectors.toList());
-    }
-
-    private ResponsePlannedPaymentDTO convertToResponsePlannedPaymentDTO(PlannedPayment plannedPayment) {
-        return modelMapper.map(plannedPayment, ResponsePlannedPaymentDTO.class);
+        List<ResponsePlannedPaymentDTO> response = new ArrayList<>();
+        for (PlannedPayment p : plannedPayments) {
+            response.add(new ResponsePlannedPaymentDTO(p));
+        }
+        return response;
     }
 }

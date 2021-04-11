@@ -8,6 +8,6 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     List<Category> findAllByOwnerId(int ownerId);
     List<Category> findAllByOwnerIsNull();
+    Category findById(int categoryId);
     Category findByIdAndOwnerId(int categoryId, int ownerId);
-    Category findByIdAndOwnerIsNull(int categoryId);
 }
