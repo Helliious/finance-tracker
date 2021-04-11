@@ -19,6 +19,7 @@ is processed using the latest technologies in software and design.
 - Spring Rest
 - Maven
 - JPA
+- JUnit
 - MySQL
 - BCrypt
 - Lombok
